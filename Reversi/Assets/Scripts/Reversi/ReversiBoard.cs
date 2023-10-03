@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,8 +6,12 @@ namespace Reversi
 {
     [System.Serializable]
 
+
     public class Board
     {
+
+        // --- private ---
+        // enum
         private enum Direction
         {
             None = 0,
@@ -20,15 +25,47 @@ namespace Reversi
             UpperRight = 128,
         }
 
+        // variable
         private DiscColor[,] rawBoard = new DiscColor[Constant.BoardSize + 2, Constant.BoardSize + 2];
-        private int turn;
+        private uint turn;
         private DiscColor currentColor;
-
-        [SerializeField]
         private List<List<Disc>> updatedDiscList = new List<List<Disc>>();
-        
+        [SerializeField]
         private List<Point> movablePointList = new List<Point>(Constant.MaxTurn + 1);
-        private int[,,] moveableDirection = new int[Constant.MaxTurn,Constant.BoardSize+2,Constant.BoardSize+2];
+        private uint[,,] moveableDirection = new uint[Constant.MaxTurn,Constant.BoardSize+2,Constant.BoardSize+2];
+        // ColorStorage discList = new ColorStorage();
+
+
+        // method
+        private void FlipDiscs(in Point point)
+        {
+
+        }
+
+        private uint CheckMobility(in Disc disc)
+        {
+            if (rawBoard[disc.x, disc.y] != DiscColor.Empty) return ((uint)Direction.None);
+
+            int x, y;
+            uint dir = (uint)Direction.None;
+
+            //if ((int)rawBoard[disc.x,disc.y-1] == -(int)disc.color)
+            //{
+            //    x = disc.x;
+            //    y = disc.y - 2;
+            //    while ((int)rawBoard[x,y] == ())
+            //}
+            return 0;
+        }
+
+        private void InitMovable()
+        {
+
+        }
+
+
+        // --- public ---
+        // method
 
         public void Init()
         {
@@ -55,7 +92,7 @@ namespace Reversi
             return false;
         }
 
-        public int CountDisc(DiscColor color)
+        public uint CountDisc(DiscColor color)
         {
             return 0;
         }
@@ -75,12 +112,12 @@ namespace Reversi
             return new List<Disc>();
         }
 
-        DiscColor GetCurrentColor()
+        public DiscColor GetCurrentColor()
         {
             return DiscColor.Empty;
         }
 
-        int GetTurns()
+        public uint GetTurns()
         {
             return 0;
         }
