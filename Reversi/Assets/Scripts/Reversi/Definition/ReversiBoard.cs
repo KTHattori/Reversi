@@ -33,7 +33,7 @@ namespace Reversi
         private List<List<Disc>> updatedDiscList = new List<List<Disc>>();
 
         [SerializeField]
-        private List<Point>[] movablePointList = new List<Point>[Constant.BoardSize + 1];
+        private List<Point>[] movablePointList = new List<Point>[Constant.MaxTurn + 1];
         private Direction[,,] movableDirection = new Direction[Constant.MaxTurn,Constant.BoardSize+2,Constant.BoardSize+2];
         DiscColorStorage<int> discAmount = new DiscColorStorage<int>();
 
@@ -507,11 +507,22 @@ namespace Reversi
         /// <summary>
         /// point で指定された座標の色を返す。
         /// </summary>
-        /// <param name="point">指定されたボード上の座標</param>
+        /// <param name="point">指定されたボード座標上の色</param>
         /// <returns></returns>
         public DiscColor GetColor(in Point point)
         {
             return rawBoard[point.x,point.y];
+        }
+
+        /// <summary>
+        /// x,y の整数値で指定された座標の色を返す
+        /// </summary>
+        /// <param name="x">x座標</param>
+        /// <param name="y">y座標</param>
+        /// <returns>指定されたボード座標上の色</returns>
+        public DiscColor GetColor(int x,int y)
+        {
+            return rawBoard[x,y];
         }
 
         /// <summary>

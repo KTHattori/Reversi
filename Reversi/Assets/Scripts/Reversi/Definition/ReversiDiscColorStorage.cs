@@ -15,8 +15,8 @@ namespace Reversi
         // インデクサ定義
         public T this[DiscColor color]
         {
-            set { data[(int)color] = value; }
-            get { return data[(int)color]; }
+            set { data[(int)color + 1] = value; }
+            get { return data[(int)color + 1]; }
         }
     }
 }
