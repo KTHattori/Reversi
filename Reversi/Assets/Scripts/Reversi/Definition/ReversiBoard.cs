@@ -2,6 +2,7 @@
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using System;
 
 namespace Reversi
 {
@@ -10,11 +11,11 @@ namespace Reversi
     {
         // --- private ---
         // enum
-        [System.Flags]
+        [Flags]
         private enum Direction
         {
             None        = 0,
-            Upper       = 1,
+            Upper       = 1 << 0,
             UpperLeft   = 1 << 1,
             Left        = 1 << 2,
             LowerLeft   = 1 << 3,
@@ -33,6 +34,7 @@ namespace Reversi
         private List<List<Disc>> updatedDiscList = new List<List<Disc>>();
 
         [SerializeField]
+
         private List<Point>[] movablePointList = new List<Point>[Constant.MaxTurn + 1];
         private Direction[,,] movableDirection = new Direction[Constant.MaxTurn,Constant.BoardSize+2,Constant.BoardSize+2];
         DiscColorStorage<int> discAmount = new DiscColorStorage<int>();
@@ -48,25 +50,24 @@ namespace Reversi
         private void FlipDiscs(in Point point)
         {
             int x,y;
-            Disc operation = new Disc(point.x,point.y,currentColor);
 
             Direction dir = movableDirection[currentTurn,point.x,point.y];
             
             List<Disc> update = new List<Disc>();
 
             rawBoard[point.x,point.y] = currentColor;
-            update.Add(operation);
+            update.Add(new Disc(point.x,point.y,currentColor));
+
+            Debug.Log(dir);
 
             // 上に置ける場合
             if(dir.HasFlag(Direction.Upper))
             {
                 y = point.y;
-                operation.x = point.x;
                 while(rawBoard[point.x,--y] != currentColor)
                 {
                     rawBoard[point.x,y] = currentColor;
-                    operation.y = y;
-                    update.Add(operation);
+                    update.Add(new Disc(point.x,y,currentColor));
                 }
             }
 
@@ -74,12 +75,10 @@ namespace Reversi
             if(dir.HasFlag(Direction.Lower))
             {
                 y = point.y;
-                operation.x = point.x;
                 while(rawBoard[point.x,++y] != currentColor)
                 {
                     rawBoard[point.x,y] = currentColor;
-                    operation.y = y;
-                    update.Add(operation);
+                    update.Add(new Disc(point.x,y,currentColor));
                 }
             }
 
@@ -87,12 +86,10 @@ namespace Reversi
             if(dir.HasFlag(Direction.Left))
             {
                 x = point.x;
-                operation.y = point.y;
                 while(rawBoard[--x,point.y] != currentColor)
                 {
                     rawBoard[x,point.y] = currentColor;
-                    operation.x = x;
-                    update.Add(operation);
+                    update.Add(new Disc(x,point.y,currentColor));
                 }
             }
 
@@ -100,12 +97,10 @@ namespace Reversi
             if(dir.HasFlag(Direction.Right))
             {
                 x = point.x;
-                operation.y = point.y;
                 while(rawBoard[++x,point.y] != currentColor)
                 {
                     rawBoard[x,point.y] = currentColor;
-                    operation.x = x;
-                    update.Add(operation);
+                    update.Add(new Disc(x,point.y,currentColor));
                 }
             }
 
@@ -117,9 +112,7 @@ namespace Reversi
                 while(rawBoard[++x,--y] != currentColor)
                 {
                     rawBoard[x,y] = currentColor;
-                    operation.x = x;
-                    operation.y = y;
-                    update.Add(operation);
+                    update.Add(new Disc(x,y,currentColor));
                 }
             }
 
@@ -131,9 +124,7 @@ namespace Reversi
                 while(rawBoard[--x,--y] != currentColor)
                 {
                     rawBoard[x,y] = currentColor;
-                    operation.x = x;
-                    operation.y = y;
-                    update.Add(operation);
+                    update.Add(new Disc(x,y,currentColor));
                 }
             }
 
@@ -145,9 +136,7 @@ namespace Reversi
                 while(rawBoard[--x,++y] != currentColor)
                 {
                     rawBoard[x,y] = currentColor;
-                    operation.x = x;
-                    operation.y = y;
-                    update.Add(operation);
+                    update.Add(new Disc(x,y,currentColor));
                 }
             }
 
@@ -159,15 +148,14 @@ namespace Reversi
                 while(rawBoard[++x,++y] != currentColor)
                 {
                     rawBoard[x,y] = currentColor;
-                    operation.x = x;
-                    operation.y = y;
-                    update.Add(operation);
+                    update.Add(new Disc(x,y,currentColor));
                 }
             }
 
 
             // 石の数を更新、反映
             int discdiff = update.Count;
+            Debug.Log(discdiff);
 
             discAmount[currentColor] += discdiff;
             discAmount[currentColor.GetInvertedColor()] -= discdiff - 1;
@@ -274,18 +262,16 @@ namespace Reversi
         /// </summary>
         private void InitMovable()
         {
-            Disc disc = new Disc(0,0,currentColor);
+            Disc disc;
                 
             Direction dir;
             movablePointList[currentTurn].Clear();
 
-            for(int x = 1; x <= Constant.BoardSize; x++)
+            for(int x = 0; x < Constant.BoardSize; x++)
             {
-                disc.x = x;
-                for(int y = 1; y <= Constant.BoardSize; y++)
+                for(int y = 0; y < Constant.BoardSize; y++)
                 {
-                    disc.y = y;
-
+                    disc = new Disc(x,y,currentColor);
                     dir = CheckMobility(disc);
                     if(dir != Direction.None)
                     {

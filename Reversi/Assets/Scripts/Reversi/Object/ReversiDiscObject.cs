@@ -12,18 +12,22 @@ public class ReversiDiscObject : MonoBehaviour
     [SerializeField]
     Disc _disc;
 
+    public Point point { get{return _disc;} }
+
+    public DiscColor color {get { return _disc.color;}}
+
     public void Set(Disc disc)
     {
         _disc = disc;
-        ApplyAppearance(disc.color);
+        ApplyAppearance(_disc.color);
     }
 
     public void Place()
     {
-        
+        ReversiBoardObject.PlaceDisc(_disc);
     }
 
-    void ApplyAppearance(DiscColor color)
+    public void ApplyAppearance(DiscColor color)
     {
         switch(color)
         {
@@ -52,7 +56,7 @@ public class ReversiDiscObject : MonoBehaviour
 
     void OnValidate()
     {
-        ApplyAppearance(_disc.color);
+        // ApplyAppearance();
     }
 
     // Start is called before the first frame update
