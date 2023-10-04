@@ -1,5 +1,8 @@
-namespace Reversi
+﻿namespace Reversi
 {
+    /// <summary>
+    /// オセロのマス座標を表すクラス
+    /// </summary>
     [System.Serializable]
     public class Point
     {

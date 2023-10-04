@@ -1,5 +1,8 @@
-namespace Reversi
+﻿namespace Reversi
 {
+    /// <summary>
+    /// オセロの石を表すクラス
+    /// </summary>
     [System.Serializable]
     public class Disc : Point
     {
