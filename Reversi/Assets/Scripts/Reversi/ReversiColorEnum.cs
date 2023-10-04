@@ -21,7 +21,7 @@
         /// </summary>
         /// <param name="color"></param>
         /// <returns></returns>
-        public static DiscColor Inverted(this DiscColor color)
+        public static DiscColor GetInvertedColor(this DiscColor color)
         {
             switch(color)
             {
