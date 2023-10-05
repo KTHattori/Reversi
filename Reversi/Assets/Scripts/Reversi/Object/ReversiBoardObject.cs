@@ -6,8 +6,11 @@ using TMPro;
 
 public class ReversiBoardObject : MonoBehaviour
 {
-    [SerializeField]
-    static Board _board;
+    static Board _board = null;
+    
+    static ReversiBoardObject instance = null;
+
+    static ReversiDiscObject[,] objBoard = null;
 
     [SerializeField]
     Transform parentUI;
@@ -27,23 +30,18 @@ public class ReversiBoardObject : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI messageText;
 
-    [SerializeField]
+    [SerializeField,Header("配置可能マス")]
     List<Point> movable = null;
 
-    static ReversiBoardObject instance = null;
-
-    static ReversiDiscObject[,] objBoard = new ReversiDiscObject[Constant.BoardSize + 2, Constant.BoardSize + 2];
-
-    static void DebugInfo()
-    {
-        instance.movable = _board.CurrentMovablePoints;
-    }
+    [SerializeField,Header("配置可能マスカラー")]
+    Color movableColor = Color.yellow;
 
     // Start is called before the first frame update
     void Start()
     {
         if(instance) {GameObject.Destroy(instance.gameObject);}
         instance = this;
+        objBoard = new ReversiDiscObject[Constant.BoardSize + 2, Constant.BoardSize + 2];
         _board = new Board();
         for(int x = 0;x < Constant.BoardSize + 2; x++)
         {
@@ -53,15 +51,16 @@ public class ReversiBoardObject : MonoBehaviour
                 ReversiDiscObject discObj = obj.GetComponent<ReversiDiscObject>();
                 Disc disc = new Disc(x,y,_board.GetColor(x,y));
                 
-                discObj.Set(disc);
+                discObj.Init(disc);
                 objBoard[x,y] = discObj;
             }
         }
 
+        HighlightMovable();
+
         SetTurn();
         SetMessage("Game Start!");
-
-        DebugInfo();
+        result.Hide();
     }
 
     static public void PlaceDisc(Disc disc)
@@ -73,8 +72,11 @@ public class ReversiBoardObject : MonoBehaviour
             foreach(Disc updated in updatedList)
             {
                 Debug.Log($"Flipped disc at: {updated.x}, {updated.y}");
-                objBoard[updated.x,updated.y].Set(updated);
+                objBoard[updated.x,updated.y].SetDiscColor(updated.discColor);
             }
+            HighlightMovable();
+
+            SetTurn();
             SetMessage("");
         }
         else
@@ -86,11 +88,9 @@ public class ReversiBoardObject : MonoBehaviour
         if(_board.IsGameOver())
         {
             instance.result.Show();
-            instance.result.SetResult(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
+            instance.result.SetResult(_board.CountDisc(DiscType.Black),_board.CountDisc(DiscType.White));
             SetMessage("");
         }
-
-        SetTurn();
     }
 
     static public void Pass()
@@ -98,6 +98,7 @@ public class ReversiBoardObject : MonoBehaviour
         if(_board.Pass())
         {
             SetMessage("Passed!");
+            HighlightMovable();
             SetTurn();
         }
         else
@@ -114,9 +115,11 @@ public class ReversiBoardObject : MonoBehaviour
             {
                 for(int y = 0; y < Constant.BoardSize + 2; y++)
                 {
-                    objBoard[x,y].Set(new Disc(x,y,_board.GetColor(x,y)));
+                    objBoard[x,y].SetDiscColor(_board.GetColor(x,y));
                 }
             }
+
+            HighlightMovable();
 
             SetMessage("Undone!");
             SetTurn();
@@ -129,14 +132,46 @@ public class ReversiBoardObject : MonoBehaviour
 
     static public void Restart()
     {
-        
+        _board = new Board();
+        for(int x = 0;x < Constant.BoardSize + 2; x++)
+        {
+            for(int y = 0; y < Constant.BoardSize + 2; y++)
+            {
+                Disc disc = new Disc(x,y,_board.GetColor(x,y));
+                objBoard[x,y].Init(disc);
+            }
+        }
+
+        HighlightMovable();
+
+        SetTurn();
+        SetMessage("Game Start!");
+        instance.result.Hide();
+    }
+
+    static public void HighlightMovable()
+    {
+        // previous movable
+        foreach(Point point in instance.movable)
+        {
+            objBoard[point.x,point.y].SetImageColor(objBoard[point.x,point.y].DiscColor.ToColor());
+        }
+
+        // get
+        instance.movable = _board.GetMovablePoint();
+
+        // current movable
+        foreach(Point point in instance.movable)
+        {
+            objBoard[point.x,point.y].SetImageColor(instance.movableColor);
+        }
     }
 
     static public void SetTurn()
     {
         instance.turnText.SetText(_board.GetCurrentTurn().ToString());
         if(instance.background) instance.background.color = _board.GetCurrentColor().ToColor();
-        DebugInfo();
+        instance.movable = _board.GetMovablePoint();
     }
 
     static public void SetMessage(string msg)

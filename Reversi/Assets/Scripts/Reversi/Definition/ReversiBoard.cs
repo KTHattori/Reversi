@@ -26,10 +26,10 @@ namespace Reversi
         }
 
         // variable
-        private DiscColor[,] rawBoard = new DiscColor[Constant.BoardSize + 2, Constant.BoardSize + 2];
+        private DiscType[,] rawBoard = new DiscType[Constant.BoardSize + 2, Constant.BoardSize + 2];
 
         private int currentTurn;
-        private DiscColor currentColor;
+        private DiscType currentColor;
 
         private List<List<Disc>> updatedDiscList = new List<List<Disc>>();
 
@@ -161,7 +161,7 @@ namespace Reversi
 
             discAmount[currentColor] += discdiff;
             discAmount[currentColor.GetInvertedColor()] -= discdiff - 1;
-            discAmount[DiscColor.Empty]--;
+            discAmount[DiscType.Empty]--;
 
             updatedDiscList.Add(update);
         }
@@ -177,89 +177,89 @@ namespace Reversi
         {
             // 既に石が置かれていたら置けない
             // not placeable if a disc is already placed
-            if (rawBoard[disc.x, disc.y] != DiscColor.Empty) return Direction.None;
+            if (rawBoard[disc.x, disc.y] != DiscType.Empty) return Direction.None;
 
             int x, y;
             Direction dir = Direction.None;
 
             // 上 - Upper
-            if (rawBoard[disc.x,disc.y - 1] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x,disc.y - 1] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x;
                 y = disc.y - 2;
-                while (rawBoard[x,y] == disc.color.GetInvertedColor()) { y--; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.Upper;
+                while (rawBoard[x,y] == disc.discColor.GetInvertedColor()) { y--; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.Upper;
                 Debug.Log("Upper");
             }
 
             // 下 - Lower
-            if (rawBoard[disc.x,disc.y + 1] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x,disc.y + 1] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x;
                 y = disc.y + 2;
-                while (rawBoard[x,y] == disc.color.GetInvertedColor()) { y++; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.Lower;
+                while (rawBoard[x,y] == disc.discColor.GetInvertedColor()) { y++; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.Lower;
                 Debug.Log("Lower");
             }
 
             // 左 - Left
-            if (rawBoard[disc.x - 1, disc.y] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x - 1, disc.y] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x - 2;
                 y = disc.y;
-                while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x--; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.Left;
+                while (rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x--; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.Left;
                 Debug.Log("Left");
             }
 
             // 右 - Right
-            if (rawBoard[disc.x + 1, disc.y] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x + 1, disc.y] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x + 2;
                 y = disc.y;
-                while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x++; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.Right;
+                while (rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x++; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.Right;
                 Debug.Log("Right");
             }
 
             // 右上 - UpperRight
-            if (rawBoard[disc.x + 1, disc.y - 1] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x + 1, disc.y - 1] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x + 2;
                 y = disc.y - 2;
-                while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x++; y--; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.UpperRight;
+                while (rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x++; y--; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.UpperRight;
                 Debug.Log("UpperRight");
             }
 
             // 左上 - UpperLeft
-            if (rawBoard[disc.x - 1, disc.y - 1] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x - 1, disc.y - 1] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x - 2;
                 y = disc.y - 2;
-                while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x--; y--; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.UpperLeft;
+                while (rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x--; y--; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.UpperLeft;
                 Debug.Log("UpperLeft");
             }
 
             // 左下 - LowerLeft
-            if (rawBoard[disc.x - 1, disc.y + 1] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x - 1, disc.y + 1] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x - 2;
                 y = disc.y + 2;
-                while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x--; y++; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.LowerLeft;
+                while (rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x--; y++; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.LowerLeft;
                 Debug.Log("LowerLeft");
             }
 
 
             // 右下 - LowerRight
-            if (rawBoard[disc.x + 1, disc.y + 1] == disc.color.GetInvertedColor())
+            if (rawBoard[disc.x + 1, disc.y + 1] == disc.discColor.GetInvertedColor())
             {
                 x = disc.x + 2;
                 y = disc.y + 2;
-                while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x++; y++; }
-                if (rawBoard[x, y] == disc.color) dir |= Direction.LowerRight;
+                while (rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x++; y++; }
+                if (rawBoard[x, y] == disc.discColor) dir |= Direction.LowerRight;
                 Debug.Log("LowerRight");
             }
 
@@ -325,35 +325,35 @@ namespace Reversi
             {
                 for(int y = 1; y <= Constant.BoardSize; y++)
                 {
-                    rawBoard[x,y] = DiscColor.Empty;
+                    rawBoard[x,y] = DiscType.Empty;
                 }
             }
 
             // 壁の設定
             for(int y = 0;y < Constant.BoardSize + 2; y++)
             {
-                rawBoard[0,y] = DiscColor.Wall;
-                rawBoard[Constant.BoardSize + 1,y] = DiscColor.Wall;
+                rawBoard[0,y] = DiscType.Wall;
+                rawBoard[Constant.BoardSize + 1,y] = DiscType.Wall;
             }
             for(int x = 0;x < Constant.BoardSize + 2; x++)
             {
-                rawBoard[x,0] = DiscColor.Wall;
-                rawBoard[x,Constant.BoardSize + 1] = DiscColor.Wall;
+                rawBoard[x,0] = DiscType.Wall;
+                rawBoard[x,Constant.BoardSize + 1] = DiscType.Wall;
             }
 
             // 初期配置
-            rawBoard[4,4] = DiscColor.White;
-            rawBoard[5,5] = DiscColor.White;
-            rawBoard[4,5] = DiscColor.Black;
-            rawBoard[5,4] = DiscColor.Black;
+            rawBoard[4,4] = DiscType.White;
+            rawBoard[5,5] = DiscType.White;
+            rawBoard[4,5] = DiscType.Black;
+            rawBoard[5,4] = DiscType.Black;
 
             // 石数の初期設定
-            discAmount[DiscColor.Black] = 2;
-            discAmount[DiscColor.White] = 2;
-            discAmount[DiscColor.Empty] = Constant.BoardSize * Constant.BoardSize - 4;
+            discAmount[DiscType.Black] = 2;
+            discAmount[DiscType.White] = 2;
+            discAmount[DiscType.Empty] = Constant.BoardSize * Constant.BoardSize - 4;
 
             currentTurn = 0;    // 手数は0スタート
-            currentColor = DiscColor.Black; // 先手黒
+            currentColor = DiscType.Black; // 先手黒
 
             // 更新履歴をすべて削除
             updatedDiscList.Clear();
@@ -441,7 +441,7 @@ namespace Reversi
                 currentTurn--;
 
                 // 石を元に戻す
-                rawBoard[update[0].x,update[0].y] = DiscColor.Empty;
+                rawBoard[update[0].x,update[0].y] = DiscType.Empty;
                 for(int i = 1; i < update.Count; i++)
                 {
                     rawBoard[update[i].x,update[i].y] = currentColor.GetInvertedColor();
@@ -451,7 +451,7 @@ namespace Reversi
                 int discdiff = update.Count;
                 discAmount[currentColor] -= discdiff;
                 discAmount[currentColor.GetInvertedColor()] += discdiff - 1;
-                discAmount[DiscColor.Empty]++;
+                discAmount[DiscType.Empty]++;
             }
 
             // 不要になったupdateを1つ削除
@@ -474,7 +474,7 @@ namespace Reversi
 
             // 現在の手番と逆の色が打てるかどうか調べる
             Disc disc = new Disc();
-            disc.color = currentColor.GetInvertedColor();
+            disc.discColor = currentColor.GetInvertedColor();
             for(int x = 1; x <= Constant.BoardSize; x++)
             {
                 disc.x = x;
@@ -495,7 +495,7 @@ namespace Reversi
         /// </summary>
         /// <param name="color">指定された色</param>
         /// <returns></returns>
-        public int CountDisc(DiscColor color)
+        public int CountDisc(DiscType color)
         {
             return discAmount[color];
         }
@@ -505,7 +505,7 @@ namespace Reversi
         /// </summary>
         /// <param name="point">指定されたボード座標上の色</param>
         /// <returns></returns>
-        public DiscColor GetColor(in Point point)
+        public DiscType GetColor(in Point point)
         {
             return rawBoard[point.x,point.y];
         }
@@ -516,7 +516,7 @@ namespace Reversi
         /// <param name="x">x座標</param>
         /// <param name="y">y座標</param>
         /// <returns>指定されたボード座標上の色</returns>
-        public DiscColor GetColor(int x,int y)
+        public DiscType GetColor(int x,int y)
         {
             return rawBoard[x,y];
         }
@@ -544,7 +544,7 @@ namespace Reversi
         /// 現在の手番の色を返す。
         /// </summary>
         /// <returns>現在の手番の色を表す列挙体</returns>
-        public DiscColor GetCurrentColor()
+        public DiscType GetCurrentColor()
         {
             return currentColor;
         }

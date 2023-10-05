@@ -29,7 +29,6 @@ public class ReversiResultObject : MonoBehaviour
     void Start()
     {
         resultPanel = gameObject;
-        Hide();
     }
 
     // Update is called once per frame

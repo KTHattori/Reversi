@@ -12,22 +12,33 @@ public class ReversiDiscObject : MonoBehaviour
     [SerializeField]
     Disc _disc;
 
-    public Point point { get {return _disc;} }
+    public Point Point { get {return _disc;} }
 
-    public DiscColor color {get { return _disc.color;}}
+    public DiscType DiscColor {get { return _disc.discColor;} set { _disc.discColor = value;}}
 
-    public void Set(Disc disc)
+    public void Init(Disc disc)
     {
         _disc = disc;
-        ApplyAppearance(_disc.color);
+        image.color =_disc.discColor.ToColor();
     }
 
+    public void SetDiscColor(DiscType discColor)
+    {
+        _disc.discColor = discColor;
+        image.color = discColor.ToColor();
+    }
+
+    public void SetImageColor(Color color)
+    {
+        image.color = color;
+    }
+    
     public void Place()
     {
         ReversiBoardObject.PlaceDisc(_disc);
     }
 
-    public void ApplyAppearance(DiscColor color)
+    public void ApplyAppearance(DiscType color)
     {
         image.color = color.ToColor();
     }
