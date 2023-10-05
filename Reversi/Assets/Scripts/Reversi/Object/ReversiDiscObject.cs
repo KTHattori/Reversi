@@ -12,7 +12,7 @@ public class ReversiDiscObject : MonoBehaviour
     [SerializeField]
     Disc _disc;
 
-    public Point point { get{return _disc;} }
+    public Point point { get {return _disc;} }
 
     public DiscColor color {get { return _disc.color;}}
 
@@ -29,21 +29,7 @@ public class ReversiDiscObject : MonoBehaviour
 
     public void ApplyAppearance(DiscColor color)
     {
-        switch(color)
-        {
-            case DiscColor.White:
-            image.color = Color.white;
-            break;
-            case DiscColor.Black:
-            image.color = Color.black;
-            break;
-            case DiscColor.Empty:
-            image.color = new Color(0.0f,0.0f,0.0f,0.0f);
-            break;
-            case DiscColor.Wall:
-            image.color = Color.red;
-            break;
-        }
+        image.color = color.ToColor();
     }
 
     void Reset()

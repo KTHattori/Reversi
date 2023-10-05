@@ -1,4 +1,6 @@
-﻿namespace Reversi
+﻿using UnityEngine;
+
+namespace Reversi
 {
     /// <summary>
     /// 石の色を表す列挙体
@@ -31,6 +33,23 @@
                 return DiscColor.White;
                 default:
                 return color;
+            }
+        }
+
+        public static Color ToColor(this DiscColor color)
+        {
+            switch(color)
+            {
+                case DiscColor.White:
+                return Color.white;
+                case DiscColor.Black:
+                return Color.black;
+                case DiscColor.Empty:
+                return new Color(0.0f,0.0f,0.0f,0.0f);
+                case DiscColor.Wall:
+                return Color.red;
+                default:
+                return Color.gray;
             }
         }
     }

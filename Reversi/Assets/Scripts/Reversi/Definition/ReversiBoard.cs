@@ -36,8 +36,10 @@ namespace Reversi
         [SerializeField]
 
         private List<Point>[] movablePointList = new List<Point>[Constant.MaxTurn + 1];
-        private Direction[,,] movableDirection = new Direction[Constant.MaxTurn,Constant.BoardSize+2,Constant.BoardSize+2];
+        private Direction[,,] movableDirection = new Direction[Constant.MaxTurn + 1,Constant.BoardSize+2,Constant.BoardSize+2];
         DiscColorStorage<int> discAmount = new DiscColorStorage<int>();
+
+        public List<Point> CurrentMovablePoints { get { return movablePointList[currentTurn]; }}
 
 
         // method
@@ -128,7 +130,7 @@ namespace Reversi
                 }
             }
 
-            // 左に置ける場合
+            // 左下に置ける場合
             if(dir.HasFlag(Direction.LowerLeft))
             {
                 x = point.x;
@@ -140,7 +142,7 @@ namespace Reversi
                 }
             }
 
-            // 右に置ける場合
+            // 右下に置ける場合
             if(dir.HasFlag(Direction.LowerRight))
             {
                 x = point.x;
@@ -187,6 +189,7 @@ namespace Reversi
                 y = disc.y - 2;
                 while (rawBoard[x,y] == disc.color.GetInvertedColor()) { y--; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.Upper;
+                Debug.Log("Upper");
             }
 
             // 下 - Lower
@@ -196,6 +199,7 @@ namespace Reversi
                 y = disc.y + 2;
                 while (rawBoard[x,y] == disc.color.GetInvertedColor()) { y++; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.Lower;
+                Debug.Log("Lower");
             }
 
             // 左 - Left
@@ -205,6 +209,7 @@ namespace Reversi
                 y = disc.y;
                 while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x--; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.Left;
+                Debug.Log("Left");
             }
 
             // 右 - Right
@@ -214,6 +219,7 @@ namespace Reversi
                 y = disc.y;
                 while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x++; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.Right;
+                Debug.Log("Right");
             }
 
             // 右上 - UpperRight
@@ -223,6 +229,7 @@ namespace Reversi
                 y = disc.y - 2;
                 while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x++; y--; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.UpperRight;
+                Debug.Log("UpperRight");
             }
 
             // 左上 - UpperLeft
@@ -232,6 +239,7 @@ namespace Reversi
                 y = disc.y - 2;
                 while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x--; y--; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.UpperLeft;
+                Debug.Log("UpperLeft");
             }
 
             // 左下 - LowerLeft
@@ -241,6 +249,7 @@ namespace Reversi
                 y = disc.y + 2;
                 while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x--; y++; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.LowerLeft;
+                Debug.Log("LowerLeft");
             }
 
 
@@ -251,6 +260,7 @@ namespace Reversi
                 y = disc.y + 2;
                 while (rawBoard[x, y] == disc.color.GetInvertedColor()) { x++; y++; }
                 if (rawBoard[x, y] == disc.color) dir |= Direction.LowerRight;
+                Debug.Log("LowerRight");
             }
 
             return dir;
@@ -267,9 +277,9 @@ namespace Reversi
             Direction dir;
             movablePointList[currentTurn].Clear();
 
-            for(int x = 0; x < Constant.BoardSize; x++)
+            for(int x = 1; x <= Constant.BoardSize; x++)
             {
-                for(int y = 0; y < Constant.BoardSize; y++)
+                for(int y = 1 ; y <= Constant.BoardSize; y++)
                 {
                     disc = new Disc(x,y,currentColor);
                     dir = CheckMobility(disc);
@@ -363,16 +373,16 @@ namespace Reversi
             // 石が打てる位置かどうかを判定する
             // 打てない位置ならfalseで処理抜け
             // 座標の値が正しい範囲かどうかもここでチェック
-            if(point.x < 0 || point.x >= Constant.BoardSize) return false;
-            if(point.y < 0 || point.y >= Constant.BoardSize) return false;
-            if(movableDirection[currentTurn,point.x,point.y] == (uint)Direction.None) return false;
+            if(point.x < 0 || point.x > Constant.BoardSize) {Debug.Log("out of bounds!"); return false;}
+            if(point.y < 0 || point.y > Constant.BoardSize) {Debug.Log("out of bounds!"); return false;}
+            if(movableDirection[currentTurn,point.x,point.y] == Direction.None) {Debug.Log("nowhere to place!"); return false; }
 
             // 石を返す
             FlipDiscs(point);
 
             // 手番の色や現在の手数などを更新
             currentTurn++;
-            currentColor = (DiscColor)System.Enum.ToObject(typeof(DiscColor), -(uint)currentColor);
+            currentColor = currentColor.GetInvertedColor();
 
             // movableDir, movablePointを調べなおす
             InitMovable();
@@ -398,7 +408,7 @@ namespace Reversi
 
             InitMovable();
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -457,7 +467,7 @@ namespace Reversi
         public bool IsGameOver()
         {
             // 60手に達していたらゲーム終了
-            if(currentTurn == Constant.MaxTurn) return true;
+            if(currentTurn == Constant.MaxTurn - 1) return true;
 
             // 打てる手があればゲーム終了ではない
             if(movablePointList[currentTurn].Count != 0) return false;
@@ -543,7 +553,7 @@ namespace Reversi
         /// 0から数えた現在の手数を返す。
         /// </summary>
         /// <returns>現在の手数の整数値</returns>
-        public int GetTurns()
+        public int GetCurrentTurn()
         {
             return currentTurn;
         }
