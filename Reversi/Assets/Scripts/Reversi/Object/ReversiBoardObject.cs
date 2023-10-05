@@ -68,6 +68,7 @@ public class ReversiBoardObject : MonoBehaviour
         if(_board.Move(disc))
         {
             Debug.Log("Disc placed at: " + disc.x + ", " + disc.y);
+            
             List<Disc> updatedList = _board.GetUpdate();
             foreach(Disc updated in updatedList)
             {
