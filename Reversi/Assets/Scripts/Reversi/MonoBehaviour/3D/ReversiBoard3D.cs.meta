@@ -4,8 +4,8 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - _settings: {fileID: 11400000, guid: 9ed5611ccc3b659468154cc289adf5af, type: 2}
-  - _parentUI: {instanceID: 0}
+  - _settings: {fileID: 11400000, guid: 5d31dfc276a9061409a75499518f1bd2, type: 2}
+  - _boardObject: {instanceID: 0}
   - _discPrefab: {instanceID: 0}
   - _background: {instanceID: 0}
   - _result: {instanceID: 0}

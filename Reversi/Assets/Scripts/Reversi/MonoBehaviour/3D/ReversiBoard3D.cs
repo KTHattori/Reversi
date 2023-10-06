@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Reversi;
 using TMPro;
-using Unity.VisualScripting;
 
 public class ReversiBoard3D : MonoBehaviour
 {
@@ -13,13 +12,19 @@ public class ReversiBoard3D : MonoBehaviour
 
     private static ReversiDisc3D[,] _objBoard = null;
     [SerializeField]
-    ReversiDiscSettings _settings;
+    ReversiBoardSettings _settings;
 
     [SerializeField]
     private Transform _boardObject;
 
     [SerializeField]
+    private Transform _selectorParent;
+
+    [SerializeField]
     private GameObject _discPrefab;
+
+    [SerializeField]
+    private GameObject _selectorPrefab;
 
     [SerializeField]
     private Image _background;
@@ -47,20 +52,19 @@ public class ReversiBoard3D : MonoBehaviour
 
         _objBoard = new ReversiDisc3D[Constant.BoardSize + 2, Constant.BoardSize + 2];
         _board = new Board();
+
+        int order = 0;
         
-        for(int x = 0;x < Constant.BoardSize + 2; x++)
+        for(int x = 1;x < Constant.BoardSize + 1; x++)
         {
-            for(int y = 0; y < Constant.BoardSize + 2; y++)
+            for(int y = 1; y < Constant.BoardSize + 1; y++)
             {
                 DiscType disctype = _board.GetColor(x,y);
-                if(disctype != DiscType.White && disctype != DiscType.Black) { _objBoard[x,y] = null; return; }
-
-                GameObject obj = Instantiate(_discPrefab,_boardObject);
-                ReversiDisc3D discObj = obj.GetComponent<ReversiDisc3D>();
-                Disc disc = new Disc(x,y,_board.GetColor(x,y));
-                
-                discObj.SetDisc(disc);
-                _objBoard[x,y] = discObj;
+                GameObject selector = Instantiate(_selectorPrefab,_selectorParent);
+                selector.GetComponent<ReversiPointSelector>().SetDisc(new Disc(x,y,disctype));
+                if(disctype != DiscType.White && disctype != DiscType.Black) { _objBoard[x,y] = null; continue; }
+                PlaceDisc(x,y,disctype,order);
+                order++;
             }
         }
 
@@ -71,17 +75,22 @@ public class ReversiBoard3D : MonoBehaviour
         _result.Hide();
     }
 
-    static public void PlaceDisc(Disc disc)
+    static public void SelectPoint(Disc disc)
     {
         if(_board.Move(disc))
         {
             Debug.Log("Disc placed at: " + disc.x + ", " + disc.y);
             
             List<Disc> updatedList = _board.GetUpdate();
+            int order = 0;
             foreach(Disc updated in updatedList)
             {
                 Debug.Log($"Flipped disc at: {updated.x}, {updated.y}");
-                _objBoard[updated.x,updated.y].SetDiscColor(updated.discColor);
+
+                // 新しく配置されたもののみ生成
+                if(order == 0) _instance.PlaceDisc(updated.x,updated.y,updated.discType,order);
+                else _objBoard[updated.x,updated.y].SetDiscColor(updated.discType,order * _instance._settings.AnimationDelay);
+                order++;
             }
             HighlightMovable();
 
@@ -120,12 +129,13 @@ public class ReversiBoard3D : MonoBehaviour
     {
         if(_board.Undo())
         {
-            for(int x = 0;x < Constant.BoardSize + 2; x++)
+            List<Disc> undoneList = _board.GetUndone();
+            int order = 0;
+            foreach(Disc undone in undoneList)
             {
-                for(int y = 0; y < Constant.BoardSize + 2; y++)
-                {
-                    _objBoard[x,y].SetDiscColor(_board.GetColor(x,y));
-                }
+                Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discType}");
+                _objBoard[undone.x,undone.y].SetDiscColor(undone.discType,order * _instance._settings.AnimationDelay);
+                order++;
             }
 
             HighlightMovable();
@@ -147,7 +157,7 @@ public class ReversiBoard3D : MonoBehaviour
             for(int y = 0; y < Constant.BoardSize + 2; y++)
             {
                 Disc disc = new Disc(x,y,_board.GetColor(x,y));
-                _objBoard[x,y].SetDisc(disc);
+                // _objBoard[x,y].SetDisc(disc);
             }
         }
 
@@ -156,6 +166,25 @@ public class ReversiBoard3D : MonoBehaviour
         UpdateUI();
         SetMessage("Game Start!");
         _instance._result.Hide();
+    }
+
+    private void PlaceDisc(int x,int y,DiscType disctype,int order = 0)
+    {
+        // 生成・配置
+        GameObject obj = Instantiate(_discPrefab);
+        Vector3 pos = obj.transform.localPosition;
+        pos.x = x * 1.25f;
+        pos.z = y * 1.25f;
+        pos += _settings.PositionOrigin;
+        obj.transform.localPosition = pos;
+
+        // コンポーネント取得
+        ReversiDisc3D discObj = obj.GetComponent<ReversiDisc3D>();
+        Disc disc = new Disc(x,y,disctype);
+        // 配列にコンポーネント保存
+        _objBoard[x,y] = discObj;
+        // コンポーネントに値を流し込む
+        discObj.SetDisc(disc,order * _settings.AnimationDelay);
     }
 
     /// <summary>
@@ -206,5 +235,10 @@ public class ReversiBoard3D : MonoBehaviour
             _board = null;
             _objBoard = null;
         }
+    }
+
+    void Update()
+    {
+
     }
 }

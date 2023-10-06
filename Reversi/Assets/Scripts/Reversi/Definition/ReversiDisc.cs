@@ -6,16 +6,16 @@
     [System.Serializable]
     public class Disc : Point
     {
-        public DiscType discColor;
+        public DiscType discType;
 
         public Disc() : base(0, 0)
         {
-            discColor = DiscType.Empty;
+            discType = DiscType.Empty;
         }
 
         public Disc(int x, int y, DiscType color) : base(x, y)
         {
-            this.discColor = color;
+            this.discType = color;
         }
     }
 }

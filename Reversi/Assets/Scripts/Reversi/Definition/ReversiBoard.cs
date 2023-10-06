@@ -182,84 +182,76 @@ namespace Reversi
             Direction dir = Direction.None;
 
             // 上 - Upper
-            if (_rawBoard[disc.x,disc.y - 1] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x,disc.y - 1] == disc.discType.GetInvertedColor())
             {
                 x = disc.x;
                 y = disc.y - 2;
-                while (_rawBoard[x,y] == disc.discColor.GetInvertedColor()) { y--; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.Upper;
-                Debug.Log("Upper");
+                while (_rawBoard[x,y] == disc.discType.GetInvertedColor()) { y--; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.Upper;
             }
 
             // 下 - Lower
-            if (_rawBoard[disc.x,disc.y + 1] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x,disc.y + 1] == disc.discType.GetInvertedColor())
             {
                 x = disc.x;
                 y = disc.y + 2;
-                while (_rawBoard[x,y] == disc.discColor.GetInvertedColor()) { y++; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.Lower;
-                Debug.Log("Lower");
+                while (_rawBoard[x,y] == disc.discType.GetInvertedColor()) { y++; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.Lower;
             }
 
             // 左 - Left
-            if (_rawBoard[disc.x - 1, disc.y] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x - 1, disc.y] == disc.discType.GetInvertedColor())
             {
                 x = disc.x - 2;
                 y = disc.y;
-                while (_rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x--; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.Left;
-                Debug.Log("Left");
+                while (_rawBoard[x, y] == disc.discType.GetInvertedColor()) { x--; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.Left;
             }
 
             // 右 - Right
-            if (_rawBoard[disc.x + 1, disc.y] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x + 1, disc.y] == disc.discType.GetInvertedColor())
             {
                 x = disc.x + 2;
                 y = disc.y;
-                while (_rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x++; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.Right;
-                Debug.Log("Right");
+                while (_rawBoard[x, y] == disc.discType.GetInvertedColor()) { x++; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.Right;
             }
 
             // 右上 - UpperRight
-            if (_rawBoard[disc.x + 1, disc.y - 1] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x + 1, disc.y - 1] == disc.discType.GetInvertedColor())
             {
                 x = disc.x + 2;
                 y = disc.y - 2;
-                while (_rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x++; y--; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.UpperRight;
-                Debug.Log("UpperRight");
+                while (_rawBoard[x, y] == disc.discType.GetInvertedColor()) { x++; y--; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.UpperRight;
             }
 
             // 左上 - UpperLeft
-            if (_rawBoard[disc.x - 1, disc.y - 1] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x - 1, disc.y - 1] == disc.discType.GetInvertedColor())
             {
                 x = disc.x - 2;
                 y = disc.y - 2;
-                while (_rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x--; y--; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.UpperLeft;
-                Debug.Log("UpperLeft");
+                while (_rawBoard[x, y] == disc.discType.GetInvertedColor()) { x--; y--; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.UpperLeft;
             }
 
             // 左下 - LowerLeft
-            if (_rawBoard[disc.x - 1, disc.y + 1] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x - 1, disc.y + 1] == disc.discType.GetInvertedColor())
             {
                 x = disc.x - 2;
                 y = disc.y + 2;
-                while (_rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x--; y++; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.LowerLeft;
-                Debug.Log("LowerLeft");
+                while (_rawBoard[x, y] == disc.discType.GetInvertedColor()) { x--; y++; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.LowerLeft;
             }
 
 
             // 右下 - LowerRight
-            if (_rawBoard[disc.x + 1, disc.y + 1] == disc.discColor.GetInvertedColor())
+            if (_rawBoard[disc.x + 1, disc.y + 1] == disc.discType.GetInvertedColor())
             {
                 x = disc.x + 2;
                 y = disc.y + 2;
-                while (_rawBoard[x, y] == disc.discColor.GetInvertedColor()) { x++; y++; }
-                if (_rawBoard[x, y] == disc.discColor) dir |= Direction.LowerRight;
-                Debug.Log("LowerRight");
+                while (_rawBoard[x, y] == disc.discType.GetInvertedColor()) { x++; y++; }
+                if (_rawBoard[x, y] == disc.discType) dir |= Direction.LowerRight;
             }
 
             return dir;
@@ -486,7 +478,7 @@ namespace Reversi
 
             // 現在の手番と逆の色が打てるかどうか調べる
             Disc disc = new Disc();
-            disc.discColor = _currentColor.GetInvertedColor();
+            disc.discType = _currentColor.GetInvertedColor();
             for(int x = 1; x <= Constant.BoardSize; x++)
             {
                 disc.x = x;

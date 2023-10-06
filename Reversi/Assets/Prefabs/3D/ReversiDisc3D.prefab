@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8368204036695130681}
   - component: {fileID: 6986473662208807655}
   m_Layer: 0
-  m_Name: ReversiDisc
+  m_Name: ReversiDisc3D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
   _disc:
     x: 0
     y: 0
-    discColor: 0
+    discType: 0
   _settings: {fileID: 11400000, guid: 9ed5611ccc3b659468154cc289adf5af, type: 2}
   _animState: 0
   _animProgress: 0
@@ -63,7 +63,6 @@ GameObject:
   - component: {fileID: 3369247165477475431}
   - component: {fileID: 4724477322992154302}
   - component: {fileID: 3131864237334270219}
-  - component: {fileID: 8350597871596646465}
   m_Layer: 0
   m_Name: DiscMesh
   m_TagString: Untagged
@@ -136,26 +135,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8350597871596646465
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6838359229375733587}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}

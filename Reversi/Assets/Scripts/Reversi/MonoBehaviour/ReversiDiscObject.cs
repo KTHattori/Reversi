@@ -16,7 +16,7 @@ public class ReversiDiscObject : MonoBehaviour
     // public 
     public Point Point { get {return _disc;} }
 
-    public DiscType DiscColor {get { return _disc.discColor;} set { _disc.discColor = value;}}
+    public DiscType DiscColor {get { return _disc.discType;} set { _disc.discType = value;}}
 
     /// <summary>
     /// ディスク情報をセットする。
@@ -25,7 +25,7 @@ public class ReversiDiscObject : MonoBehaviour
     public void SetDisc(Disc disc)
     {
         _disc = disc;
-        ApplyColor(disc.discColor);
+        ApplyColor(disc.discType);
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class ReversiDiscObject : MonoBehaviour
     /// <param name="discColor"></param>
     public void SetDiscColor(DiscType discColor)
     {
-        _disc.discColor = discColor;
+        _disc.discType = discColor;
         ApplyColor(discColor);
     }
 

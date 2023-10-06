@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Reversi;
 using Interpolation;
+using System;
+using System.Collections;
 
 public class ReversiDisc3D : MonoBehaviour
 {
@@ -13,8 +15,8 @@ public class ReversiDisc3D : MonoBehaviour
     }
 
     const float flipAngle = 90.0f;
-    private float CurrentFlipAngle{ get { return flipAngle * (int)_disc.discColor;} }
-    private float InvertedFlipAngle{ get { return flipAngle * (int)_disc.discColor.GetInvertedColor();} }
+    private float CurrentFlipAngle{ get { return flipAngle * (int)_disc.discType;} }
+    private float InvertedFlipAngle{ get { return flipAngle * (int)_disc.discType.GetInvertedColor();} }
 
     // private
     [SerializeField]
@@ -38,32 +40,44 @@ public class ReversiDisc3D : MonoBehaviour
     // public 
     public Point Point { get {return _disc;} }
 
-    public DiscType DiscColor { get { return _disc.discColor;} set { _disc.discColor = value;}}
+    public DiscType DiscColor { get { return _disc.discType;} set { _disc.discType = value;}}
 
     /// <summary>
     /// ディスク情報をセットする。
     /// </summary>
     /// <param name="disc"></param>
-    public void SetDisc(Disc disc)
+    public void SetDisc(Disc disc,float delay)
     {
         _disc = disc;
+        transform.localEulerAngles = new Vector3(CurrentFlipAngle,0.0f,0.0f);
+        PlayAnimation(AnimationState.Placing,delay);
     }
 
     /// <summary>
     /// ディスクの色情報をセットする。
     /// </summary>
     /// <param name="discColor"></param>
-    public void SetDiscColor(DiscType discColor)
+    public void SetDiscColor(DiscType discColor,float delay)
     {
-        _disc.discColor = discColor;
+        _disc.discType = discColor;
+        PlayAnimation(AnimationState.Flipping,delay);
     }
+
+    // 一定時間後にアニメーション状態を設定するコルーチン
+    public void PlayAnimation(AnimationState state,float delay)
+    {
+        StartCoroutine(SetAnimationState(state,delay));
+    }
+
 
     /// <summary>
     /// アニメーションの状態を設定する
     /// </summary>
     /// <param name="state">アニメーションの状態</param>
-    public void SetAnimationState(AnimationState state)
+    private IEnumerator SetAnimationState(AnimationState state,float delay)
     {
+        yield return new WaitForSeconds(delay);
+
         _animStateQueue.Enqueue(state);
 
         if(_animState == AnimationState.None)
@@ -76,7 +90,6 @@ public class ReversiDisc3D : MonoBehaviour
 
     void UpdateAnimation()
     {
-        
         switch(_animState)
         {
             case AnimationState.Placing:
@@ -134,8 +147,6 @@ public class ReversiDisc3D : MonoBehaviour
     void Start()
     {
         _initPos = transform.position;
-
-        SetAnimationState(AnimationState.Placing);
     }
 
     // Update is called once per frame
@@ -143,6 +154,7 @@ public class ReversiDisc3D : MonoBehaviour
     {
         if(_animState == AnimationState.None)
         {
+            // if(Input.GetKeyDown(KeyCode.Space)) PlayAnimation(AnimationState.Flipping,0.0f);
             return;
         }
         else

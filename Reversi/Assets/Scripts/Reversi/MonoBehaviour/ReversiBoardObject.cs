@@ -80,7 +80,7 @@ public class ReversiBoardObject : MonoBehaviour
             foreach(Disc updated in updatedList)
             {
                 Debug.Log($"Flipped disc at: {updated.x}, {updated.y}");
-                _objBoard[updated.x,updated.y].SetDiscColor(updated.discColor);
+                _objBoard[updated.x,updated.y].SetDiscColor(updated.discType);
             }
             HighlightMovable();
 
@@ -124,8 +124,8 @@ public class ReversiBoardObject : MonoBehaviour
             List<Disc> undoneList = _board.GetUndone();
             foreach(Disc undone in undoneList)
             {
-                Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discColor}");
-                _objBoard[undone.x,undone.y].SetDiscColor(undone.discColor);
+                Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discType}");
+                _objBoard[undone.x,undone.y].SetDiscColor(undone.discType);
             }
 
             _instance.undones = undoneList;
