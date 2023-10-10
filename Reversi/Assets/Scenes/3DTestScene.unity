@@ -154,9 +154,9 @@ RectTransform:
   - {fileID: 1344969146}
   m_Father: {fileID: 2059572793}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 125, y: -75}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &214264713
@@ -223,6 +223,7 @@ GameObject:
   - component: {fileID: 234588342}
   - component: {fileID: 234588344}
   - component: {fileID: 234588343}
+  - component: {fileID: 234588345}
   m_Layer: 0
   m_Name: TextMP_Message
   m_TagString: Untagged
@@ -346,6 +347,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 234588341}
   m_CullTransparentMesh: 1
+--- !u!114 &234588345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234588341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateAfterRegister: 0
+  relay: {fileID: 11400000, guid: 43e52417fc128cf41a6c3af5c5ae2b87, type: 2}
 --- !u!1 &245708352
 GameObject:
   m_ObjectHideFlags: 0
@@ -592,9 +607,9 @@ RectTransform:
   - {fileID: 1695983177}
   m_Father: {fileID: 2059572793}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 375, y: -75}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &364505579
@@ -901,7 +916,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 577334880}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
@@ -1063,6 +1078,7 @@ GameObject:
   - component: {fileID: 856114240}
   - component: {fileID: 856114239}
   - component: {fileID: 856114241}
+  - component: {fileID: 856114242}
   m_Layer: 0
   m_Name: Panel_Info
   m_TagString: Untagged
@@ -1154,6 +1170,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &856114242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856114236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateAfterRegister: 0
+  relay: {fileID: 11400000, guid: ac8b2bad3af4e874a9abe4788b8a9664, type: 2}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -1214,7 +1244,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 91.5644
+  field of view: 91.49284
   orthographic: 0
   orthographic size: 9.79
   m_Depth: -1
@@ -1408,6 +1438,7 @@ GameObject:
   - component: {fileID: 1020041350}
   - component: {fileID: 1020041349}
   - component: {fileID: 1020041348}
+  - component: {fileID: 1020041351}
   m_Layer: 0
   m_Name: Panel_Board3D
   m_TagString: Untagged
@@ -1496,6 +1527,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1020041346}
   m_CullTransparentMesh: 1
+--- !u!114 &1020041351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1020041346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateAfterRegister: 0
+  relay: {fileID: 11400000, guid: be14412ad8863944dab10b8ed495048b, type: 2}
 --- !u!1 &1022782928
 GameObject:
   m_ObjectHideFlags: 0
@@ -1643,7 +1688,7 @@ GameObject:
   - component: {fileID: 1086150989}
   - component: {fileID: 1086150988}
   m_Layer: 0
-  m_Name: Panel_Result
+  m_Name: Panel_Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1768,9 +1813,9 @@ RectTransform:
   - {fileID: 1022782929}
   m_Father: {fileID: 1086150987}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 540, y: -100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 750, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1139402373
@@ -2133,8 +2178,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ReversiBoardObject, Assembly-CSharp
+      - m_Target: {fileID: 1835345046}
+        m_TargetAssemblyTypeName: ReversiBoard3D, Assembly-CSharp
         m_MethodName: Undo
         m_Mode: 1
         m_Arguments:
@@ -2400,8 +2445,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ReversiBoardObject, Assembly-CSharp
+      - m_Target: {fileID: 1835345046}
+        m_TargetAssemblyTypeName: ReversiBoard3D, Assembly-CSharp
         m_MethodName: Pass
         m_Mode: 1
         m_Arguments:
@@ -2695,9 +2740,9 @@ RectTransform:
   - {fileID: 1542732057}
   m_Father: {fileID: 1086150987}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 540, y: -700}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1702152791
@@ -2744,8 +2789,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ReversiBoardObject, Assembly-CSharp
+      - m_Target: {fileID: 1835345046}
+        m_TargetAssemblyTypeName: ReversiBoard3D, Assembly-CSharp
         m_MethodName: Restart
         m_Mode: 1
         m_Arguments:
@@ -2806,13 +2851,14 @@ GameObject:
   - component: {fileID: 1711727482}
   - component: {fileID: 1711727481}
   - component: {fileID: 1711727483}
+  - component: {fileID: 1711727484}
   m_Layer: 0
-  m_Name: Panel_Finish
+  m_Name: Panel_Result
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1711727480
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2889,6 +2935,20 @@ MonoBehaviour:
   _whiteAmount: {fileID: 1344969147}
   _winnerText: {fileID: 1022782930}
   _winnerPanel: {fileID: 1139402373}
+--- !u!114 &1711727484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1711727479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateAfterRegister: 0
+  relay: {fileID: 11400000, guid: 1b277c14e52eddb45aa05f31406b710b, type: 2}
 --- !u!1 &1805738830
 GameObject:
   m_ObjectHideFlags: 0
@@ -3034,6 +3094,7 @@ GameObject:
   - component: {fileID: 1831393632}
   - component: {fileID: 1831393634}
   - component: {fileID: 1831393633}
+  - component: {fileID: 1831393635}
   m_Layer: 0
   m_Name: TextMP_TurnCount
   m_TagString: Untagged
@@ -3157,6 +3218,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1831393631}
   m_CullTransparentMesh: 1
+--- !u!114 &1831393635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831393631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateAfterRegister: 0
+  relay: {fileID: 11400000, guid: 4213394a54846714aa74f542007669e8, type: 2}
 --- !u!1 &1835345043
 GameObject:
   m_ObjectHideFlags: 0
@@ -3204,16 +3279,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings: {fileID: 11400000, guid: 5d31dfc276a9061409a75499518f1bd2, type: 2}
-  _boardObject: {fileID: 1835345045}
-  _selectorParent: {fileID: 1020041347}
   _discPrefab: {fileID: 1895381435015490164, guid: eebe04fa99eee73489e9898cb5231b3e, type: 3}
   _selectorPrefab: {fileID: 2720275753783592769, guid: 4feb9ddb8f86def42b340cafa25dbdb4, type: 3}
-  _background: {fileID: 856114239}
-  _result: {fileID: 1711727483}
-  _turnText: {fileID: 1831393633}
-  _messageText: {fileID: 234588343}
+  _discParentObjRef: {fileID: 11400000, guid: 5e936dfac629d4040932b42c809b14a4, type: 2}
+  _selectorParentObjRef: {fileID: 11400000, guid: be14412ad8863944dab10b8ed495048b, type: 2}
+  _backgroundObjRef: {fileID: 11400000, guid: ac8b2bad3af4e874a9abe4788b8a9664, type: 2}
+  _resultObjRef: {fileID: 11400000, guid: 1b277c14e52eddb45aa05f31406b710b, type: 2}
+  _turnObjRef: {fileID: 11400000, guid: 4213394a54846714aa74f542007669e8, type: 2}
+  _messageObjRef: {fileID: 11400000, guid: 43e52417fc128cf41a6c3af5c5ae2b87, type: 2}
   _movable: []
-  _movableColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  _backgroundImageRef: {fileID: 0}
 --- !u!1 &1932356016
 GameObject:
   m_ObjectHideFlags: 0
@@ -3350,9 +3425,9 @@ RectTransform:
   - {fileID: 364505578}
   m_Father: {fileID: 1086150987}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 540, y: -425}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2059572795

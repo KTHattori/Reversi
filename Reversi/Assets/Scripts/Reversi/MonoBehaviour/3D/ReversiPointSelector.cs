@@ -1,18 +1,22 @@
 using UnityEngine;
 using Reversi;
 
-public class ReversiPointSelector : MonoBehaviour
+public class ReversiPointSelector : MonoBehaviour,IPointSelector
 {
-    Disc _disc;
+    Point _point;
 
-    public void SetDisc(Disc disc)
+    public void SetPoint(Point point)
     {
-        _disc = disc;
+        _point = point;
     }
 
-    public void SelectPoint()
+    public void SelectPoint(Point point)
     {
-        if(_disc.discType != DiscType.Empty) return;
-        ReversiBoard3D.SelectPoint(_disc);
+        ReversiBoard3D.SelectPoint(point);
+    }
+
+    public void OnPress()
+    {
+        SelectPoint(_point);
     }
 }

@@ -6,125 +6,277 @@ using TMPro;
 
 public class ReversiBoard3D : MonoBehaviour
 {
+    /// <summary>
+    /// ボード内部データ
+    /// </summary>
     private static Board _board = null;
     
+    /// <summary>
+    /// このクラスのインスタンス保持用
+    /// </summary>
     private static ReversiBoard3D _instance = null;
 
-    private static ReversiDisc3D[,] _objBoard = null;
+    /// <summary>
+    /// 石オブジェクトクラスの配列, ボード内部データと同じ構造
+    /// </summary>
+    private static ReversiDisc3D[,] _discObjBoard = null;   // 石
+
+    /// <summary>
+    /// ScriptableObjectで定義された各設定事項
+    /// </summary>
     [SerializeField]
     ReversiBoardSettings _settings;
 
-    [SerializeField]
-    private Transform _boardObject;
-
-    [SerializeField]
-    private Transform _selectorParent;
-
+    /// <summary>
+    /// 石オブジェクトのプレハブ
+    /// </summary>
     [SerializeField]
     private GameObject _discPrefab;
 
+    /// <summary>
+    /// マス選択ボタンのプレハブ
+    /// </summary>
     [SerializeField]
     private GameObject _selectorPrefab;
 
+    /// <summary>
+    /// 石生成時の親となるオブジェクト
+    /// </summary>
     [SerializeField]
-    private Image _background;
+    private ObjectReferencer _discParentObjRef;
 
+
+    /// <summary>
+    /// マス選択ボタン生成時の親となるオブジェクト
+    /// </summary>
     [SerializeField]
-    private ReversiResultObject _result;
+    private ObjectReferencer _selectorParentObjRef;
 
+    /// <summary>
+    /// UI背景 参照
+    /// </summary>
     [SerializeField]
-    private TextMeshProUGUI _turnText;
+    private ObjectReferencer _backgroundObjRef;
 
+    /// <summary>
+    /// リザルト表示 参照
+    /// </summary>
     [SerializeField]
-    private TextMeshProUGUI _messageText;
+    private ObjectReferencer _resultObjRef;
 
+    /// <summary>
+    /// ターン表示 参照
+    /// </summary>
+    [SerializeField]
+    private ObjectReferencer _turnObjRef;
+
+    /// <summary>
+    /// メッセージ表示 参照
+    /// </summary>
+    [SerializeField]
+    private ObjectReferencer _messageObjRef;
+
+    /// <summary>
+    /// 配置可能なマスを保持するリスト
+    /// </summary>
     [SerializeField,Header("配置可能マス")]
     private List<Point> _movable = null;
 
-    [SerializeField,Header("配置可能マスカラー")]
-    private Color _movableColor = Color.yellow;
 
-    // Start is called before the first frame update
+    // [SerializeField,Header("配置可能マスカラー")]
+    // private Color _movableColor = Color.yellow;
+
+    /// <summary>
+    /// 背景 Imageコンポーネント参照
+    /// </summary>
+    private Image _backgroundImageRef;
+    /// <summary>
+    /// リザルトコンポーネント参照
+    /// </summary>
+    private ReversiResultObject _resultCompRef;
+    /// <summary>
+    /// ターン表示Text参照
+    /// </summary>
+    private TextMeshProUGUI _turnTextRef;
+    /// <summary>
+    /// メッセージ表示テキスト参照
+    /// </summary>
+    private TextMeshProUGUI _messageTextRef;
+
+
+    /// <summary>
+    /// オブジェクト生成初回ループにてコール
+    /// </summary>
     void Start()
     {
-        if(_instance) {GameObject.Destroy(_instance.gameObject);}
+        if(_instance) {Destroy(_instance.gameObject);}
         _instance = this;
 
-        _objBoard = new ReversiDisc3D[Constant.BoardSize + 2, Constant.BoardSize + 2];
-        _board = new Board();
+        GetComponentRefs();
 
-        int order = 0;
-        
-        for(int x = 1;x < Constant.BoardSize + 1; x++)
-        {
-            for(int y = 1; y < Constant.BoardSize + 1; y++)
-            {
-                DiscType disctype = _board.GetColor(x,y);
-                GameObject selector = Instantiate(_selectorPrefab,_selectorParent);
-                selector.GetComponent<ReversiPointSelector>().SetDisc(new Disc(x,y,disctype));
-                if(disctype != DiscType.White && disctype != DiscType.Black) { _objBoard[x,y] = null; continue; }
-                PlaceDisc(x,y,disctype,order);
-                order++;
-            }
-        }
+        CreateBoard();
+        InitializeBoard();
 
         HighlightMovable();
 
         UpdateUI();
         SetMessage("Game Start!");
-        _result.Hide();
+        _resultCompRef.Hide();
     }
 
-    static public void SelectPoint(Disc disc)
+    /// <summary>
+    /// オブジェクト破棄時
+    /// </summary>
+    void OnDestroy()
     {
-        if(_board.Move(disc))
+        _instance.StopAllCoroutines();
+        if(_instance == this)
         {
-            Debug.Log("Disc placed at: " + disc.x + ", " + disc.y);
-            
+            _instance = null;
+            _board = null;
+            _discObjBoard = null;
+        }
+    }
+
+
+    /// <summary>
+    /// 各コンポーネント参照を取得
+    /// </summary>
+    void GetComponentRefs()
+    {
+        if(!_backgroundObjRef.gameObject) Debug.LogError("Background Object Not Set!");
+        if(!_resultObjRef.gameObject) Debug.LogError("Result Object Not Set!");
+        if(!_turnObjRef.gameObject) Debug.LogError("Turn Text Object Not Set!");
+        if(!_messageObjRef.gameObject) Debug.LogError("Message Text Object Not Set!");
+
+        _backgroundImageRef = _backgroundObjRef.GetComponent<Image>();
+        _resultCompRef = _resultObjRef.GetComponent<ReversiResultObject>();
+        _turnTextRef = _turnObjRef.GetComponent<TextMeshProUGUI>();
+        _messageTextRef = _messageObjRef.GetComponent<TextMeshProUGUI>();
+    }
+
+    /// <summary>
+    /// ボードの作成（初回のみ）
+    /// </summary>
+    void CreateBoard()
+    {
+        _discObjBoard = new ReversiDisc3D[Constant.BoardSize + 2, Constant.BoardSize + 2];
+        _board = new Board();
+        for(int x = 1;x < Constant.BoardSize + 1;x++)
+        {
+            for(int y = 1; y < Constant.BoardSize + 1; y++)
+            {
+                GameObject selector = Instantiate(_selectorPrefab,_selectorParentObjRef.transform);
+                selector.GetComponent<ReversiPointSelector>().SetPoint(new Point(x,y));
+                selector.name = $"Selector({x},{y})";
+
+                // 生成・配置
+                GameObject discObj = Instantiate(_discPrefab);
+                discObj.name = $"Disc({x},{y})";
+                Vector3 pos = discObj.transform.localPosition;
+                pos.x = x * 1.25f;
+                pos.z = y * 1.25f;
+                pos += _settings.PositionOrigin;
+                discObj.transform.localPosition = pos;
+
+                // 石のコンポーネント
+                ReversiDisc3D disc3D = discObj.GetComponent<ReversiDisc3D>();  // 取得
+                _discObjBoard[x,y] = disc3D;   // 配列にコンポーネント保存
+            }
+        }
+    }
+
+    /// <summary>
+    /// ボードの初期化
+    /// </summary>
+    void InitializeBoard()
+    {
+        _board.Init();
+
+        int order = 0;
+        for(int x = 1;x < Constant.BoardSize + 1;x++)
+        {
+            for(int y = 1; y < Constant.BoardSize + 1; y++)
+            {
+                // 初期状態にセット・石情報をセット
+                DiscColor disctype = _board.GetColor(x,y);
+                _discObjBoard[x,y].Initialize();    // 初期化
+                _discObjBoard[x,y].SetDisc(new Disc(x,y,disctype));   // 値を流し込む
+
+                // --- 初期で配置されている場所ならこの先を実行 ---
+                if(disctype != DiscColor.White && disctype != DiscColor.Black) { continue; }
+                _discObjBoard[x,y].PlaceDisc(disctype,order * _settings.AnimationDelay);  // 配置処理
+                order++;
+            }
+        }
+    }
+
+    /// <summary>
+    /// マスを選択する（置ける場合は置く）
+    /// </summary>
+    /// <param name="point"></param>
+    static public void SelectPoint(Point point)
+    {
+        if(_board.Move(point))
+        {         
             List<Disc> updatedList = _board.GetUpdate();
             int order = 0;
             foreach(Disc updated in updatedList)
             {
-                Debug.Log($"Flipped disc at: {updated.x}, {updated.y}");
-
-                // 新しく配置されたもののみ生成
-                if(order == 0) _instance.PlaceDisc(updated.x,updated.y,updated.discType,order);
-                else _objBoard[updated.x,updated.y].SetDiscColor(updated.discType,order * _instance._settings.AnimationDelay);
+                // 新しく配置されたもののみ配置処理
+                if(order == 0)
+                {
+                    _discObjBoard[updated.x,updated.y].PlaceDisc(updated.discColor,order);
+                    Debug.Log($"Placed {updated.discColor} disc at: {point.x}, {point.y}");
+                }
+                else
+                {
+                    _discObjBoard[updated.x,updated.y].FlipDisc(updated.discColor,order * _instance._settings.AnimationDelay);
+                    Debug.Log($"Flipped disc to {updated.discColor} at: {updated.x}, {updated.y}");
+                }
                 order++;
             }
-            HighlightMovable();
+            _instance.HighlightMovable();
 
-            UpdateUI();
-            SetMessage("");
+            _instance.UpdateUI();
+            _instance.SetMessage("");
         }
         else
         {
-            Debug.Log($"Cannot place disc at: {disc.x}, {disc.y}");
-            SetMessage("Cannot place here!");
+            Debug.Log($"Cannot place disc at: {point.x}, {point.y}");
+            _instance.SetMessage("Cannot place here!");
         }
 
         if(_board.IsGameOver())
         {
-            _instance._result.Show();
-            _instance._result.SetResult(_board.CountDisc(DiscType.Black),_board.CountDisc(DiscType.White));
-            SetMessage("");
+            _instance._resultCompRef.Show();
+            _instance._resultCompRef.SetResult(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
+            _instance.SetMessage("");
         }
+
+        Debug.Log($"Black: {_board.CountDisc(DiscColor.Black)}, White: {_board.CountDisc(DiscColor.White)}");
     }
 
+    /// <summary>
+    /// パスする
+    /// </summary>
     static public void Pass()
     {
         if(_board.Pass())
         {
-            SetMessage("Passed!");
-            HighlightMovable();
-            UpdateUI();
+            _instance.SetMessage("Passed!");
+            _instance.HighlightMovable();
+            _instance.UpdateUI();
         }
         else
         {
-            SetMessage("Cannot pass now!");
+            _instance.SetMessage("Cannot pass now!");
         }
     }
 
+    /// <summary>
+    /// 一手戻る
+    /// </summary>
     static public void Undo()
     {
         if(_board.Undo())
@@ -133,76 +285,55 @@ public class ReversiBoard3D : MonoBehaviour
             int order = 0;
             foreach(Disc undone in undoneList)
             {
-                Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discType}");
-                _objBoard[undone.x,undone.y].SetDiscColor(undone.discType,order * _instance._settings.AnimationDelay);
+                Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discColor}");
+
+                // 前の手で配置された石のみ回収処理
+                if(order == 0) _discObjBoard[undone.x,undone.y].RecallDisc(undone.discColor,order);
+                else _discObjBoard[undone.x,undone.y].FlipDisc(undone.discColor,order * _instance._settings.AnimationDelay);
                 order++;
             }
 
-            HighlightMovable();
+            _instance.HighlightMovable();
 
-            SetMessage("Undone!");
-            UpdateUI();
+            _instance.SetMessage("Undone!");
+            _instance.UpdateUI();
         }
         else
         {
-            SetMessage("Cannot undo now!");
+            _instance.SetMessage("Cannot undo now!");
         }
-    }
-
-    static public void Restart()
-    {
-        _board = new Board();
-        for(int x = 0;x < Constant.BoardSize + 2; x++)
-        {
-            for(int y = 0; y < Constant.BoardSize + 2; y++)
-            {
-                Disc disc = new Disc(x,y,_board.GetColor(x,y));
-                // _objBoard[x,y].SetDisc(disc);
-            }
-        }
-
-        HighlightMovable();
-
-        UpdateUI();
-        SetMessage("Game Start!");
-        _instance._result.Hide();
-    }
-
-    private void PlaceDisc(int x,int y,DiscType disctype,int order = 0)
-    {
-        // 生成・配置
-        GameObject obj = Instantiate(_discPrefab);
-        Vector3 pos = obj.transform.localPosition;
-        pos.x = x * 1.25f;
-        pos.z = y * 1.25f;
-        pos += _settings.PositionOrigin;
-        obj.transform.localPosition = pos;
-
-        // コンポーネント取得
-        ReversiDisc3D discObj = obj.GetComponent<ReversiDisc3D>();
-        Disc disc = new Disc(x,y,disctype);
-        // 配列にコンポーネント保存
-        _objBoard[x,y] = discObj;
-        // コンポーネントに値を流し込む
-        discObj.SetDisc(disc,order * _settings.AnimationDelay);
     }
 
     /// <summary>
-    /// 配置可能マスをハイライトする
+    /// ゲームをリスタートする
     /// </summary>
-    static public void HighlightMovable()
+    static public void Restart()
+    {
+        _instance.InitializeBoard();
+
+        _instance.HighlightMovable();
+
+        _instance.UpdateUI();
+        _instance.SetMessage("Game Start!");
+        _instance._resultCompRef.Hide();
+    }
+
+    /// <summary>
+    /// 配置可能マスをハイライトする, 現在無効
+    /// </summary>
+    void HighlightMovable()
     {
         // previous movable
-        foreach(Point point in _instance._movable)
+        foreach(Point point in _movable)
         {
             //_objBoard[point.x,point.y].SetImageColor(_objBoard[point.x,point.y].DiscColor.ToColor());
         }
 
         // get
-        _instance._movable = _board.GetMovablePoint();
+        _movable = _board.GetMovablePoint();
 
         // current movable
-        foreach(Point point in _instance._movable)
+        foreach(Point point in _movable)
         {
             //_objBoard[point.x,point.y].SetImageColor(_instance._movableColor);
         }
@@ -211,34 +342,18 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// UI更新
     /// </summary>
-    static public void UpdateUI()
+    void UpdateUI()
     {
-        _instance._turnText.SetText(_board.GetCurrentTurn().ToString());
-        if(_instance._background) _instance._background.color = _board.GetCurrentColor().ToColor();
+        _turnTextRef.SetText(_board.GetCurrentTurn().ToString());
+        if(_backgroundImageRef) _instance._backgroundImageRef.color = _board.GetCurrentColor().ToColor();
     }
 
     /// <summary>
     /// 画面下部に指定したメッセージを表示する
     /// </summary>
     /// <param name="msg"></param>
-    static public void SetMessage(string msg)
+    void SetMessage(string msg)
     {
-        _instance._messageText.SetText(msg);
-    }
-
-    void OnDestroy()
-    {
-        _instance.StopAllCoroutines();
-        if(_instance == this)
-        {
-            _instance = null;
-            _board = null;
-            _objBoard = null;
-        }
-    }
-
-    void Update()
-    {
-
+        _messageTextRef.SetText(msg);
     }
 }
