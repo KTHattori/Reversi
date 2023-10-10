@@ -74,5 +74,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-# Private Folders
-/[Pp]rivate/
+# Ignore Some Folders in Assets to contain unnecessary files
+/[Aa]ssets/[Pp]rivate/
+/[Aa]ssets/[Oo]ld/
