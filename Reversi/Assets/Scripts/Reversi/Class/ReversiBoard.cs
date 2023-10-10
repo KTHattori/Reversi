@@ -38,8 +38,8 @@ namespace Reversi
         public Disc PlacedUndone { get{ return GetUndone()[0];}}
 
         [SerializeField]
-
         private List<Point>[] _movablePointList = new List<Point>[Constant.MaxTurn + 1];
+        
         private Direction[,,] _movableDirection = new Direction[Constant.MaxTurn + 1,Constant.BoardSize+2,Constant.BoardSize+2];
         private DiscColorStorage<int> _discAmount = new DiscColorStorage<int>();
 
@@ -473,7 +473,7 @@ namespace Reversi
         public bool IsGameOver()
         {
             // 60手に達していたらゲーム終了
-            if(_currentTurn == Constant.MaxTurn - 1) return true;
+            if(_currentTurn == Constant.MaxTurn) return true;
 
             // 打てる手があればゲーム終了ではない
             if(_movablePointList[_currentTurn].Count != 0) return false;
@@ -573,6 +573,21 @@ namespace Reversi
         public int GetCurrentTurn()
         {
             return _currentTurn;
+        }
+
+        /// <summary>
+        /// 現在の手でパス可能かどうかを返す
+        /// </summary>
+        /// <returns></returns>
+        public bool IsPassable()
+        {
+            // 打つ手があれば、パスはできない
+            if(_movablePointList[_currentTurn].Count != 0) return false;
+
+            // ゲームが終了しているなら、パスはできない
+            if(IsGameOver()) return false;
+
+            return true;
         }
     }
 }

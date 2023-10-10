@@ -7,11 +7,32 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class CameraSizeAdjuster : MonoBehaviour
 {
-    [SerializeField] private Vector2Int _baseAspectRatio = new Vector2Int(9, 16);
-    [SerializeField] private float _baseCameraSize = 5;
-    [SerializeField, Range(1, 179)] private float _baseCameraFOV = 60;
+    /// <summary>
+    /// 基準となるアスペクト比
+    /// </summary>
+    [SerializeField]
+    private Vector2Int _baseAspectRatio = new Vector2Int(9, 16);
+
+    /// <summary>
+    /// 基準となるカメラサイズ
+    /// </summary>
+    [SerializeField]
+    private float _baseCameraSize = 5;
+
+    /// <summary>
+    /// 基準となる視野角
+    /// </summary>
+    [SerializeField, Range(1, 179)]
+    private float _baseCameraFOV = 60;
+
+    /// <summary>
+    /// カメラコンポーネント
+    /// </summary>
     private Camera _camera;
 
+    /// <summary>
+    /// アスペクト比を得るためのプロパティ
+    /// </summary>
     private float BaseAspect => _baseAspectRatio.x / (float)_baseAspectRatio.y;
 
     private void Awake()
@@ -31,6 +52,9 @@ public class CameraSizeAdjuster : MonoBehaviour
     }
 #endif
 
+    /// <summary>
+    /// カメラサイズの調整
+    /// </summary>
     private void AdjustCameraSize()
     {
         if (_camera.orthographic)
@@ -43,6 +67,9 @@ public class CameraSizeAdjuster : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 平行投影カメラサイズの調整
+    /// </summary>
     private void AdjustOrthographicCameraSize()
     {
         if (_camera.aspect < BaseAspect)
@@ -59,6 +86,9 @@ public class CameraSizeAdjuster : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 透視投影カメラサイズの調整
+    /// </summary>
     private void AdjustPerspectiveCameraSize()
     {
         if (_camera.aspect < BaseAspect)

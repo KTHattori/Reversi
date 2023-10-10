@@ -1,4 +1,4 @@
-Shader "Unlit/BasicToon"
+Shader "Unlit/ReversiDisc"
 {
     Properties
     {

@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66f8b00efb711d549b27ca912e9205df, type: 3}
-  m_Name: Board Settings
+  m_Script: {fileID: 11500000, guid: 7ffa8f0c59f5f234ebcbf70a9711e9d7, type: 3}
+  m_Name: Ref_PassButton
   m_EditorClassIdentifier: 
-  <PositionOrigin>k__BackingField: {x: -5.65, y: -0.4, z: -5.65}
-  <AnimationDelay>k__BackingField: 0.1
+  <gameObject>k__BackingField: {fileID: 0}

@@ -48,9 +48,10 @@ MonoBehaviour:
   _disc:
     x: 0
     y: 0
-    discType: 0
+    discColor: 0
   _settings: {fileID: 11400000, guid: 9ed5611ccc3b659468154cc289adf5af, type: 2}
   _animState: 0
+  debugAnimQueue: 
   _animProgress: 0
 --- !u!1 &6838359229375733587
 GameObject:

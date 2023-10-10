@@ -97,19 +97,19 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
     /// インスタンス破棄時関数
     public virtual void OnFinalize() {}
  
-    void Awake()
+    private void Awake()
     {
         // 初期化
         Initialize( this as T );
     }
  
-    void OnDestroy()
+    private void OnDestroy()
     {
         // オブジェクトが破棄された場合の処理
         Destroyed( this as T );
     }
  
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         // アプリケーションが終了した場合も破棄時の処理
         Destroyed( this as T );

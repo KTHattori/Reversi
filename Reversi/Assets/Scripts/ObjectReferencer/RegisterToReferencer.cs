@@ -10,10 +10,12 @@ namespace RegisterObject
 	public class RegisterToReferencer : MonoBehaviour 
 	{
 		[SerializeField,Header("受け渡し後に非Activeにする")]
-		bool deactivateAfterRegister = false;
+		private bool deactivateAfterRegister = false;
+
 		[SerializeField,Header("対象となる媒介用ScriptableObject")]
-        ObjectReferencer relay;
-		void Awake()
+        private ObjectReferencer relay;
+
+		private void Awake()
 		{
 			relay.gameObject = gameObject;
 			if(deactivateAfterRegister) gameObject.SetActive(false);

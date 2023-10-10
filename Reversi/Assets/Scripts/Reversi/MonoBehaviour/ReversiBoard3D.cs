@@ -25,7 +25,7 @@ public class ReversiBoard3D : MonoBehaviour
     /// ScriptableObjectで定義された各設定事項
     /// </summary>
     [SerializeField]
-    ReversiBoardSettings _settings;
+    private ReversiBoardSettings _settings;
 
     /// <summary>
     /// 石オブジェクトのプレハブ
@@ -44,7 +44,6 @@ public class ReversiBoard3D : MonoBehaviour
     /// </summary>
     [SerializeField]
     private ObjectReferencer _discParentObjRef;
-
 
     /// <summary>
     /// マス選択ボタン生成時の親となるオブジェクト
@@ -77,6 +76,12 @@ public class ReversiBoard3D : MonoBehaviour
     private ObjectReferencer _messageObjRef;
 
     /// <summary>
+    /// パス用のボタン 参照
+    /// </summary>
+    [SerializeField]
+    private ObjectReferencer _passButtonObjRef;
+
+    /// <summary>
     /// 配置可能なマスを保持するリスト
     /// </summary>
     [SerializeField,Header("配置可能マス")]
@@ -107,7 +112,7 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// オブジェクト生成初回ループにてコール
     /// </summary>
-    void Start()
+    private void Start()
     {
         if(_instance) {Destroy(_instance.gameObject);}
         _instance = this;
@@ -127,7 +132,7 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// オブジェクト破棄時
     /// </summary>
-    void OnDestroy()
+    private void OnDestroy()
     {
         _instance.StopAllCoroutines();
         if(_instance == this)
@@ -142,12 +147,13 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// 各コンポーネント参照を取得
     /// </summary>
-    void GetComponentRefs()
+    private void GetComponentRefs()
     {
-        if(!_backgroundObjRef.gameObject) Debug.LogError("Background Object Not Set!");
-        if(!_resultObjRef.gameObject) Debug.LogError("Result Object Not Set!");
-        if(!_turnObjRef.gameObject) Debug.LogError("Turn Text Object Not Set!");
-        if(!_messageObjRef.gameObject) Debug.LogError("Message Text Object Not Set!");
+        if(!_backgroundObjRef) Debug.LogError("Background Ref Not Set!");
+        if(!_resultObjRef) Debug.LogError("Result Ref Not Set!");
+        if(!_turnObjRef) Debug.LogError("Turn Text Ref Not Set!");
+        if(!_messageObjRef) Debug.LogError("Message Text Ref Not Set!");
+        if(!_passButtonObjRef) Debug.LogError("Pass Button Ref Not Set!");
 
         _backgroundImageRef = _backgroundObjRef.GetComponent<Image>();
         _resultCompRef = _resultObjRef.GetComponent<ReversiResultObject>();
@@ -158,7 +164,7 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// ボードの作成（初回のみ）
     /// </summary>
-    void CreateBoard()
+    private void CreateBoard()
     {
         _discObjBoard = new ReversiDisc3D[Constant.BoardSize + 2, Constant.BoardSize + 2];
         _board = new Board();
@@ -166,21 +172,23 @@ public class ReversiBoard3D : MonoBehaviour
         {
             for(int y = 1; y < Constant.BoardSize + 1; y++)
             {
-                GameObject selector = Instantiate(_selectorPrefab,_selectorParentObjRef.transform);
-                selector.GetComponent<ReversiPointSelector>().SetPoint(new Point(x,y));
-                selector.name = $"Selector({x},{y})";
+                GameObject selectorObj = Instantiate(_selectorPrefab,_selectorParentObjRef.transform);
+                selectorObj.name = $"Selector({x},{y})";
+                ReversiPointSelector selectorComp = selectorObj.GetComponent<ReversiPointSelector>();
+                selectorComp.SetPoint(new Point(x,y));
 
                 // 生成・配置
-                GameObject discObj = Instantiate(_discPrefab);
+                GameObject discObj = Instantiate(_discPrefab,_discParentObjRef.transform);
                 discObj.name = $"Disc({x},{y})";
                 Vector3 pos = discObj.transform.localPosition;
-                pos.x = x * 1.25f;
-                pos.z = y * 1.25f;
+                pos.x = 1.25f * x;
+                pos.z = 1.25f * y;
                 pos += _settings.PositionOrigin;
                 discObj.transform.localPosition = pos;
 
                 // 石のコンポーネント
                 ReversiDisc3D disc3D = discObj.GetComponent<ReversiDisc3D>();  // 取得
+                disc3D.PointSelector = selectorComp;
                 _discObjBoard[x,y] = disc3D;   // 配列にコンポーネント保存
             }
         }
@@ -189,7 +197,7 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// ボードの初期化
     /// </summary>
-    void InitializeBoard()
+    private void InitializeBoard()
     {
         _board.Init();
 
@@ -258,7 +266,7 @@ public class ReversiBoard3D : MonoBehaviour
     }
 
     /// <summary>
-    /// パスする
+    /// パスを試みる
     /// </summary>
     static public void Pass()
     {
@@ -275,7 +283,7 @@ public class ReversiBoard3D : MonoBehaviour
     }
 
     /// <summary>
-    /// 一手戻る
+    /// 一手戻しを試みる
     /// </summary>
     static public void Undo()
     {
@@ -321,7 +329,7 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// 配置可能マスをハイライトする, 現在無効
     /// </summary>
-    void HighlightMovable()
+    private void HighlightMovable()
     {
         // previous movable
         foreach(Point point in _movable)
@@ -342,17 +350,20 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// UI更新
     /// </summary>
-    void UpdateUI()
+    private void UpdateUI()
     {
         _turnTextRef.SetText(_board.GetCurrentTurn().ToString());
-        if(_backgroundImageRef) _instance._backgroundImageRef.color = _board.GetCurrentColor().ToColor();
+        _instance._backgroundImageRef.color = _board.GetCurrentColor().ToColor();
+        
+        if(_board.IsPassable()) _passButtonObjRef.ActivateObject();
+        else _passButtonObjRef.DeactivateObject();
     }
 
     /// <summary>
     /// 画面下部に指定したメッセージを表示する
     /// </summary>
     /// <param name="msg"></param>
-    void SetMessage(string msg)
+    private void SetMessage(string msg)
     {
         _messageTextRef.SetText(msg);
     }

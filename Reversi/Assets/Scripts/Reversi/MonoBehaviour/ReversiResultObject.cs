@@ -8,7 +8,7 @@ using Unity.VisualScripting;
 public class ReversiResultObject : MonoBehaviour
 {
     [SerializeField]
-    private List<Image> _imagesToApplyWinnerColor = new List<Image>();
+    private List<Image> _imagesToApplyWinnerColor;
 
     [SerializeField]
     private GameObject _resultPanel;
@@ -21,18 +21,19 @@ public class ReversiResultObject : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI _winnerText;
+
     [SerializeField]
     private Image _winnerPanel;
 
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         _resultPanel = gameObject;
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         
     }

@@ -57,13 +57,13 @@ public class ReversiDisc3D : MonoBehaviour
     /// アニメーションの状態
     /// </summary>
     [SerializeField]
-    AnimationState _animState = AnimationState.None;
+    private AnimationState _animState = AnimationState.None;
 
     /// <summary>
     /// アニメーションの状態キュー
     /// </summary>
     [SerializeField]
-    Queue<AnimationState> _animStateQueue = new Queue<AnimationState>();
+    private Queue<AnimationState> _animStateQueue;
 
     /// <summary>
     /// アニメーションの進行度.  範囲は 0.0f ~ 1.0f で表される
@@ -84,6 +84,16 @@ public class ReversiDisc3D : MonoBehaviour
     /// </summary>
     private Vector3 _initScale;
 
+    /// <summary>
+    /// 位置指定用ボタンへの参照
+    /// </summary>
+    private ReversiPointSelector pointSelector;
+
+    /// <summary>
+    /// 位置指定用ボタンへの参照セット用プロパティ
+    /// </summary>
+    public ReversiPointSelector PointSelector { set{ pointSelector = value; }}
+
     // public 
     /// <summary>
     /// プロパティ：自身の保持するリバーシ石をPoint型で返す
@@ -95,24 +105,19 @@ public class ReversiDisc3D : MonoBehaviour
     /// </summary>
     public DiscColor DiscColor { get { return _disc.discColor;} set { _disc.discColor = value;}}
 
-    
     /// <summary>
-    /// コンポーネントがアタッチされた時にコールされる関数
+    /// 開始時にコール
     /// </summary>
-    void Reset()
-    {
-
-    }
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         _initPos = transform.position;
         _initScale = transform.localScale;
     }
 
-    // Update is called once per frame
-    void Update()
+    /// <summary>
+    /// Update毎に呼ばれる
+    /// </summary>
+    private void Update()
     {
         if(_animState == AnimationState.None)
         {
@@ -206,25 +211,27 @@ public class ReversiDisc3D : MonoBehaviour
     /// <summary>
     /// アニメーション更新
     /// </summary>
-    void UpdateAnimation()
+    private void UpdateAnimation()
     {
         switch(_animState)
         {
-            case AnimationState.Placing:
+        case AnimationState.Placing:
             PlaceAnimation(Easing.Ease(_animProgress,1.0f,Easing.Curve.EaseInQuint));
             // ScaleAnimation(_animProgress);
             break;
-            case AnimationState.Flipping:
+        case AnimationState.Flipping:
             HopAnimation(Easing.Ease(_animProgress,1.0f,_settings.HopEase));
             FlipAnimation(Easing.Ease(_animProgress,1.0f,_settings.FlipEase));
             break;
-            case AnimationState.Recalling:
+        case AnimationState.Recalling:
             RecallAnimation(Easing.Ease(_animProgress,1.0f,Easing.Curve.EaseInQuint));
             // ScaleAnimation(1.0f - _animProgress);
             break;
             
         }
+
         if(_currentTime >= _settings.AnimationTime) { EndAnimation(); return; }
+
         _currentTime += Time.deltaTime;
         _animProgress = Mathf.Clamp01((_currentTime - 0.0f) / (_settings.AnimationTime - 0.0f));
     }
@@ -232,20 +239,20 @@ public class ReversiDisc3D : MonoBehaviour
     /// <summary>
     /// アニメーション終了時
     /// </summary>
-    void EndAnimation()
+    private void EndAnimation()
     {
         _animProgress = 1.0f;
 
         switch(_animState)
         {
-            case AnimationState.Recalling:
+        case AnimationState.Recalling:
             gameObject.SetActive(false);
             break;
         }
 
-        _animState = AnimationState.None;
+        SetAnimationState(AnimationState.None,0.0f);
 
-        if(_animStateQueue.TryDequeue(out _animState)) _animProgress = 0.0f;
+        if(_animStateQueue.TryDequeue(out _animState)) { _animProgress = 0.0f; _currentTime = 0.0f; }
     }
     
     // Animations
@@ -253,7 +260,7 @@ public class ReversiDisc3D : MonoBehaviour
     /// 跳ねるアニメーション
     /// </summary>
     /// <param name="progress"></param>
-    void HopAnimation(float progress)
+    private void HopAnimation(float progress)
     {
         Vector3 pos = transform.position;
         pos.y = Mathf.Sin(progress * Mathf.PI) + _initPos.y;
@@ -264,7 +271,7 @@ public class ReversiDisc3D : MonoBehaviour
     /// ひっくり返るアニメーション
     /// </summary>
     /// <param name="progress"></param>
-    void FlipAnimation(float progress)
+    private void FlipAnimation(float progress)
     {
         Vector3 angle = transform.localEulerAngles;
         angle.x = MathUtility.Remap(progress,0.0f,1.0f,InvertedFlipAngle,CurrentFlipAngle);
@@ -275,7 +282,7 @@ public class ReversiDisc3D : MonoBehaviour
     /// 置かれるアニメーション
     /// </summary>
     /// <param name="progress"></param>
-    void PlaceAnimation(float progress)
+    private void PlaceAnimation(float progress)
     {
         Vector3 pos = transform.position;
         pos.y = (1.0f - progress) * 2.0f + _initPos.y;
@@ -286,7 +293,7 @@ public class ReversiDisc3D : MonoBehaviour
     /// 大きさを変えるアニメーション
     /// </summary>
     /// <param name="progress"></param>
-    void ScaleAnimation(float progress)
+    private void ScaleAnimation(float progress)
     {
         transform.localScale = progress * _initScale;
     }
@@ -295,7 +302,7 @@ public class ReversiDisc3D : MonoBehaviour
     /// 石を回収するアニメーション
     /// </summary>
     /// <param name="progress"></param>
-    void RecallAnimation(float progress)
+    private void RecallAnimation(float progress)
     {
         Vector3 pos = transform.position;
         pos.y = progress * 2.0f + _initPos.y;

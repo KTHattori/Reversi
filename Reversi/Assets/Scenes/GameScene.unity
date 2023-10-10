@@ -1856,6 +1856,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1139402371}
   m_CullTransparentMesh: 1
+--- !u!1 &1142854841
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1142854842}
+  - component: {fileID: 1142854843}
+  m_Layer: 0
+  m_Name: Discs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1142854842
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142854841}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1835345045}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &1142854843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142854841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateAfterRegister: 0
+  relay: {fileID: 11400000, guid: 5e936dfac629d4040932b42c809b14a4, type: 2}
 --- !u!1 &1291621441
 GameObject:
   m_ObjectHideFlags: 0
@@ -2374,6 +2420,7 @@ GameObject:
   - component: {fileID: 1645145254}
   - component: {fileID: 1645145253}
   - component: {fileID: 1645145252}
+  - component: {fileID: 1645145255}
   m_Layer: 0
   m_Name: Button_Pass
   m_TagString: Untagged
@@ -2495,6 +2542,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1645145250}
   m_CullTransparentMesh: 1
+--- !u!114 &1645145255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1645145250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateAfterRegister: 0
+  relay: {fileID: 11400000, guid: f5a97882cedb18f4b9a500a5546cf3d6, type: 2}
 --- !u!1 &1649090137
 GameObject:
   m_ObjectHideFlags: 0
@@ -3264,6 +3325,7 @@ Transform:
   m_Children:
   - {fileID: 1291621442}
   - {fileID: 1932356017}
+  - {fileID: 1142854842}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1835345046
@@ -3287,8 +3349,8 @@ MonoBehaviour:
   _resultObjRef: {fileID: 11400000, guid: 1b277c14e52eddb45aa05f31406b710b, type: 2}
   _turnObjRef: {fileID: 11400000, guid: 4213394a54846714aa74f542007669e8, type: 2}
   _messageObjRef: {fileID: 11400000, guid: 43e52417fc128cf41a6c3af5c5ae2b87, type: 2}
+  _passButtonObjRef: {fileID: 11400000, guid: f5a97882cedb18f4b9a500a5546cf3d6, type: 2}
   _movable: []
-  _backgroundImageRef: {fileID: 0}
 --- !u!1 &1932356016
 GameObject:
   m_ObjectHideFlags: 0
@@ -3315,14 +3377,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1932356016}
-  m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1020041347}
   m_Father: {fileID: 1835345045}
-  m_LocalEulerAnglesHint: {x: 90, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0.505}

@@ -30,11 +30,11 @@ namespace Reversi
         {
             switch(color)
             {
-                case DiscColor.White:
+            case DiscColor.White:
                 return DiscColor.Black;
-                case DiscColor.Black:
+            case DiscColor.Black:
                 return DiscColor.White;
-                default:
+            default:
                 return color;
             }
         }
@@ -49,19 +49,19 @@ namespace Reversi
         {
             switch(color)
             {
-                case DiscColor.White:
+            case DiscColor.White:
                 return Color.white;
-                case DiscColor.Black:
+            case DiscColor.Black:
                 return Color.black;
-                case DiscColor.Empty:
+            case DiscColor.Empty:
                 return new Color(0.0f,0.0f,0.0f,0.0f);
-                case DiscColor.Wall:
+            case DiscColor.Wall:
                 return Color.red;
-                case DiscColor.White_Placeable:
+            case DiscColor.White_Placeable:
                 return new Color(1.0f,1.0f,1.0f,0.5f);
-                case DiscColor.Black_Placeable:
+            case DiscColor.Black_Placeable:
                 return new Color(0.0f,0.0f,0.0f,0.5f);
-                default:
+            default:
                 return Color.gray;
             }
         }
@@ -75,11 +75,11 @@ namespace Reversi
         {
             switch(color)
             {
-                case DiscColor.White:
+            case DiscColor.White:
                 return DiscColor.White_Placeable;
-                case DiscColor.Black:
+            case DiscColor.Black:
                 return DiscColor.Black_Placeable;
-                default:
+            default:
                 return color;
             }
         }
