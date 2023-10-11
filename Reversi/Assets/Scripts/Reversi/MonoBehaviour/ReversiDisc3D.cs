@@ -65,7 +65,6 @@ public class ReversiDisc3D : MonoBehaviour
     /// <summary>
     /// アニメーションの状態キュー
     /// </summary>
-    [SerializeField]
     private Queue<AnimationState> _animStateQueue = new Queue<AnimationState>();
 
     /// <summary>

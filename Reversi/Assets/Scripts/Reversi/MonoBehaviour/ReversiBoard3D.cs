@@ -350,7 +350,6 @@ public class ReversiBoard3D : MonoBehaviour
         foreach(Point point in _movable)
         {
             _discObjBoard[point.x,point.y].SetMovable(true,current);
-            Debug.Log($"{point.x},{point.y}");
         }
     }
 
