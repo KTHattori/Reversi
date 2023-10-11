@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f8b00efb711d549b27ca912e9205df, type: 3}
   m_Name: Board Settings
   m_EditorClassIdentifier: 
-  <PositionOrigin>k__BackingField: {x: -5.65, y: -0.4, z: -5.65}
+  <PositionOrigin>k__BackingField: {x: -5.625, y: -0.4, z: -5.625}
   <AnimationDelay>k__BackingField: 0.1

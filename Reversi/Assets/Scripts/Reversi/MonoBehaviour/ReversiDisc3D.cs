@@ -90,12 +90,12 @@ public class ReversiDisc3D : MonoBehaviour
     /// <summary>
     /// 位置指定用ボタンへの参照
     /// </summary>
-    private ReversiPointSelector pointSelector;
+    private ReversiPointSelector _pointSelector;
 
     /// <summary>
-    /// 位置指定用ボタンへの参照セット用プロパティ
+    /// 位置指定用オブジェクトへの参照セット用プロパティ
     /// </summary>
-    public ReversiPointSelector PointSelector { set{ pointSelector = value; }}
+    public ReversiPointSelector PointSelector { set{ _pointSelector = value; }}
 
     // public 
     /// <summary>
@@ -141,6 +141,7 @@ public class ReversiDisc3D : MonoBehaviour
     {
         // transform.localScale = Vector3.zero;
         gameObject.SetActive(false);
+        SetMovable(false);
     }
 
     /// <summary>
@@ -161,11 +162,15 @@ public class ReversiDisc3D : MonoBehaviour
     {
         gameObject.SetActive(true);
         _disc.discColor = type;
-        Debug.Log(type);
         FlipAnimation(1.0f);
         PlayAnimation(AnimationState.Placing,delay);
     }
 
+    /// <summary>
+    /// 配置された石を戻す。
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="delay"></param>
     public void RecallDisc(DiscColor type,float delay)
     {
         _disc.discColor = type;
@@ -173,7 +178,7 @@ public class ReversiDisc3D : MonoBehaviour
     }
 
     /// <summary>
-    /// 石の色情報のみを設定する（ひっくり返す）。
+    /// 石をひっくり返す。
     /// </summary>
     /// <param name="type"></param>
     public void FlipDisc(DiscColor type,float delay)
@@ -181,6 +186,16 @@ public class ReversiDisc3D : MonoBehaviour
         _disc.discColor = type;
         PlayAnimation(AnimationState.Flipping,delay);
     }
+
+    /// <summary>
+    /// 配置可能状態にする。
+    /// </summary>
+    /// <param name="color"></param>
+    public void SetMovable(bool flag,DiscColor color = DiscColor.Empty)
+    {
+        _pointSelector.SetSelectable(flag);
+    }
+
 
     /// <summary>
     /// 一定時間後にアニメーション状態をセットするコルーチン

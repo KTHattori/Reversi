@@ -90,10 +90,6 @@ public class ReversiBoard3D : MonoBehaviour
     [SerializeField,Header("配置可能マス")]
     private List<Point> _movable = null;
 
-
-    // [SerializeField,Header("配置可能マスカラー")]
-    // private Color _movableColor = Color.yellow;
-
     /// <summary>
     /// 背景 Imageコンポーネント参照
     /// </summary>
@@ -175,12 +171,7 @@ public class ReversiBoard3D : MonoBehaviour
         {
             for(int y = 1; y < Constant.BoardSize + 1; y++)
             {
-                GameObject selectorObj = Instantiate(_selectorPrefab,_selectorParentObjRef.transform);
-                selectorObj.name = $"Selector({x},{y})";
-                ReversiPointSelector selectorComp = selectorObj.GetComponent<ReversiPointSelector>();
-                selectorComp.SetPoint(new Point(x,y));
-
-                // 生成・配置
+                // 石の生成・整列
                 GameObject discObj = Instantiate(_discPrefab,_discParentObjRef.transform);
                 discObj.name = $"Disc({x},{y})";
                 Vector3 pos = discObj.transform.localPosition;
@@ -189,7 +180,18 @@ public class ReversiBoard3D : MonoBehaviour
                 pos += _settings.PositionOrigin;
                 discObj.transform.localPosition = pos;
 
-                // 石のコンポーネント
+                // 選択用オブジェクトの生成・整列
+                GameObject selectorObj = Instantiate(_selectorPrefab,_selectorParentObjRef.transform);
+                selectorObj.name = $"Selector({x},{y})";
+                Vector3 selectorPos = selectorObj.transform.position;
+                selectorPos.x = discObj.transform.position.x;
+                selectorPos.z = discObj.transform.position.z;
+                selectorObj.transform.position = selectorPos;   // 石と同じxz座標
+
+                ReversiPointSelector selectorComp = selectorObj.GetComponent<ReversiPointSelector>();
+                selectorComp.SetPoint(new Point(x,y));
+
+                // 石のコンポーネント取得と設定
                 ReversiDisc3D disc3D = discObj.GetComponent<ReversiDisc3D>();  // 取得
                 disc3D.PointSelector = selectorComp;
                 _discObjBoard[x,y] = disc3D;   // 配列にコンポーネント保存
@@ -337,16 +339,18 @@ public class ReversiBoard3D : MonoBehaviour
         // previous movable
         foreach(Point point in _movable)
         {
-            //_objBoard[point.x,point.y].SetImageColor(_objBoard[point.x,point.y].DiscColor.ToColor());
+            _discObjBoard[point.x,point.y].SetMovable(false);
         }
 
         // get
         _movable = _board.GetMovablePoint();
+        DiscColor current = _board.GetCurrentColor();
 
         // current movable
         foreach(Point point in _movable)
         {
-            //_objBoard[point.x,point.y].SetImageColor(_instance._movableColor);
+            _discObjBoard[point.x,point.y].SetMovable(true,current);
+            Debug.Log($"{point.x},{point.y}");
         }
     }
 

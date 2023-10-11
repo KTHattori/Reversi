@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8368204036695130681}
   - component: {fileID: 6986473662208807655}
   m_Layer: 0
-  m_Name: ReversiDisc3D
+  m_Name: Reversi_Disc3D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

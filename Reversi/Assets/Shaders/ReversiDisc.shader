@@ -55,7 +55,9 @@ Shader "Unlit/ReversiDisc"
                 float3 L = normalize(_WorldSpaceLightPos0.xyz);
                 float3 N = normalize(i.worldNormal);
                 fixed4 diffuseColor = max(0, dot(N, L) * _DiffuseShade + (1 - _DiffuseShade));
-                // diffuseColor = step(0.5,diffuseColor);
+                diffuseColor = diffuseColor * 12;
+                diffuseColor = floor(diffuseColor);
+                diffuseColor = diffuseColor / 12;
                 fixed heightColor = step(0.0,i.localPos.y) + 0.01;
                 fixed4 finalColor = heightColor * _MainColor * diffuseColor * _LightColor0 * float4(i.ambient,0);
                 return finalColor;
