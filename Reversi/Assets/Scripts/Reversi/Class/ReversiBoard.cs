@@ -32,6 +32,29 @@ namespace Reversi
             UpperRight  = 1 << 7,
         }
 
+        /// <summary>
+        /// 上下左右4方向のうち、maskDirで指定した方向を含んでいるかをチェックする拡張メソッド
+        /// 4方向以外が指定された場合はfalseを返す
+        /// </summary>
+        /// <param name="maskDir">チェックする方向（上下左右）</param>
+        /// <returns>含んでいればtrue, いなければfalse</returns>
+        private bool GetMask(Direction dir,Direction maskDir)
+        {
+            switch(maskDir)
+            {
+            case Direction.Upper:
+                return dir.HasFlag(Direction.Upper | Direction.UpperLeft | Direction.UpperRight);
+            case Direction.Left:
+                return dir.HasFlag(Direction.Left | Direction.UpperLeft | Direction.LowerLeft);
+            case Direction.Lower:
+                return dir.HasFlag(Direction.Lower | Direction.LowerLeft | Direction.LowerRight);
+            case Direction.Right:
+                return dir.HasFlag(Direction.Right | Direction.UpperRight | Direction.LowerRight);
+            default:
+                return false;
+            }
+        }
+
         // variable
 
         /// <summary>
@@ -85,8 +108,6 @@ namespace Reversi
         /// </summary>
         private DiscColorStorage<int> _discAmount = new DiscColorStorage<int>();
 
-
-        // method
 
         /// <summary>
         /// point で指定された座標に石をうち、挟み込むことができるすべての石を裏返す。<br/>
