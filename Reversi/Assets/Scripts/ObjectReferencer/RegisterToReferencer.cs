@@ -80,7 +80,7 @@ namespace RegisterObject
 			}
 			else
 			{
-				Debug.LogError($"There is no referencer to register!");
+				Debug.LogError($"There is no referencer set to register for gameObject: {gameObject.name}!");
 			}
 		}
 

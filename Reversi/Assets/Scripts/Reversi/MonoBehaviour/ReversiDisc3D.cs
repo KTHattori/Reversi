@@ -66,7 +66,7 @@ public class ReversiDisc3D : MonoBehaviour
     /// アニメーションの状態キュー
     /// </summary>
     [SerializeField]
-    private Queue<AnimationState> _animStateQueue;
+    private Queue<AnimationState> _animStateQueue = new Queue<AnimationState>();
 
     /// <summary>
     /// アニメーションの進行度.  範囲は 0.0f ~ 1.0f で表される
