@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 21a0cc7427aa39f47b7e61f74d6e6792
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _settings: {fileID: 11400000, guid: 5d31dfc276a9061409a75499518f1bd2, type: 2}
+  - _boardObject: {instanceID: 0}
+  - _discPrefab: {instanceID: 0}
+  - _background: {instanceID: 0}
+  - _result: {instanceID: 0}
+  - _turnText: {instanceID: 0}
+  - _messageText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
