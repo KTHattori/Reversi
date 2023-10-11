@@ -359,8 +359,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deactivateAfterRegister: 0
-  relay: {fileID: 11400000, guid: 43e52417fc128cf41a6c3af5c5ae2b87, type: 2}
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: 43e52417fc128cf41a6c3af5c5ae2b87, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &245708352
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +479,7 @@ GameObject:
   - component: {fileID: 274432712}
   - component: {fileID: 274432714}
   - component: {fileID: 274432713}
+  - component: {fileID: 274432715}
   m_Layer: 0
   m_Name: Panel_Message
   m_TagString: Untagged
@@ -541,6 +545,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 274432711}
   m_CullTransparentMesh: 1
+--- !u!114 &274432715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274432711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: 85a1a42fc9a810a43a35a3fb4cac87d3, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &289782887
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,6 +697,7 @@ GameObject:
   - component: {fileID: 380585113}
   - component: {fileID: 380585112}
   - component: {fileID: 380585111}
+  - component: {fileID: 380585114}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -733,6 +755,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &380585114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380585110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: f2aa343f870825b4cb98878245fd5790, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &416190754
 GameObject:
   m_ObjectHideFlags: 0
@@ -1182,8 +1221,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deactivateAfterRegister: 0
-  relay: {fileID: 11400000, guid: ac8b2bad3af4e874a9abe4788b8a9664, type: 2}
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: ac8b2bad3af4e874a9abe4788b8a9664, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -1539,8 +1581,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deactivateAfterRegister: 0
-  relay: {fileID: 11400000, guid: be14412ad8863944dab10b8ed495048b, type: 2}
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: be14412ad8863944dab10b8ed495048b, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &1022782928
 GameObject:
   m_ObjectHideFlags: 0
@@ -1900,8 +1945,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deactivateAfterRegister: 0
-  relay: {fileID: 11400000, guid: 5e936dfac629d4040932b42c809b14a4, type: 2}
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: 5e936dfac629d4040932b42c809b14a4, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &1291621441
 GameObject:
   m_ObjectHideFlags: 0
@@ -2554,8 +2602,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deactivateAfterRegister: 0
-  relay: {fileID: 11400000, guid: f5a97882cedb18f4b9a500a5546cf3d6, type: 2}
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: f5a97882cedb18f4b9a500a5546cf3d6, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &1649090137
 GameObject:
   m_ObjectHideFlags: 0
@@ -3008,8 +3059,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deactivateAfterRegister: 0
-  relay: {fileID: 11400000, guid: 1b277c14e52eddb45aa05f31406b710b, type: 2}
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: 1b277c14e52eddb45aa05f31406b710b, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &1805738830
 GameObject:
   m_ObjectHideFlags: 0
@@ -3291,8 +3345,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deactivateAfterRegister: 0
-  relay: {fileID: 11400000, guid: 4213394a54846714aa74f542007669e8, type: 2}
+  _deactivateAfterRegister: 0
+  _referencer: {fileID: 11400000, guid: 4213394a54846714aa74f542007669e8, type: 2}
+  _assetCreation:
+    destPath: ScriptableObjects/ObjectReferencer/
+    prefix: Ref_
 --- !u!1 &1835345043
 GameObject:
   m_ObjectHideFlags: 0

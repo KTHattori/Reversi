@@ -16,6 +16,9 @@ namespace Reversi
         Black_Placeable = 10,
     }
 
+    /// <summary>
+    /// 石色に関する拡張メソッドなどを定義したクラス。
+    /// </summary>
     public static class DiscColorUtil
     {
         // extension method

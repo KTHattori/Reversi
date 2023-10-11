@@ -35,17 +35,27 @@ public class CameraSizeAdjuster : MonoBehaviour
     /// </summary>
     private float BaseAspect => _baseAspectRatio.x / (float)_baseAspectRatio.y;
 
-    private void Awake()
+    /// <summary>
+    /// オブジェクト有効化時に実行、カメラ
+    /// </summary>
+    private void OnEnable()
     {
         _camera = GetComponent<Camera>();
     }
 
+    /// <summary>
+    /// 初回Update直前にコール
+    /// カメラサイズ調整の実行
+    /// </summary>
     private void Start()
     {
         AdjustCameraSize();
     }
 
 #if UNITY_EDITOR
+    /// <summary>
+    /// エディタ内のみ：常にカメラサイズ調整
+    /// </summary>
     private void Update()
     {
         AdjustCameraSize();

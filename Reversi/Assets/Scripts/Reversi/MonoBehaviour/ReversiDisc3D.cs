@@ -5,6 +5,9 @@ using Interpolation;
 using System;
 using System.Collections;
 
+/// <summary>
+/// 3Dオブジェクトとしてのリバーシ石定義
+/// </summary>
 public class ReversiDisc3D : MonoBehaviour
 {
     public enum AnimationState

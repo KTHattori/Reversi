@@ -12,10 +12,14 @@ dontDestroyOnLoadの部分と、各コメント以外は下記サイトを引用
 */
 public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
 {
-    // メンバ インスタンス
+    /// <summary>
+    /// インスタンス
+    /// </summary>
     static T m_Instance = null;
 
-    // シーンロード時に破棄を行わないかどうか
+    /// <summary>
+    /// シーンロード時に破棄しないようにする
+    /// </summary>
     [SerializeField]
     protected bool dontDestroyOnLoad;
  
@@ -59,7 +63,10 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
         }
     }
  
+    /// <summary>
     /// 初期化関数
+    /// </summary>
+    /// <param name="instance"></param>
     static void Initialize(T instance)
     {
         if( m_Instance == null )
@@ -80,7 +87,10 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
         }
     }
  
-    /// オブジェクト破棄時関数
+    /// <summary>
+    /// 破棄時の処理
+    /// </summary>
+    /// <param name="instance"></param>
     static void Destroyed(T instance)
     {
         if( m_Instance == instance )
@@ -91,24 +101,37 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
         }
     }
  
-    /// インスタンス初期化時関数
+    /// <summary>
+    /// インスタンス初期化時にコールされる関数
+    /// </summary>
     public virtual void OnInitialize() {}
 
-    /// インスタンス破棄時関数
+    /// <summary>
+    /// インスタンス破棄時にコールされる関数
+    /// </summary>
     public virtual void OnFinalize() {}
  
+    /// <summary>
+    /// ループ初期にコール
+    /// </summary>
     private void Awake()
     {
         // 初期化
         Initialize( this as T );
     }
  
+    /// <summary>
+    /// オブジェクト破棄時
+    /// </summary>
     private void OnDestroy()
     {
         // オブジェクトが破棄された場合の処理
         Destroyed( this as T );
     }
  
+    /// <summary>
+    /// アプリケーション終了時
+    /// </summary>
     private void OnApplicationQuit()
     {
         // アプリケーションが終了した場合も破棄時の処理

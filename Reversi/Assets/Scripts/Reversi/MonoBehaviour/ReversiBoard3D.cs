@@ -4,6 +4,9 @@ using UnityEngine.UI;
 using Reversi;
 using TMPro;
 
+/// <summary>
+/// 3Dオブジェクトとしてのリバーシ盤面定義
+/// </summary>
 public class ReversiBoard3D : MonoBehaviour
 {
     /// <summary>

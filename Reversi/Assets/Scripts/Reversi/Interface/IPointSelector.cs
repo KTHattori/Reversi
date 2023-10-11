@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Reversi
 {
+    /// <summary>
+    /// リバーシのマス選択に関するインタフェース
+    /// </summary>
     public interface IPointSelector
     {
         /// <summary>

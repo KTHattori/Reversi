@@ -6,11 +6,18 @@ using System;
 
 namespace Reversi
 {
+    /// <summary>
+    /// リバーシのボードについて定義したクラス
+    /// </summary>
     [System.Serializable]
     public class Board
     {
         // --- private ---
         // enum
+
+        /// <summary>
+        /// 方向を表すビットフラグ列挙体
+        /// </summary>
         [Flags]
         private enum Direction
         {
@@ -26,21 +33,56 @@ namespace Reversi
         }
 
         // variable
+
+        /// <summary>
+        /// ボード上の各マスの石色情報を格納する配列
+        /// </summary>
         private DiscColor[,] _rawBoard = new DiscColor[Constant.BoardSize + 2, Constant.BoardSize + 2];
 
+        /// <summary>
+        /// 現在のターン数
+        /// </summary>
         private int _currentTurn;
+
+        /// <summary>
+        /// 現在の手番の色
+        /// </summary>
         private DiscColor _currentColor;
 
+        /// <summary>
+        /// 更新された石の履歴のリスト（全手分）
+        /// </summary>
         private List<List<Disc>> _updatedDiscList = new List<List<Disc>>();
+
+        /// <summary>
+        /// 一手戻された時に更新された石のリスト（一手分）
+        /// </summary>
         private List<Disc> _undoneDiscList = new List<Disc>();
 
+        /// <summary>
+        /// 直前のターンで置かれた石を取得
+        /// </summary>
         public Disc PlacedUpdated { get{ return GetUpdate()[0];}}
+
+        /// <summary>
+        /// 直前の一手戻しで戻された石を取得
+        /// </summary>
         public Disc PlacedUndone { get{ return GetUndone()[0];}}
 
+        /// <summary>
+        /// 配置可能マスのリストを全手分格納する配列
+        /// </summary>
         [SerializeField]
         private List<Point>[] _movablePointList = new List<Point>[Constant.MaxTurn + 1];
         
+        /// <summary>
+        /// 指定されたマスからひっくり返せる方向を格納した配列
+        /// </summary>
         private Direction[,,] _movableDirection = new Direction[Constant.MaxTurn + 1,Constant.BoardSize+2,Constant.BoardSize+2];
+
+        /// <summary>
+        /// 黒石, 白石, 空のマスの個数を保存する変数
+        /// </summary>
         private DiscColorStorage<int> _discAmount = new DiscColorStorage<int>();
 
 
