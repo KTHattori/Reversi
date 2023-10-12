@@ -1,4 +1,6 @@
-﻿namespace Reversi
+﻿using System;
+
+namespace Reversi
 {
     /// <summary>
     /// オセロのマス座標を表すクラス
@@ -13,6 +15,22 @@
         {
             this.x = x;
             this.y = y;
+        }
+
+        public Point(string coord)
+        {
+            if(coord == null || coord.Length < 2) throw new ArgumentException("リバーシ座標で指定してください!");
+            x = coord[0] - 'a' + 1;
+            y = coord[1] - '1' + 1;
+        }
+
+        public string ToStrCoord()
+        {
+            string coord = "";
+            coord += (char)('a' + x - 1);
+            coord += (char)('1' + y - 1);
+
+            return coord;
         }
 
         public static Point GetBoardDirQuad(Board.DirectionQuad dirQuad)

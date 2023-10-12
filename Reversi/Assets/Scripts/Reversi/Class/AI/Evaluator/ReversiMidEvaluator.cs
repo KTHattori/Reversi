@@ -1,7 +1,8 @@
-using Unity.Android.Gradle.Manifest;
-
 namespace Reversi
 {
+    /// <summary>
+    /// 中盤の評価関数
+    /// </summary>
     public class MidEvaluator : IEvaluator
     {
         /// <summary>
@@ -29,6 +30,11 @@ namespace Reversi
             /// </summary>
             public byte dangerCMove = 0;
 
+            /// <summary>
+            /// 加算
+            /// </summary>
+            /// <param name="src"></param>
+            /// <returns></returns>
             public EdgeParam Add(EdgeParam src)
             {
                 stable += src.stable;
@@ -39,6 +45,10 @@ namespace Reversi
                 return this;
             }
 
+            /// <summary>
+            /// 代入
+            /// </summary>
+            /// <param name="src"></param>
             public void Set(EdgeParam src)
             {
                 stable = src.stable;
@@ -48,10 +58,19 @@ namespace Reversi
             }
         }
 
+        /// <summary>
+        /// 辺の評価情報を格納するクラス
+        /// </summary>
         private class EdgeStat
         {
+            /// <summary>
+            /// 各石色ごとの辺評価情報
+            /// </summary>
             ColoredContainer<EdgeParam> stat = new ColoredContainer<EdgeParam>();
 
+            /// <summary>
+            /// コンストラクタ
+            /// </summary>
             public EdgeStat()
             {
                 stat[DiscColor.Black] = new EdgeParam();
@@ -59,6 +78,10 @@ namespace Reversi
                 stat[DiscColor.Empty] = new EdgeParam();
             }
 
+            /// <summary>
+            /// 各石色のデータに加算
+            /// </summary>
+            /// <param name="value"></param>
             public void Add(EdgeStat value)
             {
                 stat[DiscColor.Black].Add(value.stat[DiscColor.Black]);
@@ -66,12 +89,20 @@ namespace Reversi
                 stat[DiscColor.Empty].Add(value.stat[DiscColor.Empty]);
             }
 
+            /// <summary>
+            /// 指定した石色のデータを取得
+            /// </summary>
+            /// <param name="color"></param>
+            /// <returns></returns>
             public EdgeParam this[DiscColor color]
             {
                 get { return stat[color]; }
             }
         }
 
+        /// <summary>
+        /// 隅の評価に関するクラス
+        /// </summary>
         private class CornerParam
         {
             /// <summary>
@@ -84,10 +115,19 @@ namespace Reversi
             public byte dangerXmove = 0;
         }
 
+        /// <summary>
+        /// 隅の評価情報を格納するクラス
+        /// </summary>
         private class CornerStat
         {
+            /// <summary>
+            /// 各色ごとの隅評価情報
+            /// </summary>
             ColoredContainer<CornerParam> stat = new ColoredContainer<CornerParam>();
 
+            /// <summary>
+            /// コンストラクタ
+            /// </summary>
             public CornerStat()
             {
                 stat[DiscColor.Black] = new CornerParam();
@@ -95,12 +135,20 @@ namespace Reversi
                 stat[DiscColor.Empty] = new CornerParam();
             }
 
+            /// <summary>
+            /// 指定した石色のデータを取得
+            /// </summary>
+            /// <param name="color"></param>
+            /// <returns></returns>
             public CornerParam this[DiscColor color]
             {
                 get { return stat[color]; }
             }
         }
 
+        /// <summary>
+        /// 評価の重みづけを定義するクラス
+        /// </summary>
         private class Weight
         {
             public int mobility_w;
@@ -111,32 +159,56 @@ namespace Reversi
             public int dangerCmove_w;
         }
 
-        private Weight evalWeight;
+        /// <summary>
+        /// 評価の重みづけ
+        /// </summary>
+        private Weight _evalWeight;
         
-        private const int Table_Size = 6561;    // 3^8
-        private static EdgeStat[] edgeTable = new EdgeStat[Table_Size];
-        private static bool tableInitialized = false;
+        /// <summary>
+        /// テーブルのサイズ 3の8乗
+        /// </summary>
+        private const int Table_Size = 6561;    // 3 ^ 8
 
+        /// <summary>
+        /// 静的変数：辺の評価テーブルを格納する
+        /// </summary>
+        private static EdgeStat[] _edgeTable = new EdgeStat[Table_Size];
+
+        /// <summary>
+        /// 静的変数：評価テーブルが初期化されたかどうか
+        /// </summary>
+        private static bool _tableInitialized = false;
+
+        /// <summary>
+        /// 試合中盤で用いられる評価関数のコンストラクタ
+        /// </summary>
         public MidEvaluator()
         {
-            if(!tableInitialized)
+            if(!_tableInitialized)
             {
                 // 初回起動時にテーブル作成
                 DiscColor[] line = new DiscColor[Constant.BoardSize];
                 GenerateEdge(line,0);
 
-                tableInitialized = true;
+                _tableInitialized = true;
             }
 
-            evalWeight = new Weight();
-            evalWeight.mobility_w = 67;
-            evalWeight.liberty_w = -13;
-            evalWeight.stable_w = 101;
-            evalWeight.wing_w = -308;
-            evalWeight.dangerXmove_w = -449;
-            evalWeight.dangerCmove_w = -552;
+            _evalWeight = new Weight
+            {
+                mobility_w = 67,
+                liberty_w = -13,
+                stable_w = 101,
+                wing_w = -308,
+                dangerXmove_w = -449,
+                dangerCmove_w = -552
+            };
         }
 
+        /// <summary>
+        /// 評価を行う。評価値を返す。
+        /// </summary>
+        /// <param name="board"></param>
+        /// <returns></returns>
         public int Evaluate(in Board board)
         {
             EdgeStat edgeStat;
@@ -144,10 +216,10 @@ namespace Reversi
             int result;
 
             // 辺の評価
-            edgeStat = edgeTable[GetIndex(board,Board.DirectionQuad.Top)];
-            edgeStat.Add(edgeTable[GetIndex(board,Board.DirectionQuad.Bottom)]);
-            edgeStat.Add(edgeTable[GetIndex(board,Board.DirectionQuad.Right)]);
-            edgeStat.Add(edgeTable[GetIndex(board,Board.DirectionQuad.Left)]);
+            edgeStat = _edgeTable[GetIndex(board,Board.DirectionQuad.Top)];
+            edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Bottom)]);
+            edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Right)]);
+            edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Left)]);
 
             // 隅の評価
             cornerStat = EvaluateCorner(board);
@@ -159,32 +231,37 @@ namespace Reversi
             // パラメータ線形結合
             // もう少し表記を簡略化できそう.
             result =
-                  edgeStat[DiscColor.Black].stable * evalWeight.stable_w
-                - edgeStat[DiscColor.White].stable * evalWeight.stable_w
-                + edgeStat[DiscColor.Black].wing * evalWeight.wing_w
-                - edgeStat[DiscColor.White].wing * evalWeight.wing_w
-                + cornerStat[DiscColor.Black].dangerXmove * evalWeight.dangerXmove_w
-                - cornerStat[DiscColor.White].dangerXmove * evalWeight.dangerXmove_w
-                + edgeStat[DiscColor.Black].dangerCMove * evalWeight.dangerCmove_w
-                - edgeStat[DiscColor.White].dangerCMove * evalWeight.dangerCmove_w
+                  edgeStat[DiscColor.Black].stable * _evalWeight.stable_w
+                - edgeStat[DiscColor.White].stable * _evalWeight.stable_w
+                + edgeStat[DiscColor.Black].wing * _evalWeight.wing_w
+                - edgeStat[DiscColor.White].wing * _evalWeight.wing_w
+                + cornerStat[DiscColor.Black].dangerXmove * _evalWeight.dangerXmove_w
+                - cornerStat[DiscColor.White].dangerXmove * _evalWeight.dangerXmove_w
+                + edgeStat[DiscColor.Black].dangerCMove * _evalWeight.dangerCmove_w
+                - edgeStat[DiscColor.White].dangerCMove * _evalWeight.dangerCmove_w
                 ;
             
             // 開放度・着手可能手数の評価
-            if(evalWeight.liberty_w != 0)
+            if(_evalWeight.liberty_w != 0)
             {
                 ColoredContainer<int> lib = CountLiberty(board);
-                result += lib[DiscColor.Black] * evalWeight.liberty_w;
-                result -= lib[DiscColor.White] * evalWeight.liberty_w;
+                result += lib[DiscColor.Black] * _evalWeight.liberty_w;
+                result -= lib[DiscColor.White] * _evalWeight.liberty_w;
             }
 
             result +=
                     (int)board.GetCurrentColor()
                 *   board.GetMovablePoints().Count
-                *   evalWeight.mobility_w;
+                *   _evalWeight.mobility_w;
 
             return (int)board.GetCurrentColor() * result;
         }
 
+        /// <summary>
+        /// 辺情報を作成
+        /// </summary>
+        /// <param name="edge"></param>
+        /// <param name="count"></param>
         private void GenerateEdge(DiscColor[] edge,int count)
         {
             if(count == Constant.BoardSize)
@@ -195,7 +272,7 @@ namespace Reversi
                 stat[DiscColor.Black].Set(EvaluateEdge(edge,DiscColor.Black));
                 stat[DiscColor.White].Set(EvaluateEdge(edge,DiscColor.White));
 
-                edgeTable[IndexLine(edge)] = stat;
+                _edgeTable[IndexLine(edge)] = stat;
 
                 return;
             }
@@ -211,6 +288,12 @@ namespace Reversi
             return;
         }
 
+        /// <summary>
+        /// 辺を評価する
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="color"></param>
+        /// <returns></returns>
         private EdgeParam EvaluateEdge(DiscColor[] line,DiscColor color)
         {
             EdgeParam edgeParam = new EdgeParam();
@@ -267,6 +350,11 @@ namespace Reversi
             return edgeParam;
         }
 
+        /// <summary>
+        /// 隅を評価する
+        /// </summary>
+        /// <param name="board"></param>
+        /// <returns></returns>
         private CornerStat EvaluateCorner(in Board board)
         {
             CornerStat cornerStat = new CornerStat();
@@ -321,6 +409,11 @@ namespace Reversi
             return cornerStat;
         }
 
+        /// <summary>
+        /// 各石色の開放度を取得
+        /// </summary>
+        /// <param name="board"></param>
+        /// <returns></returns>
         private ColoredContainer<int> CountLiberty(in Board board)
         {
             ColoredContainer<int> liberty = new ColoredContainer<int>();
@@ -339,7 +432,7 @@ namespace Reversi
                     point.y = y;
                     int lib = liberty[board.GetColorAt(point)];
                     lib += board.GetLibertyAt(point);
-                    liberty[board.GetColorAt(point)] = 1;
+                    liberty[board.GetColorAt(point)] = lib;
                 }            
             }
 

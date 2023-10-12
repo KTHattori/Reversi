@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Reversi
 {
+    /// <summary>
+    /// Alpha-Beta法を用いるAIクラス
+    /// </summary>
     public class AlphaBetaAI : AI
     {
         /// <summary>
@@ -40,7 +43,7 @@ namespace Reversi
         /// <summary>
         /// 評価関数のインスタンス
         /// </summary>
-        private IEvaluator evaluator;
+        private IEvaluator _evaluator;
 
         /// <summary>
         /// 行動する
@@ -65,7 +68,7 @@ namespace Reversi
             }
 
             int limit;
-            evaluator = new MidEvaluator();
+            _evaluator = new MidEvaluator();
             Sort(board,movablePoints,presearchDepth);  // 事前に手をよさそうな順にソート
 
             // 必勝読みを始めるかどうか
@@ -73,9 +76,9 @@ namespace Reversi
             {
                 limit = int.MaxValue;
                 if(Constant.MaxTurn - board.GetCurrentTurn() <= perfectDepth)
-                    evaluator = new PerfectEvaluator();
+                    _evaluator = new PerfectEvaluator();
                 else
-                    evaluator = new WLDEvaluator();
+                    _evaluator = new WLDEvaluator();
             }
             else
             {
@@ -121,7 +124,7 @@ namespace Reversi
         private int CalcAlphaBeta(in Board board,int limit,int alpha,int beta)
         {
             // 深さ制限に達したら評価値を返す
-            if(board.IsGameOver() || limit == 0) return evaluator.Evaluate(board);
+            if(board.IsGameOver() || limit == 0) return _evaluator.Evaluate(board);
 
             List<Point> points = board.GetMovablePoints();
             int eval;
