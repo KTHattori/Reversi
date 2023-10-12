@@ -17,19 +17,19 @@ namespace Reversi
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="initialPoint"></param>
-        public CoordTransformer(Point initialPoint)
+        /// <param name="first"></param>
+        public CoordTransformer(Point first)
         {
-            if(initialPoint.Equals(new Point("d3")))
+            if(first.Equals(new Point("d3")))
             {
                 _rotation = 1;
                 _isMirror = true;
             }
-            else if(initialPoint.Equals(new Point("c4")))
+            else if(first.Equals(new Point("c4")))
             {
                 _rotation = 2;
             }
-            else if(initialPoint.Equals(new Point("e6")))
+            else if(first.Equals(new Point("e6")))
             {
                 _rotation = -1;
                 _isMirror = true;

@@ -33,5 +33,7 @@
         /// 右下隅の座標
         /// </summary>
         public static readonly Point Corner_BottomRight = new Point(BoardSize,BoardSize);
+
+        public static readonly string Book_FileName = "reversi.book";
     }
 }

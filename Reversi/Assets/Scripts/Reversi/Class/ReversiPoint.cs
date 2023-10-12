@@ -17,6 +17,11 @@ namespace Reversi
             this.y = y;
         }
 
+        /// <summary>
+        /// 文字列によるマス指定
+        /// </summary>
+        /// <param name="coord"></param>
+        /// <exception cref="ArgumentException"></exception>
         public Point(string coord)
         {
             if(coord == null || coord.Length < 2) throw new ArgumentException("リバーシ座標で指定してください!");
@@ -24,6 +29,22 @@ namespace Reversi
             y = coord[1] - '1' + 1;
         }
 
+        /// <summary>
+        /// 等しいかどうかを返す
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public bool Equals(Point point)
+        {
+            if(this.x != point.x) return false;
+            if(this.y != point.y) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// 文字列でのマス表記に変換する
+        /// </summary>
+        /// <returns></returns>
         public string ToStrCoord()
         {
             string coord = "";
@@ -33,6 +54,11 @@ namespace Reversi
             return coord;
         }
 
+        /// <summary>
+        /// ボード上での方向座標を返す
+        /// </summary>
+        /// <param name="dirQuad"></param>
+        /// <returns></returns>
         public static Point GetBoardDirQuad(Board.DirectionQuad dirQuad)
         {
             switch(dirQuad)

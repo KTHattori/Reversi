@@ -702,6 +702,24 @@ namespace Reversi
 
             return true;
         }
+
+        /// <summary>
+        /// これまでに打たれた手のリストを返す
+        /// </summary>
+        /// <returns></returns>
+        public List<Point> GetHistory()
+        {
+            List<Point> history = new List<Point>();
+
+            for(int i = 0;i < _updatedDiscList.Count; i++)
+            {
+                List<Disc> update = _updatedDiscList[i];
+                if(update.Count <= 0) continue; // パスの場合は飛ばす
+                history.Add(update[0]);
+            }
+
+            return history;
+        }
     }
 }
 
