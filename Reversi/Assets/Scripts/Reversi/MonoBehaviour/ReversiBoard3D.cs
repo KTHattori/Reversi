@@ -343,7 +343,7 @@ public class ReversiBoard3D : MonoBehaviour
         }
 
         // get
-        _movable = _board.GetMovablePoint();
+        _movable = _board.GetMovablePoints();
         DiscColor current = _board.GetCurrentColor();
 
         // current movable

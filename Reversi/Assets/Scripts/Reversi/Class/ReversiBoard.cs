@@ -594,7 +594,7 @@ namespace Reversi
         /// 石が打てる座標が並んだListを返す。
         /// </summary>
         /// <returns>石が打てる座標を格納したListのコピー</returns>
-        public List<Point> GetMovablePoint()
+        public List<Point> GetMovablePoints()
         {
             return new List<Point>(_movablePointList[_currentTurn]);
         }
