@@ -19,7 +19,7 @@ namespace Reversi
         /// 方向を表すビットフラグ列挙体
         /// </summary>
         [Flags]
-        private enum Direction
+        public enum Direction
         {
             None        = 0,
             Upper       = 1 << 0,
@@ -33,22 +33,34 @@ namespace Reversi
         }
 
         /// <summary>
+        /// 4方向を表すビットフラグ列挙体
+        /// </summary>
+        [Flags]
+        public enum DirectionQuad
+        {
+            Top       = 1 << 0,
+            Left        = 1 << 2,
+            Bottom       = 1 << 4,
+            Right       = 1 << 6,
+        }
+
+        /// <summary>
         /// 上下左右4方向のうち、maskDirで指定した方向を含んでいるかをチェックする拡張メソッド
         /// 4方向以外が指定された場合はfalseを返す
         /// </summary>
         /// <param name="maskDir">チェックする方向（上下左右）</param>
         /// <returns>含んでいればtrue, いなければfalse</returns>
-        private bool GetMask(Direction dir,Direction maskDir)
+        private bool GetMask(Direction dir,DirectionQuad maskDir)
         {
             switch(maskDir)
             {
-            case Direction.Upper:
+            case DirectionQuad.Top:
                 return dir.HasFlag(Direction.Upper | Direction.UpperLeft | Direction.UpperRight);
-            case Direction.Left:
+            case DirectionQuad.Left:
                 return dir.HasFlag(Direction.Left | Direction.UpperLeft | Direction.LowerLeft);
-            case Direction.Lower:
+            case DirectionQuad.Bottom:
                 return dir.HasFlag(Direction.Lower | Direction.LowerLeft | Direction.LowerRight);
-            case Direction.Right:
+            case DirectionQuad.Right:
                 return dir.HasFlag(Direction.Right | Direction.UpperRight | Direction.LowerRight);
             default:
                 return false;
@@ -61,6 +73,11 @@ namespace Reversi
         /// ボード上の各マスの石色情報を格納する配列
         /// </summary>
         private DiscColor[,] _rawBoard = new DiscColor[Constant.BoardSize + 2, Constant.BoardSize + 2];
+
+        /// <summary>
+        /// マスごとの開放度
+        /// </summary>
+        private int[,] liberty = new int[Constant.BoardSize + 2, Constant.BoardSize + 2];
 
         /// <summary>
         /// 現在のターン数
@@ -106,7 +123,7 @@ namespace Reversi
         /// <summary>
         /// 黒石, 白石, 空のマスの個数を保存する変数
         /// </summary>
-        private DiscColorStorage<int> _discAmount = new DiscColorStorage<int>();
+        private ColoredContainer<int> _discAmount = new ColoredContainer<int>();
 
 
         /// <summary>
@@ -322,6 +339,19 @@ namespace Reversi
             return dir;
         }
 
+
+        private void UpdateLiberty(in Point point)
+        {
+            liberty[point.x,point.y - 1]--;
+            liberty[point.x - 1,point.y - 1]--;
+            liberty[point.x - 1,point.y]--;
+            liberty[point.x - 1,point.y + 1]--;
+            liberty[point.x,point.y + 1]--;
+            liberty[point.x + 1,point.y + 1]--;
+            liberty[point.x + 1,point.y]--;
+            liberty[point.x + 1,point.y - 1]--;
+        }
+
         /// <summary>
         /// 現在の手番における着手可能な手を調べなおす。<br/>
         /// movablePoint, movableDirection を更新する。
@@ -435,6 +465,7 @@ namespace Reversi
 
             // 石を返す
             FlipDiscs(point);
+            UpdateLiberty(point);
 
             // 手番の色や現在の手数などを更新
             _currentTurn++;
@@ -519,7 +550,7 @@ namespace Reversi
             // やり直しを行った石をリストに追加
             foreach(Disc disc in update)
             {
-                _undoneDiscList.Add(new Disc(disc.x,disc.y,GetColor(disc.x,disc.y)));
+                _undoneDiscList.Add(new Disc(disc.x,disc.y,GetColorAt(disc.x,disc.y)));
             }
 
 
@@ -570,11 +601,30 @@ namespace Reversi
         }
 
         /// <summary>
+        /// 現在の手番での石数の差を返す。
+        /// </summary>
+        /// <returns></returns>
+        public int GetDiscDiff()
+        {
+            return (int)_currentColor * CountDisc(DiscColor.Black) - CountDisc(DiscColor.White);
+        }
+
+        /// <summary>
+        /// point で指定された座標での開放度を返す。
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public int GetLibertyAt(in Point point)
+        {
+            return liberty[point.x,point.y];
+        }
+
+        /// <summary>
         /// point で指定された座標の色を返す。
         /// </summary>
         /// <param name="point">指定されたボード座標上の色</param>
         /// <returns></returns>
-        public DiscColor GetColor(in Point point)
+        public DiscColor GetColorAt(in Point point)
         {
             return _rawBoard[point.x,point.y];
         }
@@ -585,7 +635,7 @@ namespace Reversi
         /// <param name="x">x座標</param>
         /// <param name="y">y座標</param>
         /// <returns>指定されたボード座標上の色</returns>
-        public DiscColor GetColor(int x,int y)
+        public DiscColor GetColorAt(int x,int y)
         {
             return _rawBoard[x,y];
         }

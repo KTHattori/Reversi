@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
-using UnityEngine.UIElements;
 
 namespace Reversi
 {
@@ -38,6 +35,13 @@ namespace Reversi
             }
         }
 
+        // variables
+
+        /// <summary>
+        /// 評価関数のインスタンス
+        /// </summary>
+        private IEvaluator evaluator;
+
         /// <summary>
         /// 行動する
         /// </summary>
@@ -61,12 +65,17 @@ namespace Reversi
             }
 
             int limit;
+            evaluator = new MidEvaluator();
             Sort(board,movablePoints,presearchDepth);  // 事前に手をよさそうな順にソート
 
             // 必勝読みを始めるかどうか
-            if(Constant.MaxTurn - board.GetCurrentTurn() <= judgeDepth)
+            if(Constant.MaxTurn - board.GetCurrentTurn() <= wldDepth)
             {
                 limit = int.MaxValue;
+                if(Constant.MaxTurn - board.GetCurrentTurn() <= perfectDepth)
+                    evaluator = new PerfectEvaluator();
+                else
+                    evaluator = new WLDEvaluator();
             }
             else
             {
@@ -102,16 +111,6 @@ namespace Reversi
         }
 
         /// <summary>
-        /// 評価関数
-        /// </summary>
-        /// <param name="board">ボードへの参照</param>
-        /// <returns>評価値</returns>
-        private int Evaluate(in Board board)
-        {
-            return 0;
-        }
-
-        /// <summary>
         /// Alpha-Beta法での探索
         /// </summary>
         /// <param name="board"></param>
@@ -122,7 +121,7 @@ namespace Reversi
         private int CalcAlphaBeta(in Board board,int limit,int alpha,int beta)
         {
             // 深さ制限に達したら評価値を返す
-            if(board.IsGameOver() || limit == 0) return Evaluate(board);
+            if(board.IsGameOver() || limit == 0) return evaluator.Evaluate(board);
 
             List<Point> points = board.GetMovablePoints();
             int eval;

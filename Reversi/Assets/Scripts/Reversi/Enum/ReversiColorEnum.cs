@@ -22,7 +22,7 @@ namespace Reversi
     public static class DiscColorUtil
     {
         // extension method
-
+        
         /// <summary>
         /// 反対の石色を取得する。<br/>
         /// 空や、壁の場合はそのまま返す。

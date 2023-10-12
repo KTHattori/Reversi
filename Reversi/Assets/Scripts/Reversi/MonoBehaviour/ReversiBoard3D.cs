@@ -212,7 +212,7 @@ public class ReversiBoard3D : MonoBehaviour
             for(int y = 1; y < Constant.BoardSize + 1; y++)
             {
                 // 初期状態にセット・石情報をセット
-                DiscColor disctype = _board.GetColor(x,y);
+                DiscColor disctype = _board.GetColorAt(x,y);
                 _discObjBoard[x,y].Initialize();    // 初期化
                 _discObjBoard[x,y].SetDisc(new Disc(x,y,disctype));   // 値を流し込む
 

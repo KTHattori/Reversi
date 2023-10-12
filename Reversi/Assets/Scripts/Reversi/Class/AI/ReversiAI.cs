@@ -1,5 +1,8 @@
 namespace Reversi
 {
+    /// <summary>
+    /// リバーシ用AIのベースクラス
+    /// </summary>
     public abstract class AI : IPointSelector
     {
         /// <summary>
@@ -15,7 +18,7 @@ namespace Reversi
         /// <summary>
         /// 終盤での必勝読みを始める残り手数
         /// </summary>
-        public int judgeDepth = 15;
+        public int wldDepth = 15;
 
         /// <summary>
         /// 終盤において完全読みを始める残り手数
