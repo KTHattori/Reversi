@@ -3,7 +3,7 @@ namespace Reversi
     /// <summary>
     /// リバーシの手を打つことができるクラスがもつインタフェース
     /// </summary>
-    public interface IPlayer
+    public interface IReversiPlayer
     {
         /// <summary>
         /// 自分の手番が来た時の行動内容。

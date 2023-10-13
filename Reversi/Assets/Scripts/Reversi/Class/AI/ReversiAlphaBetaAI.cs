@@ -51,38 +51,38 @@ namespace Reversi
         /// <param name="board"></param>
         public override void Move(in Board board)
         {
-            List<Point> movablePoints = board.GetMovablePoints();
+            List<Point> movablePoints = BookManager.Instance.Find(board);
 
             // 打てる場所がなければパス
             if(movablePoints.Count <= 0)
             {
-                board.Pass();
+                Pass();
                 return;
             }
 
             // 打てる場所が一か所だけなら探索を行わず、そこに打つ
             if(movablePoints.Count == 1)
             {
-                board.Move(movablePoints[0]);
+                SelectPoint(movablePoints[0]);
                 return;
             }
 
             int limit;
             _evaluator = new MidEvaluator();
-            Sort(board,movablePoints,presearchDepth);  // 事前に手をよさそうな順にソート
+            Sort(board,movablePoints,difficulty.PresearchDepth);  // 事前に手をよさそうな順にソート
 
             // 必勝読みを始めるかどうか
-            if(Constant.MaxTurn - board.GetCurrentTurn() <= wldDepth)
+            if(Constant.MaxTurn - board.GetCurrentTurn() <= difficulty.WLDDepth)
             {
                 limit = int.MaxValue;
-                if(Constant.MaxTurn - board.GetCurrentTurn() <= perfectDepth)
+                if(Constant.MaxTurn - board.GetCurrentTurn() <= difficulty.PerfectDepth)
                     _evaluator = new PerfectEvaluator();
                 else
                     _evaluator = new WLDEvaluator();
             }
             else
             {
-                limit = normalDepth;
+                limit = difficulty.NormalDepth;
             }
 
             int eval,eval_max = int.MinValue;
@@ -105,6 +105,12 @@ namespace Reversi
 
             // 最終決定
             SelectPoint(point);
+            Debug.Log($"x:{point.x}, y:{point.y}");
+        }
+
+        public override void Pass()
+        {
+            ReversiBoard3D.Pass();
         }
 
         // 実際に手を打つ

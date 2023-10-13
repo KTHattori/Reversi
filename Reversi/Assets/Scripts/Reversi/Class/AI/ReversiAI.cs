@@ -3,27 +3,21 @@ namespace Reversi
     /// <summary>
     /// リバーシ用AIのベースクラス
     /// </summary>
-    public abstract class AI : IPointSelector
+    public abstract class AI
     {
         /// <summary>
-        /// 事前探索を行う際の先読みする手数
+        /// 難易度設定
         /// </summary>
-        public int presearchDepth = 3;
+        public ReversiAIDifficulty difficulty;
 
         /// <summary>
-        /// 序盤・中盤の先読み手数
+        /// 難易度情報ScriptableObjectをセットする
         /// </summary>
-        public int normalDepth = 5;
-
-        /// <summary>
-        /// 終盤での必勝読みを始める残り手数
-        /// </summary>
-        public int wldDepth = 15;
-
-        /// <summary>
-        /// 終盤において完全読みを始める残り手数
-        /// </summary>
-        public int perfectDepth = 13;
+        /// <param name="diffSO"></param>
+        public void SetDifficulty(ReversiAIDifficulty diffSO)
+        {
+            difficulty = diffSO;
+        }
 
         /// <summary>
         /// ターン内での行動
@@ -36,6 +30,11 @@ namespace Reversi
         /// </summary>
         /// <param name="point"></param>
         public abstract void SelectPoint(Point point);
+
+        /// <summary>
+        /// パスする
+        /// </summary>
+        public abstract void Pass();
 
     }
 }

@@ -91,10 +91,6 @@ namespace Reversi
                 rotated.x = Constant.BoardSize - original.y + 1;
                 rotated.y = original.x;
                 break;
-            case 4:
-                rotated.x = Constant.BoardSize - original.y + 1;
-                rotated.y = original.x;
-                break;
             default:
                 rotated.x = original.x;
                 rotated.y = original.y;

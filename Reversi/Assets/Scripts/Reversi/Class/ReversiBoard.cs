@@ -142,8 +142,6 @@ namespace Reversi
             _rawBoard[point.x,point.y] = _currentColor;
             update.Add(new Disc(point.x,point.y,_currentColor));
 
-            Debug.Log(dir);
-
             // 上に置ける場合
             if(dir.HasFlag(Direction.Upper))
             {
@@ -363,9 +361,9 @@ namespace Reversi
             Direction dir;
             _movablePointList[_currentTurn].Clear();
 
-            for(int x = 1; x <= Constant.BoardSize; x++)
+            for(int y = 1; y <= Constant.BoardSize; y++)
             {
-                for(int y = 1 ; y <= Constant.BoardSize; y++)
+                for(int x = 1 ; x <= Constant.BoardSize; x++)
                 {
                     disc = new Disc(x,y,_currentColor);
                     dir = CheckMobility(disc);

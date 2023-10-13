@@ -7,24 +7,64 @@ namespace Reversi
     public class BookManager
     {
         /// <summary>
+        /// このクラスのインスタンス
+        /// </summary>
+        private static BookManager _instance = null;
+
+        /// <summary>
+        /// インスタンスを外部から呼び出すためのプロパティ
+        /// </summary>
+        public static BookManager Instance
+        {
+            // ゲッター
+            get
+            {
+                if( _instance != null )
+                {   // インスタンスが存在していれば取得
+                    return _instance;
+                }
+                else if( _instance == null )
+                {   // 見つからない場合生成
+                    _instance = new BookManager();
+                }
+                return _instance;
+            }
+        }
+
+        /// <summary>
         /// 定石木構造の根
         /// </summary>
         private Node _root = null;
 
         /// <summary>
+        /// ロードされた文字列
+        /// </summary>
+        private static string[] _loadedBook = null;
+
+        /// <summary>
+        /// ロードされているかどうか
+        /// </summary>
+        private static bool _isLoaded = false;
+
+    
+        /// <summary>
         /// コンストラクタ。
         /// 定石ファイルから読み込みを行う。
+        /// シングルトン実装のためprivate指定.
         /// </summary>
-        public BookManager()
+        private BookManager()
         {
             _root = new Node
             {
                 point = new Point("f5")
             };
 
-            string[] allLine = LoadBookFile();
+            // ロードされていなければファイルから読み込み
+            if(!_isLoaded) {_loadedBook = LoadBookFromFile();}
 
-            foreach(var line in allLine)
+            if(_loadedBook == null) return;
+            
+            foreach(var line in _loadedBook)
             {
                 List<Point> book = new List<Point>();
                 for(int i = 0;i < line.Length;i +=2)
@@ -50,20 +90,22 @@ namespace Reversi
         /// 定石ファイルを読み込んで、各行ごとのstring配列を返す。
         /// </summary>
         /// <returns></returns>
-        private string[] LoadBookFile()
+        private string[] LoadBookFromFile()
         {
 #if UNITY_EDITOR
             // ファイル読み込み
             string path = "Assets/" + Constant.Book_FileName;
 #else
              // ファイル読み込み
-            string path = "Application.dataPath" + "/" + "Constant.Book_FileName";           
+            string path = Application.dataPath + "/" + Constant.Book_FileName;           
 #endif
-            if(File.Exists(path))
-            {
-                Debug.LogError("Book file not found!");
-                return null;
-            }
+            // if(!File.Exists(path))
+            // {
+            //     Debug.LogError("Book file not found!");
+            //     return null;
+            // }
+
+            _isLoaded = true;
 
             return File.ReadAllLines(path);
         }
@@ -126,6 +168,11 @@ namespace Reversi
             return list;
         }
 
+        /// <summary>
+        /// 次の手を候補の中からランダムで取得する
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public Point GetNextMove(Node node)
         {
             // 候補
@@ -139,8 +186,10 @@ namespace Reversi
             Random.InitState(System.DateTime.Now.Millisecond);
 
             // 候補の中からランダムで選択
-            int index = Random.Range(0,int.MaxValue) * candidates.Count;
-            return candidates[index];
+            int index = Random.Range(0,int.MaxValue) % candidates.Count;
+            Point point = candidates[index];
+            
+            return new Point(point.x,point.y);
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 /// リバーシのマス選択用オブジェクト
 /// </summary>
 [RequireComponent(typeof(EventTrigger))]
-public class ReversiPointSelector : MonoBehaviour,IPointSelector
+public class ReversiPointSelector : MonoBehaviour
 {
     /// <summary>
     /// 割り当てられたマス座標
@@ -34,7 +34,6 @@ public class ReversiPointSelector : MonoBehaviour,IPointSelector
     private void OnChangeSelectable(bool flag)
     {
         gameObject.SetActive(flag);
-        Debug.Log(flag);
     }
 
     /// <summary>
@@ -44,6 +43,7 @@ public class ReversiPointSelector : MonoBehaviour,IPointSelector
     public void SetPoint(Point point)
     {
         _point = point;
+        GetComponentInChildren<TMPro.TextMeshPro>().SetText(point.ToStrCoord());
     }
 
     /// <summary>

@@ -16,6 +16,6 @@ namespace Reversi
         /// <summary>
         /// 対象となるマス
         /// </summary>
-        public Point point;
+        public Point point = new Point();
     }
 }

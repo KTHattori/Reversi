@@ -13,6 +13,11 @@ public class ReversiBoard3D : MonoBehaviour
     /// ボード内部データ
     /// </summary>
     private static Board _board = null;
+
+    /// <summary>
+    /// ゲーム進行管理用クラス
+    /// </summary>
+    private static ReversiGameManager _game = null;
     
     /// <summary>
     /// このクラスのインスタンス保持用
@@ -85,6 +90,18 @@ public class ReversiBoard3D : MonoBehaviour
     private ObjectReferencer _passButtonObjRef;
 
     /// <summary>
+    /// 先手かどうか
+    /// </summary>
+    [SerializeField]
+    private bool isInitiative = false;
+
+    /// <summary>
+    /// AIの強さを定義したScriptableObject
+    /// </summary>
+    [SerializeField]
+    private ReversiAIDifficulty _aiDifficulty;
+
+    /// <summary>
     /// 配置可能なマスを保持するリスト
     /// </summary>
     [SerializeField,Header("配置可能マス")]
@@ -107,6 +124,11 @@ public class ReversiBoard3D : MonoBehaviour
     /// </summary>
     private TextMeshProUGUI _messageTextRef;
 
+    /// <summary>
+    /// プレイヤー操作が可能かどうか
+    /// </summary>
+    private bool _isPlayerInteractable = false;
+
 
     /// <summary>
     /// オブジェクト生成初回ループにてコール
@@ -121,11 +143,20 @@ public class ReversiBoard3D : MonoBehaviour
         CreateBoard();
         InitializeBoard();
 
-        HighlightMovable();
-
         UpdateUI();
         SetMessage("Game Start!");
         _resultCompRef.Hide();
+
+        _game.Act(_board);
+        if(_instance._isPlayerInteractable)
+        {
+            _instance.HighlightMovable();
+        }
+        else
+        {
+            _instance.RemoveHighlight();
+            DisablePlayerInteract();
+        }
     }
 
     /// <summary>
@@ -141,7 +172,6 @@ public class ReversiBoard3D : MonoBehaviour
             _discObjBoard = null;
         }
     }
-
 
     /// <summary>
     /// 各コンポーネント参照を取得
@@ -161,6 +191,15 @@ public class ReversiBoard3D : MonoBehaviour
     }
 
     /// <summary>
+    /// ゲーム管理用クラスの初期設定
+    /// </summary>
+    /// <param name="initiative"></param>
+    private void SetUpGame(bool initiative)
+    {
+        _game = new ReversiGameManager(initiative,_aiDifficulty);
+    }
+
+    /// <summary>
     /// ボードの作成（初回のみ）
     /// </summary>
     private void CreateBoard()
@@ -175,8 +214,8 @@ public class ReversiBoard3D : MonoBehaviour
                 GameObject discObj = Instantiate(_discPrefab,_discParentObjRef.transform);
                 discObj.name = $"Disc({x},{y})";
                 Vector3 pos = discObj.transform.localPosition;
-                pos.x = 1.25f * x;
-                pos.z = 1.25f * y;
+                pos.x = 1.25f * y;
+                pos.z = 1.25f * x;
                 pos += _settings.PositionOrigin;
                 discObj.transform.localPosition = pos;
 
@@ -222,6 +261,8 @@ public class ReversiBoard3D : MonoBehaviour
                 order++;
             }
         }
+
+        SetUpGame(isInitiative); 
     }
 
     /// <summary>
@@ -249,10 +290,22 @@ public class ReversiBoard3D : MonoBehaviour
                 }
                 order++;
             }
-            _instance.HighlightMovable();
+
+            if(_instance._isPlayerInteractable)
+            {
+                _instance.RemoveHighlight();
+                DisablePlayerInteract();
+            }
+            else
+            {
+                _instance.HighlightMovable();
+            }
 
             _instance.UpdateUI();
             _instance.SetMessage("");
+
+            // 次の手番へ
+            _game.SwapTurn();
         }
         else
         {
@@ -266,8 +319,10 @@ public class ReversiBoard3D : MonoBehaviour
             _instance._resultCompRef.SetResult(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
             _instance.SetMessage("");
         }
-
-        Debug.Log($"Black: {_board.CountDisc(DiscColor.Black)}, White: {_board.CountDisc(DiscColor.White)}");
+        else
+        {
+            _game.Act(_board);
+        }
     }
 
     /// <summary>
@@ -277,9 +332,20 @@ public class ReversiBoard3D : MonoBehaviour
     {
         if(_board.Pass())
         {
+            if(_instance._isPlayerInteractable)
+            {
+                _instance.RemoveHighlight();
+                DisablePlayerInteract();
+            }
+            else
+            {
+                _instance.HighlightMovable();
+            }
             _instance.SetMessage("Passed!");
-            _instance.HighlightMovable();
             _instance.UpdateUI();
+
+            _game.SwapTurn();
+            _game.Act(_board);
         }
         else
         {
@@ -305,11 +371,24 @@ public class ReversiBoard3D : MonoBehaviour
                 else _discObjBoard[undone.x,undone.y].FlipDisc(undone.discColor,order * _instance._settings.AnimationDelay);
                 order++;
             }
-
-            _instance.HighlightMovable();
+            if(_instance._isPlayerInteractable)
+            {
+                _instance.RemoveHighlight();
+                DisablePlayerInteract();
+            }
+            else
+            {
+                _instance.HighlightMovable();
+            }
 
             _instance.SetMessage("Undone!");
             _instance.UpdateUI();
+
+            if(undoneList.Count > 0)
+            {
+                _game.SwapTurn();
+                _game.Act(_board);
+            }
         }
         else
         {
@@ -332,16 +411,27 @@ public class ReversiBoard3D : MonoBehaviour
     }
 
     /// <summary>
-    /// 配置可能マスをハイライトする, 現在無効
+    /// プレイヤー操作を有効にする
+    /// </summary>
+    static public void EnablePlayerInteract()
+    {
+        _instance._isPlayerInteractable = true;
+    }
+
+    /// <summary>
+    /// プレイヤー操作を無効にする
+    /// </summary>
+    static public void DisablePlayerInteract()
+    {
+        _instance._isPlayerInteractable = false;
+    }
+
+    /// <summary>
+    /// 配置可能マスをハイライトする
     /// </summary>
     private void HighlightMovable()
     {
-        // previous movable
-        foreach(Point point in _movable)
-        {
-            _discObjBoard[point.x,point.y].SetMovable(false);
-        }
-
+        Debug.Log("Highlighted");
         // get
         _movable = _board.GetMovablePoints();
         DiscColor current = _board.GetCurrentColor();
@@ -354,6 +444,18 @@ public class ReversiBoard3D : MonoBehaviour
     }
 
     /// <summary>
+    /// 配置可能ハイライトを削除
+    /// </summary>
+    private void RemoveHighlight()
+    {
+        Debug.Log("Remove Highlight");
+        foreach(Point point in _movable)
+        {
+            _discObjBoard[point.x,point.y].SetMovable(false);
+        }
+    }
+
+    /// <summary>
     /// UI更新
     /// </summary>
     private void UpdateUI()
@@ -361,7 +463,7 @@ public class ReversiBoard3D : MonoBehaviour
         _turnTextRef.SetText(_board.GetCurrentTurn().ToString());
         _instance._backgroundImageRef.color = _board.GetCurrentColor().ToColor();
         
-        if(_board.IsPassable()) _passButtonObjRef.ActivateObject();
+        if(_board.IsPassable() && !_isPlayerInteractable) _passButtonObjRef.ActivateObject();
         else _passButtonObjRef.DeactivateObject();
     }
 
