@@ -3376,13 +3376,6 @@ MonoBehaviour:
   _selectorPrefab: {fileID: 3651518965013950198, guid: d7791d01a382e514a8e85aa8c4ab1538, type: 3}
   _discParentObjRef: {fileID: 11400000, guid: 5e936dfac629d4040932b42c809b14a4, type: 2}
   _selectorParentObjRef: {fileID: 11400000, guid: be14412ad8863944dab10b8ed495048b, type: 2}
-  _backgroundObjRef: {fileID: 11400000, guid: ac8b2bad3af4e874a9abe4788b8a9664, type: 2}
-  _resultObjRef: {fileID: 11400000, guid: 1b277c14e52eddb45aa05f31406b710b, type: 2}
-  _turnObjRef: {fileID: 11400000, guid: 4213394a54846714aa74f542007669e8, type: 2}
-  _messageObjRef: {fileID: 11400000, guid: 43e52417fc128cf41a6c3af5c5ae2b87, type: 2}
-  _passButtonObjRef: {fileID: 11400000, guid: f5a97882cedb18f4b9a500a5546cf3d6, type: 2}
-  isInitiative: 1
-  _aiDifficulty: {fileID: 11400000, guid: 9c6d87e681a40174b85a0706d84d7824, type: 2}
   _movable: []
 --- !u!1 &2059572792
 GameObject:
