@@ -3381,8 +3381,8 @@ MonoBehaviour:
   _turnObjRef: {fileID: 11400000, guid: 4213394a54846714aa74f542007669e8, type: 2}
   _messageObjRef: {fileID: 11400000, guid: 43e52417fc128cf41a6c3af5c5ae2b87, type: 2}
   _passButtonObjRef: {fileID: 11400000, guid: f5a97882cedb18f4b9a500a5546cf3d6, type: 2}
-  isInitiative: 0
-  _aiDifficulty: {fileID: 11400000, guid: 598521a594fb18140a7acc9c7be9a94a, type: 2}
+  isInitiative: 1
+  _aiDifficulty: {fileID: 11400000, guid: 9c6d87e681a40174b85a0706d84d7824, type: 2}
   _movable: []
 --- !u!1 &2059572792
 GameObject:

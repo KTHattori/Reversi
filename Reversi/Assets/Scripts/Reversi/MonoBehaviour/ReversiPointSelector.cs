@@ -52,7 +52,7 @@ public class ReversiPointSelector : MonoBehaviour
     /// <param name="point"></param>
     public void SelectPoint(Point point)
     {
-        ReversiBoard3D.SelectPoint(point);
+        ReversiGameManager.Instance.SelectPoint(point);
     }
 
     /// <summary>

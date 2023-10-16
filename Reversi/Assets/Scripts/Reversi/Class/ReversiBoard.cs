@@ -690,7 +690,7 @@ namespace Reversi
         /// 現在の手でパス可能かどうかを返す
         /// </summary>
         /// <returns></returns>
-        public bool IsPassable()
+        public bool IsPlacable()
         {
             // 打つ手があれば、パスはできない
             if(_movablePointList[_currentTurn].Count != 0) return false;

@@ -104,12 +104,12 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
     /// <summary>
     /// インスタンス初期化時にコールされる関数
     /// </summary>
-    public virtual void OnInitialize() {}
+    protected virtual void OnInitialize() {}
 
     /// <summary>
     /// インスタンス破棄時にコールされる関数
     /// </summary>
-    public virtual void OnFinalize() {}
+    protected virtual void OnFinalize() {}
  
     /// <summary>
     /// ループ初期にコール

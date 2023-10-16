@@ -45,26 +45,20 @@ namespace Reversi
         /// </summary>
         private IEvaluator _evaluator;
 
-        /// <summary>
-        /// 行動する
-        /// </summary>
-        /// <param name="board"></param>
-        public override void Move(in Board board)
+        protected override Point SearchPoint(in Board board)
         {
             List<Point> movablePoints = BookManager.Instance.Find(board);
 
             // 打てる場所がなければパス
             if(movablePoints.Count <= 0)
             {
-                Pass();
-                return;
+                return null;
             }
 
             // 打てる場所が一か所だけなら探索を行わず、そこに打つ
             if(movablePoints.Count == 1)
             {
-                SelectPoint(movablePoints[0]);
-                return;
+                return movablePoints[0];
             }
 
             int limit;
@@ -104,19 +98,8 @@ namespace Reversi
             }
 
             // 最終決定
-            SelectPoint(point);
             Debug.Log($"x:{point.x}, y:{point.y}");
-        }
-
-        public override void Pass()
-        {
-            ReversiBoard3D.Pass();
-        }
-
-        // 実際に手を打つ
-        public override void SelectPoint(Point point)
-        {
-            ReversiBoard3D.SelectPoint(point);
+            return point;
         }
 
         /// <summary>

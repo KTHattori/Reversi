@@ -1,29 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Reversi;
-using TMPro;
 
 /// <summary>
 /// 3Dオブジェクトとしてのリバーシ盤面定義
 /// </summary>
 public class ReversiBoard3D : MonoBehaviour
 {
-    /// <summary>
-    /// ボード内部データ
-    /// </summary>
-    private static Board _board = null;
-
-    /// <summary>
-    /// ゲーム進行管理用クラス
-    /// </summary>
-    private static ReversiGameManager _game = null;
-    
-    /// <summary>
-    /// このクラスのインスタンス保持用
-    /// </summary>
-    private static ReversiBoard3D _instance = null;
-
     /// <summary>
     /// 石オブジェクトクラスの配列, ボード内部データと同じ構造
     /// </summary>
@@ -60,134 +43,17 @@ public class ReversiBoard3D : MonoBehaviour
     private ObjectReferencer _selectorParentObjRef;
 
     /// <summary>
-    /// UI背景 参照
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _backgroundObjRef;
-
-    /// <summary>
-    /// リザルト表示 参照
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _resultObjRef;
-
-    /// <summary>
-    /// ターン表示 参照
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _turnObjRef;
-
-    /// <summary>
-    /// メッセージ表示 参照
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _messageObjRef;
-
-    /// <summary>
-    /// パス用のボタン 参照
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _passButtonObjRef;
-
-    /// <summary>
-    /// 先手かどうか
-    /// </summary>
-    [SerializeField]
-    private bool isInitiative = false;
-
-    /// <summary>
-    /// AIの強さを定義したScriptableObject
-    /// </summary>
-    [SerializeField]
-    private ReversiAIDifficulty _aiDifficulty;
-
-    /// <summary>
     /// 配置可能なマスを保持するリスト
     /// </summary>
     [SerializeField,Header("配置可能マス")]
     private List<Point> _movable = null;
 
     /// <summary>
-    /// 背景 Imageコンポーネント参照
-    /// </summary>
-    private Image _backgroundImageRef;
-    /// <summary>
-    /// リザルトコンポーネント参照
-    /// </summary>
-    private ReversiResultObject _resultCompRef;
-    /// <summary>
-    /// ターン表示Text参照
-    /// </summary>
-    private TextMeshProUGUI _turnTextRef;
-    /// <summary>
-    /// メッセージ表示テキスト参照
-    /// </summary>
-    private TextMeshProUGUI _messageTextRef;
-
-    /// <summary>
-    /// プレイヤー操作が可能かどうか
-    /// </summary>
-    private bool _isPlayerInteractable = false;
-
-
-    /// <summary>
-    /// オブジェクト生成初回ループにてコール
-    /// </summary>
-    private void Start()
-    {
-        if(_instance) {Destroy(_instance.gameObject);}
-        _instance = this;
-
-        GetComponentRefs();
-
-        CreateBoard();
-        InitializeBoard();
-
-        UpdateUI();
-        SetMessage("Game Start!");
-        _resultCompRef.Hide();
-
-        _game.Act(_board);
-        if(_instance._isPlayerInteractable)
-        {
-            _instance.HighlightMovable();
-        }
-        else
-        {
-            _instance.RemoveHighlight();
-            DisablePlayerInteract();
-        }
-    }
-
-    /// <summary>
     /// オブジェクト破棄時
     /// </summary>
     private void OnDestroy()
     {
-        _instance.StopAllCoroutines();
-        if(_instance == this)
-        {
-            _instance = null;
-            _board = null;
-            _discObjBoard = null;
-        }
-    }
-
-    /// <summary>
-    /// 各コンポーネント参照を取得
-    /// </summary>
-    private void GetComponentRefs()
-    {
-        if(!_backgroundObjRef) Debug.LogError("Background Ref Not Set!");
-        if(!_resultObjRef) Debug.LogError("Result Ref Not Set!");
-        if(!_turnObjRef) Debug.LogError("Turn Text Ref Not Set!");
-        if(!_messageObjRef) Debug.LogError("Message Text Ref Not Set!");
-        if(!_passButtonObjRef) Debug.LogError("Pass Button Ref Not Set!");
-
-        _backgroundImageRef = _backgroundObjRef.GetComponent<Image>();
-        _resultCompRef = _resultObjRef.GetComponent<ReversiResultObject>();
-        _turnTextRef = _turnObjRef.GetComponent<TextMeshProUGUI>();
-        _messageTextRef = _messageObjRef.GetComponent<TextMeshProUGUI>();
+        _discObjBoard = null;
     }
 
     /// <summary>
@@ -196,16 +62,15 @@ public class ReversiBoard3D : MonoBehaviour
     /// <param name="initiative"></param>
     private void SetUpGame(bool initiative)
     {
-        _game = new ReversiGameManager(initiative,_aiDifficulty);
+        
     }
 
     /// <summary>
     /// ボードの作成（初回のみ）
     /// </summary>
-    private void CreateBoard()
+    public void CreateBoard(in Board board)
     {
         _discObjBoard = new ReversiDisc3D[Constant.BoardSize + 2, Constant.BoardSize + 2];
-        _board = new Board();
         for(int x = 1;x < Constant.BoardSize + 1;x++)
         {
             for(int y = 1; y < Constant.BoardSize + 1; y++)
@@ -241,17 +106,15 @@ public class ReversiBoard3D : MonoBehaviour
     /// <summary>
     /// ボードの初期化
     /// </summary>
-    private void InitializeBoard()
+    public void InitializeBoard(in Board board)
     {
-        _board.Init();
-
         int order = 0;
         for(int x = 1;x < Constant.BoardSize + 1;x++)
         {
             for(int y = 1; y < Constant.BoardSize + 1; y++)
             {
                 // 初期状態にセット・石情報をセット
-                DiscColor disctype = _board.GetColorAt(x,y);
+                DiscColor disctype = board.GetColorAt(x,y);
                 _discObjBoard[x,y].Initialize();    // 初期化
                 _discObjBoard[x,y].SetDisc(new Disc(x,y,disctype));   // 値を流し込む
 
@@ -261,218 +124,72 @@ public class ReversiBoard3D : MonoBehaviour
                 order++;
             }
         }
-
-        SetUpGame(isInitiative); 
     }
 
     /// <summary>
-    /// マスを選択する（置ける場合は置く）
+    /// 石の配置
     /// </summary>
     /// <param name="point"></param>
-    static public void SelectPoint(Point point)
-    {
-        if(_board.Move(point))
-        {         
-            List<Disc> updatedList = _board.GetUpdate();
-            int order = 0;
-            foreach(Disc updated in updatedList)
+    public void UpdateBoardOnPlace(in List<Disc> updatedList)
+    {      
+        int order = 0;
+        foreach(Disc updated in updatedList)
+        {
+            // 新しく配置されたもののみ配置処理
+            if(order == 0)
             {
-                // 新しく配置されたもののみ配置処理
-                if(order == 0)
-                {
-                    _discObjBoard[updated.x,updated.y].PlaceDisc(updated.discColor,order);
-                    Debug.Log($"Placed {updated.discColor} disc at: {point.x}, {point.y}");
-                }
-                else
-                {
-                    _discObjBoard[updated.x,updated.y].FlipDisc(updated.discColor,order * _instance._settings.AnimationDelay);
-                    Debug.Log($"Flipped disc to {updated.discColor} at: {updated.x}, {updated.y}");
-                }
-                order++;
-            }
-
-            if(_instance._isPlayerInteractable)
-            {
-                _instance.RemoveHighlight();
-                DisablePlayerInteract();
+                _discObjBoard[updated.x,updated.y].PlaceDisc(updated.discColor,order);
+                Debug.Log($"Placed {updated.discColor} disc at: {updated.x}, {updated.y}");
             }
             else
             {
-                _instance.HighlightMovable();
+                _discObjBoard[updated.x,updated.y].FlipDisc(updated.discColor,order * _settings.AnimationDelay);
+                Debug.Log($"Flipped disc to {updated.discColor} at: {updated.x}, {updated.y}");
             }
-
-            _instance.UpdateUI();
-            _instance.SetMessage("");
-
-            // 次の手番へ
-            _game.SwapTurn();
-        }
-        else
-        {
-            Debug.Log($"Cannot place disc at: {point.x}, {point.y}");
-            _instance.SetMessage("Cannot place here!");
-        }
-
-        if(_board.IsGameOver())
-        {
-            _instance._resultCompRef.Show();
-            _instance._resultCompRef.SetResult(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
-            _instance.SetMessage("");
-        }
-        else
-        {
-            _game.Act(_board);
+            order++;
         }
     }
 
     /// <summary>
-    /// パスを試みる
+    /// 一手戻し
     /// </summary>
-    static public void Pass()
+    public void UpdateBoardOnUndo(List<Disc> undoneList)
     {
-        if(_board.Pass())
+        int order = 0;
+        foreach(Disc undone in undoneList)
         {
-            if(_instance._isPlayerInteractable)
-            {
-                _instance.RemoveHighlight();
-                DisablePlayerInteract();
-            }
-            else
-            {
-                _instance.HighlightMovable();
-            }
-            _instance.SetMessage("Passed!");
-            _instance.UpdateUI();
+            Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discColor}");
 
-            _game.SwapTurn();
-            _game.Act(_board);
+            // 前の手で配置された石のみ回収処理
+            if(order == 0) _discObjBoard[undone.x,undone.y].RecallDisc(undone.discColor,order);
+            else _discObjBoard[undone.x,undone.y].FlipDisc(undone.discColor,order * _settings.AnimationDelay);
+            order++;
         }
-        else
-        {
-            _instance.SetMessage("Cannot pass now!");
-        }
-    }
-
-    /// <summary>
-    /// 一手戻しを試みる
-    /// </summary>
-    static public void Undo()
-    {
-        if(_board.Undo())
-        {
-            List<Disc> undoneList = _board.GetUndone();
-            int order = 0;
-            foreach(Disc undone in undoneList)
-            {
-                Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discColor}");
-
-                // 前の手で配置された石のみ回収処理
-                if(order == 0) _discObjBoard[undone.x,undone.y].RecallDisc(undone.discColor,order);
-                else _discObjBoard[undone.x,undone.y].FlipDisc(undone.discColor,order * _instance._settings.AnimationDelay);
-                order++;
-            }
-            if(_instance._isPlayerInteractable)
-            {
-                _instance.RemoveHighlight();
-                DisablePlayerInteract();
-            }
-            else
-            {
-                _instance.HighlightMovable();
-            }
-
-            _instance.SetMessage("Undone!");
-            _instance.UpdateUI();
-
-            if(undoneList.Count > 0)
-            {
-                _game.SwapTurn();
-                _game.Act(_board);
-            }
-        }
-        else
-        {
-            _instance.SetMessage("Cannot undo now!");
-        }
-    }
-
-    /// <summary>
-    /// ゲームをリスタートする
-    /// </summary>
-    static public void Restart()
-    {
-        _instance.InitializeBoard();
-
-        _instance.HighlightMovable();
-
-        _instance.UpdateUI();
-        _instance.SetMessage("Game Start!");
-        _instance._resultCompRef.Hide();
-    }
-
-    /// <summary>
-    /// プレイヤー操作を有効にする
-    /// </summary>
-    static public void EnablePlayerInteract()
-    {
-        _instance._isPlayerInteractable = true;
-    }
-
-    /// <summary>
-    /// プレイヤー操作を無効にする
-    /// </summary>
-    static public void DisablePlayerInteract()
-    {
-        _instance._isPlayerInteractable = false;
     }
 
     /// <summary>
     /// 配置可能マスをハイライトする
     /// </summary>
-    private void HighlightMovable()
+    public void HighlightMovable(in List<Point> targets,DiscColor side)
     {
         Debug.Log("Highlighted");
-        // get
-        _movable = _board.GetMovablePoints();
-        DiscColor current = _board.GetCurrentColor();
 
         // current movable
-        foreach(Point point in _movable)
+        foreach(Point point in targets)
         {
-            _discObjBoard[point.x,point.y].SetMovable(true,current);
+            _discObjBoard[point.x,point.y].SetMovable(true,side);
         }
     }
 
     /// <summary>
     /// 配置可能ハイライトを削除
     /// </summary>
-    private void RemoveHighlight()
+    public void RemoveHighlight(in List<Point> targets)
     {
         Debug.Log("Remove Highlight");
-        foreach(Point point in _movable)
+        foreach(Point point in targets)
         {
             _discObjBoard[point.x,point.y].SetMovable(false);
         }
-    }
-
-    /// <summary>
-    /// UI更新
-    /// </summary>
-    private void UpdateUI()
-    {
-        _turnTextRef.SetText(_board.GetCurrentTurn().ToString());
-        _instance._backgroundImageRef.color = _board.GetCurrentColor().ToColor();
-        
-        if(_board.IsPassable() && !_isPlayerInteractable) _passButtonObjRef.ActivateObject();
-        else _passButtonObjRef.DeactivateObject();
-    }
-
-    /// <summary>
-    /// 画面下部に指定したメッセージを表示する
-    /// </summary>
-    /// <param name="msg"></param>
-    private void SetMessage(string msg)
-    {
-        _messageTextRef.SetText(msg);
     }
 }
