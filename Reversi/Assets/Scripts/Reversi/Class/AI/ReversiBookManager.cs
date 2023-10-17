@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 namespace Reversi
 {
@@ -99,12 +98,6 @@ namespace Reversi
              // ファイル読み込み
             string path = Application.dataPath + "/" + Constant.Book_FileName;           
 #endif
-            // if(!File.Exists(path))
-            // {
-            //     Debug.LogError("Book file not found!");
-            //     return null;
-            // }
-
             _isLoaded = true;
 
             return File.ReadAllLines(path);
@@ -182,11 +175,12 @@ namespace Reversi
                 candidates.Add(n.point);
             }
             
-            // 乱数シードを初期化
-            Random.InitState(System.DateTime.Now.Millisecond);
+            // 乱数シードを生成
+            System.Random random = new System.Random(System.DateTime.Now.Millisecond);
 
             // 候補の中からランダムで選択
-            int index = Random.Range(0,int.MaxValue) % candidates.Count;
+            int index = random.Next(0,int.MaxValue) % candidates.Count;
+            UnityEngine.Debug.Log(index);
             Point point = candidates[index];
             
             return new Point(point.x,point.y);

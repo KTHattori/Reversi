@@ -43,26 +43,11 @@ public class ReversiBoard3D : MonoBehaviour
     private ObjectReferencer _selectorParentObjRef;
 
     /// <summary>
-    /// 配置可能なマスを保持するリスト
-    /// </summary>
-    [SerializeField,Header("配置可能マス")]
-    private List<Point> _movable = null;
-
-    /// <summary>
     /// オブジェクト破棄時
     /// </summary>
     private void OnDestroy()
     {
         _discObjBoard = null;
-    }
-
-    /// <summary>
-    /// ゲーム管理用クラスの初期設定
-    /// </summary>
-    /// <param name="initiative"></param>
-    private void SetUpGame(bool initiative)
-    {
-        
     }
 
     /// <summary>
@@ -191,5 +176,15 @@ public class ReversiBoard3D : MonoBehaviour
         {
             _discObjBoard[point.x,point.y].SetMovable(false);
         }
+    }
+
+    /// <summary>
+    /// 指定したPointの評価値を表示する
+    /// </summary>
+    /// <param name="point"></param>
+    /// <param name="score"></param>
+    public void DisplayEvalScore(Point point,int score)
+    {
+        _discObjBoard[point.x,point.y].SetDisplayText(score.ToString());
     }
 }

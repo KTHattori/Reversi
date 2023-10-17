@@ -337,7 +337,10 @@ namespace Reversi
             return dir;
         }
 
-
+        /// <summary>
+        /// 指定した地点の開放度を設定する
+        /// </summary>
+        /// <param name="point"></param>
         private void UpdateLiberty(in Point point)
         {
             liberty[point.x,point.y - 1]--;
@@ -690,7 +693,7 @@ namespace Reversi
         /// 現在の手でパス可能かどうかを返す
         /// </summary>
         /// <returns></returns>
-        public bool IsPlacable()
+        public bool IsPassable()
         {
             // 打つ手があれば、パスはできない
             if(_movablePointList[_currentTurn].Count != 0) return false;

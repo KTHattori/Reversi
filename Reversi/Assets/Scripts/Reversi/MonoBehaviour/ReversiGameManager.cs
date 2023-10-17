@@ -4,6 +4,7 @@ using Reversi;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
+
 public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 {
     /// <summary>
@@ -25,6 +26,21 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         PlayerNetwork = 2,
     }
 
+    // 定数 Constants
+
+    /// <summary>
+    /// 先手を表す定数
+    /// </summary>
+    private const int Initiative = 0;
+    /// <summary>
+    /// 黒（先手）
+    /// </summary>
+    private const int BlackSide = Initiative;
+    /// <summary>
+    /// 白（後手）
+    /// </summary>
+    private const int WhiteSide = Initiative + 1;
+
     /// <summary>
     /// ボード内部データ
     /// </summary>
@@ -40,30 +56,6 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private PlayMode _mode = PlayMode.NonPlayerLocal;
 
     /// <summary>
-    /// 石オブジェクトのプレハブ
-    /// </summary>
-    [SerializeField]
-    private GameObject _discPrefab;
-
-    /// <summary>
-    /// マス選択ボタンのプレハブ
-    /// </summary>
-    [SerializeField]
-    private GameObject _selectorPrefab;
-    
-    /// <summary>
-    /// 石生成時の親となるオブジェクト
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _discParentObjRef;
-
-    /// <summary>
-    /// マス選択ボタン生成時の親となるオブジェクト
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _selectorParentObjRef;
-
-    /// <summary>
     /// 先手かどうか
     /// </summary>
     [SerializeField]
@@ -75,28 +67,44 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     [SerializeField]
     private ReversiAIDifficulty _aiDifficulty;
 
+    /// <summary>
+    /// プレイヤー0用UIへの参照
+    /// </summary>
+    [SerializeField]
+    private ObjectReferencer _playerUI0Ref;
+
+    /// <summary>
+    /// プレイヤー1用UIへの参照
+    /// </summary>
+    [SerializeField]
+    private ObjectReferencer _playerUI1Ref;
+
     // Private: Non-Serialized
 
     /// <summary>
     /// 配置可能なマスを保持するリスト
     /// </summary>
-    private List<Point> _movable = null;
+    private List<Point> _movablePoints = new List<Point>();
 
     /// <summary>
     /// プレイヤー操作が可能かどうか
     /// </summary>
     private bool _isPlayerInteractable = false;
 
-    private const int Initiative = 0;
-    private const int BlackSide = Initiative;
-    private const int WhiteSide = Initiative + 1;
     private IReversiPlayer[] _player = new IReversiPlayer[2];
     private ReversiUIManager[] _ui = new ReversiUIManager[2];
+
+    [SerializeField]
     private int _currentPlayer = 0;
     private int _playerSide = -1;
     private bool _completedThinking = false;
+    [SerializeField]
     private Point _selectedPoint = null;
     private SynchronizationContext _context;
+    private bool _turnUpdated = false;
+
+    public int CurrentPlayer => _currentPlayer;
+    public int OppositePlayer => _currentPlayer == BlackSide ? WhiteSide : BlackSide;
 
 
     // Start is called before the first frame update
@@ -111,10 +119,74 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _context = SynchronizationContext.Current;
     }
 
+    /// <summary>
+    /// インスタンス破棄時の処理
+    /// </summary>
     protected override void OnFinalize()
     {
         StopAllCoroutines();
         Destroy(_3dboard);
+    }
+
+    private void Start()
+    {
+        _ui[BlackSide] = _playerUI0Ref.GetComponent<ReversiUIManager>();
+        _ui[WhiteSide] = _playerUI1Ref.GetComponent<ReversiUIManager>();
+        _ui[BlackSide].Deactivate();
+        _ui[WhiteSide].Deactivate();
+        _ui[BlackSide].HideResult();
+        _ui[WhiteSide].HideResult();
+
+        StartMode(_mode,_isInitiative);
+    }
+
+    private void Update()
+    {
+        if(_turnUpdated)
+        {
+            OnTurn();
+            _turnUpdated = false;
+        }
+    }
+
+    /// <summary>
+    /// 指定したゲームモードを始める
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <param name="isInitiative"></param>
+    public void StartMode(PlayMode mode,bool isInitiative)
+    {
+        _turnUpdated = true;
+        switch(mode)
+        {
+        case PlayMode.NonPlayerLocal:
+            CreateGameWithAI(isInitiative);
+            break;
+        case PlayMode.PlayerLocal:
+            CreateGameWithHuman(false);
+            break;
+        case PlayMode.PlayerNetwork:
+            CreateGameWithHuman(true);
+            break;
+        }
+    }
+    
+    /// <summary>
+    /// 現在のゲームモードをやり直す
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <param name="isInitiative"></param>
+    public void RestartMode(PlayMode mode,bool isInitiative)
+    {
+        switch(mode)
+        {
+        case PlayMode.NonPlayerLocal:
+            InitializeGameWithAI(isInitiative);
+            break;
+        default:
+            InitializeGameWithHuman();
+            break;
+        } 
     }
 
     /// <summary>
@@ -139,6 +211,15 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         // 3D盤面の作成と初期化
         _3dboard.CreateBoard(_board);
         _3dboard.InitializeBoard(_board);
+
+        // UI有効化・更新
+        _ui[BlackSide].Activate();
+        _ui[WhiteSide].Activate();
+        _ui[BlackSide].HideResult();
+        _ui[WhiteSide].HideResult();
+        UpdateUI(_mode);
+        // スタートメッセージを表示
+        ShowMessage(_mode,"Game Start!");
     }
 
     /// <summary>
@@ -154,6 +235,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         // UI有効化・更新
         _ui[BlackSide].Activate();
         _ui[WhiteSide].Activate();
+        _ui[BlackSide].HideResult();
+        _ui[WhiteSide].HideResult();
         UpdateUI(_mode);
         // スタートメッセージを表示
         ShowMessage(_mode,"Game Start!");
@@ -165,6 +248,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="_isInitiative">先手かどうか</param>
     public void CreateGameWithAI(bool _isInitiative)
     {
+        Debug.Log("Created Game With AI");
+
         // モードをセット
         _mode = PlayMode.NonPlayerLocal;
 
@@ -188,6 +273,13 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         // 3D盤面の作成と初期化
         _3dboard.CreateBoard(_board);
         _3dboard.InitializeBoard(_board);
+
+        // UI有効化・更新
+        _ui[_playerSide].Activate();
+        _ui[_playerSide].HideResult();
+        UpdateUI(_mode);
+        // スタートメッセージを表示
+        ShowMessage(_mode,"Game Start!");
     }
 
     /// <summary>
@@ -204,27 +296,10 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 
         // UI有効化・更新
         _ui[_playerSide].Activate();
+        _ui[_playerSide].HideResult();
         UpdateUI(_mode);
         // スタートメッセージを表示
         ShowMessage(_mode,"Game Start!");
-    }
-
-    /// <summary>
-    /// 現在のゲームモードをやり直す
-    /// </summary>
-    /// <param name="mode"></param>
-    /// <param name="isInitiative"></param>
-    public void RestartMode(PlayMode mode,bool isInitiative)
-    {
-        switch(mode)
-        {
-        case PlayMode.NonPlayerLocal:
-            InitializeGameWithAI(isInitiative);
-            break;
-        default:
-            InitializeGameWithHuman();
-            break;
-        }
     }
 
     /// <summary>
@@ -288,26 +363,33 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// 各手番での行動
     /// </summary>
     private void OnTurn()
-    {
+    {    
         // 初めにハイライトを削除
-        _3dboard.RemoveHighlight(_board.GetMovablePoints());
+        _3dboard.RemoveHighlight(_movablePoints);
+        _movablePoints = _board.GetMovablePoints();
+
+        // メッセージリセット
+        _ui[CurrentPlayer].SetMessageText("");
+        _ui[OppositePlayer].SetMessageText("");
 
         if( _mode == PlayMode.NonPlayerLocal && _currentPlayer != _playerSide)
         {
+            _ui[OppositePlayer].SetMessageText("Thinking...");
             StartWait();
             return;
         }
-
-        if(_board.IsPlacable())
+        else if(_board.IsPassable())
         {
-            _3dboard.HighlightMovable(_board.GetMovablePoints(),_board.GetCurrentColor());
-            _ui[_currentPlayer].HidePassButton();
-            StartWait();
+            _ui[CurrentPlayer].SetMessageText("Passed!");
+            _ui[OppositePlayer].SetMessageText("Passed!");
+            _board.Pass();
+            SwapTurn();
         }
         else
         {
-            _ui[_currentPlayer].SetMessageText("Passed!");
-            _board.Pass();
+            _ui[OppositePlayer].SetMessageText("Thinking...");
+            _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
+            StartWait();
         }
     }
 
@@ -329,6 +411,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         yield return new WaitUntil(() => _completedThinking);
         Act(_selectedPoint);
         _selectedPoint = null;
+        _completedThinking = false;
+        SwapTurn();
     }
 
     /// <summary>
@@ -343,7 +427,6 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         {
         case IReversiPlayer.ActionResult.Placed:
             _3dboard.UpdateBoardOnPlace(_board.GetUpdate());
-            SwapTurn();
             break;
         case IReversiPlayer.ActionResult.Undone:
             _3dboard.UpdateBoardOnUndo(_board.GetUndone());
@@ -351,6 +434,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             {   // AI戦で、プレイヤーの手番ならもう一度Undo
                 _board.Undo();
                 _3dboard.UpdateBoardOnUndo(_board.GetUndone());
+                SwapTurn();
             }
             break;
         }
@@ -362,5 +446,43 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private void SwapTurn()
     {
         _currentPlayer = ++_currentPlayer % 2;
+        _turnUpdated = true;
+        OnSwapTurn();
+    }
+
+    private void OnSwapTurn()
+    {
+        UpdateUI(_mode);
+        if(!_board.IsGameOver()) return;
+
+        _turnUpdated = false;
+
+        switch(_mode)
+        {
+        case PlayMode.NonPlayerLocal:
+            _ui[_playerSide].SetResultContent(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
+            _ui[_playerSide].ShowResult();
+            break;
+        case PlayMode.PlayerLocal:
+            _ui[_playerSide].SetResultContent(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
+            _ui[_playerSide].ShowResult();
+            break;
+        case PlayMode.PlayerNetwork:
+            _ui[BlackSide].SetResultContent(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
+            _ui[WhiteSide].SetResultContent(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White));
+            _ui[BlackSide].ShowResult();
+            _ui[WhiteSide].ShowResult();
+            break;
+        }
+    }
+
+    /// <summary>
+    /// 評価値を指定したマスに表示
+    /// </summary>
+    /// <param name="point"></param>
+    /// <param name="score"></param>
+    public void DisplayEvalScore(Point point,int score)
+    {
+        _3dboard.DisplayEvalScore(point,score);
     }
 }

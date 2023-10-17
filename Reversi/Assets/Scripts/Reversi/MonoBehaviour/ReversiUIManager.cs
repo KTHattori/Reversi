@@ -9,6 +9,11 @@ namespace Reversi
     public class ReversiUIManager : MonoBehaviour
     {
         /// <summary>
+        /// プレイヤー視点（カメラ）参照
+        /// </summary>
+        [SerializeField]
+        private ObjectReferencer _playerView;
+        /// <summary>
         /// UI背景 参照
         /// </summary>
         [SerializeField]
@@ -72,11 +77,13 @@ namespace Reversi
         public void Activate()
         {
             gameObject.SetActive(true);
+            _playerView.gameObject.SetActive(true);
         }
 
         public void Deactivate()
         {
             gameObject.SetActive(false);
+            _playerView.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -129,7 +136,7 @@ namespace Reversi
         /// </summary>
         public void HideResult()
         {
-            _resultCompRef.Show();
+            _resultCompRef.Hide();
         }
 
         /// <summary>

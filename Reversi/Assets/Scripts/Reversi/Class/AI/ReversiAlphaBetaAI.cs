@@ -8,36 +8,6 @@ namespace Reversi
     /// </summary>
     public class AlphaBetaAI : AI
     {
-        /// <summary>
-        /// 手と評価値をまとめるクラス
-        /// </summary>
-        private class MoveEval : Point
-        {
-            /// <summary>
-            /// 評価値
-            /// </summary>
-            public int eval = 0;
-
-            /// <summary>
-            /// デフォルトコンストラクタ
-            /// </summary>
-            public MoveEval() : base(0, 0)
-            {
-                eval = 0;
-            }
-
-            /// <summary>
-            /// 引数付きコンストラクタ
-            /// </summary>
-            /// <param name="x"></param>
-            /// <param name="y"></param>
-            /// <param name="e"></param>
-            public MoveEval(int x, int y, int e) : base(x,y)
-            {
-                eval = e;
-            }
-        }
-
         // variables
 
         /// <summary>
@@ -48,6 +18,7 @@ namespace Reversi
         protected override Point SearchPoint(in Board board)
         {
             List<Point> movablePoints = BookManager.Instance.Find(board);
+            _evaluatedScores.Clear();
 
             // 打てる場所がなければパス
             if(movablePoints.Count <= 0)
@@ -89,6 +60,8 @@ namespace Reversi
                 eval = -CalcAlphaBeta(board,limit - 1,int.MinValue,int.MaxValue);
 
                 board.Undo();
+
+                _evaluatedScores.Add(new MoveEval(movablePoints[i].x,movablePoints[i].y,eval));
 
                 if(eval > eval_max)
                 {

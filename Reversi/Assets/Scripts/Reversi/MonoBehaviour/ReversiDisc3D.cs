@@ -194,6 +194,15 @@ public class ReversiDisc3D : MonoBehaviour
     {
         _pointSelector.SetSelectable(flag);
     }
+    
+    /// <summary>
+    /// 表示テキストを変更する
+    /// </summary>
+    /// <param name="text"></param>
+    public void SetDisplayText(string text)
+    {
+        _pointSelector.SetDisplayText(text);
+    }
 
 
     /// <summary>

@@ -25,9 +25,8 @@ namespace Reversi
         public Point(string coord)
         {
             if(coord == null || coord.Length < 2) throw new ArgumentException("リバーシ座標で指定してください!");
-            UnityEngine.Debug.Log(coord);
-            x = coord[0] - 'a' + 1; UnityEngine.Debug.Log(x);
-            y = coord[1] - '1' + 1; UnityEngine.Debug.Log(y);
+            x = coord[0] - 'a' + 1;
+            y = coord[1] - '1' + 1;
         }
 
         /// <summary>

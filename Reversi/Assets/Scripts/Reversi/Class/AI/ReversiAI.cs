@@ -1,6 +1,4 @@
-using UnityEngine;
-using System.Collections;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Reversi
 {
@@ -9,8 +7,38 @@ namespace Reversi
     /// </summary>
     public abstract class AI
     {
+        /// <summary>
+        /// 手と評価値をまとめるクラス
+        /// </summary>
+        protected class MoveEval : Point
+        {
+            /// <summary>
+            /// 評価値
+            /// </summary>
+            public int eval = 0;
+
+            /// <summary>
+            /// デフォルトコンストラクタ
+            /// </summary>
+            public MoveEval() : base(0, 0)
+            {
+                eval = 0;
+            }
+
+            /// <summary>
+            /// 引数付きコンストラクタ
+            /// </summary>
+            /// <param name="x"></param>
+            /// <param name="y"></param>
+            /// <param name="e"></param>
+            public MoveEval(int x, int y, int e) : base(x,y)
+            {
+                eval = e;
+            }
+        }
+
         private bool _searchCompleted;
-        private Point _selectingPoint;
+        protected List<MoveEval> _evaluatedScores = new List<MoveEval>();
 
         public bool SearchCompleted{ get {return _searchCompleted;}}
 
@@ -38,21 +66,14 @@ namespace Reversi
             return SearchPoint(board);
         }
         
-
-        public IReversiPlayer.ActionResult FinishTurn(in Board board)
+        public void RelayEvalScores()
         {
-            // 見つからなければパス、見つかれば配置
-            if(_selectingPoint == null)
+            foreach(MoveEval ev in _evaluatedScores)
             {
-                board.Pass();
-                return IReversiPlayer.ActionResult.Passed;
-            }
-            else
-            {
-                board.Move(_selectingPoint);
-                return IReversiPlayer.ActionResult.Placed;
+                ReversiGameManager.Instance.DisplayEvalScore(new Point(ev.x,ev.y),ev.eval);
             }
         }
+
 
         /// <summary>
         /// 次に置くマスを探索し、結果をPointで返す。

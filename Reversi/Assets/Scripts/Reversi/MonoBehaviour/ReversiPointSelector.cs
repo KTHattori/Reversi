@@ -19,12 +19,18 @@ public class ReversiPointSelector : MonoBehaviour
     private bool _isSelectable;
 
     /// <summary>
+    /// デバッグ表示用テキスト
+    /// </summary>
+    public TMPro.TextMeshPro _dispText;
+
+    /// <summary>
     /// Update前にコールされる関数
     /// フラグ初期化とこのスクリプト無効化
     /// </summary>
     private void Start()
     {
         _isSelectable = false;
+        if(!_dispText) _dispText = GetComponentInChildren<TMPro.TextMeshPro>();
     }
 
     /// <summary>
@@ -43,7 +49,12 @@ public class ReversiPointSelector : MonoBehaviour
     public void SetPoint(Point point)
     {
         _point = point;
-        GetComponentInChildren<TMPro.TextMeshPro>().SetText(point.ToStrCoord());
+        _dispText.SetText(point.ToStrCoord());
+    }
+
+    public void SetDisplayText(string text)
+    {
+        _dispText.SetText(text);
     }
 
     /// <summary>
