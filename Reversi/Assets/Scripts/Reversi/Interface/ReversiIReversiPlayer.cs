@@ -14,7 +14,8 @@ namespace Reversi
         {
             Placed = 0,
             Undone = 1,
-            Passed = 2
+            Passed = 2,
+            Failed = 3,
         }
 
         /// <summary>

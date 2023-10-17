@@ -98,6 +98,12 @@ namespace Reversi
             {
                 get { return stat[color]; }
             }
+
+            public void _Log()
+            {
+                UnityEngine.Debug.Log($"[BLACK]stable: {stat[DiscColor.Black].stable}, wing: {stat[DiscColor.Black].wing}, mountain:{stat[DiscColor.Black].mountain}, CMove:{stat[DiscColor.Black].dangerCMove}");
+                UnityEngine.Debug.Log($"[White]stable: {stat[DiscColor.White].stable}, wing: {stat[DiscColor.White].wing}, mountain:{stat[DiscColor.White].mountain}, CMove:{stat[DiscColor.White].dangerCMove}");
+            }
         }
 
         /// <summary>
@@ -143,6 +149,12 @@ namespace Reversi
             public CornerParam this[DiscColor color]
             {
                 get { return stat[color]; }
+            }
+
+            public void _Log()
+            {
+                UnityEngine.Debug.Log($"[BLACK]corner: {stat[DiscColor.Black].corner}, XMove: {stat[DiscColor.Black].dangerXmove}");
+                UnityEngine.Debug.Log($"[White]corner: {stat[DiscColor.White].corner}, XMove: {stat[DiscColor.White].dangerXmove}");
             }
         }
 
@@ -221,8 +233,12 @@ namespace Reversi
             edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Right)]);
             edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Left)]);
 
+            edgeStat._Log();    ////// Debug
+
             // 隅の評価
             cornerStat = EvaluateCorner(board);
+
+            cornerStat._Log();  ////// Debug
 
             // 確定石の補正
             edgeStat[DiscColor.Black].stable -= cornerStat[DiscColor.Black].corner;
@@ -253,6 +269,8 @@ namespace Reversi
                     (int)board.GetCurrentColor()
                 *   board.GetMovablePoints().Count
                 *   _evalWeight.mobility_w;
+
+            UnityEngine.Debug.Log($"Evaluated Score: {result}");
 
             return (int)board.GetCurrentColor() * result;
         }
@@ -440,6 +458,12 @@ namespace Reversi
             return liberty;
         }
 
+        /// <summary>
+        /// 探索方向に応じたIndexを取得する
+        /// </summary>
+        /// <param name="board"></param>
+        /// <param name="dir"></param>
+        /// <returns></returns>
         private int GetIndex(in Board board,Board.DirectionQuad dir)
         {
             int index = 0;
@@ -470,7 +494,15 @@ namespace Reversi
 
         private int IndexLine(DiscColor[] line)
         {
-            return 3 *(3 *(3 *(3 *(3 *(3 *(3 *((int)line[0] + 1)+(int)line[1] + 1)+(int)line[2] + 1)+(int)line[3] + 1)+(int)line[4] + 1)+(int)line[5] + 1)+(int)line[6] + 1)+(int)line[7] + 1;
+            return 3 *(3 *(3 *(3 *(3 *(3 *(3 *
+                ((int)line[0] + 1)
+                +(int)line[1] + 1)
+                +(int)line[2] + 1)
+                +(int)line[3] + 1)
+                +(int)line[4] + 1)
+                +(int)line[5] + 1)
+                +(int)line[6] + 1)
+                +(int)line[7] + 1;
         }
     }
 }

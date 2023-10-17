@@ -81,6 +81,16 @@ namespace Reversi
         public static Point Left{ get {return new Point(8,0);} }
         public static Point Right{ get { return new Point(1,0); } }
 
+        /// <summary>
+        /// Undoしたとして扱うPoint
+        /// </summary>
+        public static Point Undone{ get { return new Point(-99,-99); }}
+
+        /// <summary>
+        /// Passしたとして扱うPoint
+        /// </summary>
+        public static Point Passed{ get { return new Point(-1,-1); }}
+
     }
 }
 

@@ -125,6 +125,11 @@ namespace Reversi
         /// </summary>
         private ColoredContainer<int> _discAmount = new ColoredContainer<int>();
 
+        /// <summary>
+        /// AI戦の場合、プレイヤーが先手かどうか
+        /// </summary>
+        private bool _aiInitiative = false;
+
 
         /// <summary>
         /// point で指定された座標に石をうち、挟み込むことができるすべての石を裏返す。<br/>
@@ -506,6 +511,7 @@ namespace Reversi
         public bool Undo()
         {
             if(_currentTurn == 0) return false;
+            if(_aiInitiative && _currentTurn <= 1){ return false; }
 
             _currentColor = _currentColor.GetInvertedColor();
 
@@ -720,6 +726,15 @@ namespace Reversi
             }
 
             return history;
+        }
+
+        /// <summary>
+        /// AIが先手かどうかを設定する
+        /// </summary>
+        /// <param name="flag"></param>
+        public void SetAIInitiative(bool flag)
+        {
+            _aiInitiative = flag;
         }
     }
 }

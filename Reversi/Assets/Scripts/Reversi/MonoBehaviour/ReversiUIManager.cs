@@ -114,21 +114,11 @@ namespace Reversi
         }
 
         /// <summary>
-        /// リザルト表示内容（石の数）を設定する
-        /// </summary>
-        /// <param name="blackNum">黒石の数</param>
-        /// <param name="whiteNum">白石の数</param>
-        public void SetResultContent(int blackNum, int whiteNum)
-        {
-            _resultCompRef.SetResult(blackNum,whiteNum);
-        }
-
-        /// <summary>
         /// リザルトを表示する
         /// </summary>
-        public void ShowResult()
+        public void ShowResult(in Board board)
         {
-            _resultCompRef.Show();
+            _resultCompRef.Show(board);
         }
 
         /// <summary>
@@ -153,6 +143,17 @@ namespace Reversi
         public void HidePassButton()
         {
             _passButtonObjRef.DeactivateObject();
+        }
+
+        /// <summary>
+        /// 回転を設定
+        /// </summary>
+        /// <param name="angle"></param>
+        public void SetRotation(float angle)
+        {
+            Vector3 ang = transform.localEulerAngles;
+            ang.z = angle;
+            transform.localEulerAngles = ang;
         }
     }
 
