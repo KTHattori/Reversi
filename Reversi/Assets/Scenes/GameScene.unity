@@ -4708,9 +4708,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1835345046}
-        m_TargetAssemblyTypeName: ReversiBoard3D, Assembly-CSharp
-        m_MethodName: Restart
+      - m_Target: {fileID: 1835345047}
+        m_TargetAssemblyTypeName: ReversiGameManager, Assembly-CSharp
+        m_MethodName: RestartCurrent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

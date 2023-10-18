@@ -194,6 +194,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="isInitiative"></param>
     public void StartMode(PlayMode mode,bool isInitiative)
     {
+        _mode = mode;
+        _isInitiative = isInitiative;
         _turnUpdated = true;
         switch(mode)
         {
@@ -236,6 +238,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     public void RestartCurrent()
     {
+        Debug.Log("Restarting...");
         RestartMode(_mode,_isInitiative);
     }
 
