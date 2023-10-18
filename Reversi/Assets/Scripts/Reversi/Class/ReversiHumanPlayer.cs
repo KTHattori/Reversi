@@ -1,17 +1,16 @@
+using System.Threading;
+
 namespace Reversi
 {
     public class HumanPlayer : IReversiPlayer
     {
-        private bool _isInteractive = false;
-        
-        public void Think(in Board board)
+        public void Think(in Board board,CancellationToken cancelToken,SynchronizationContext mainThread)
         {
-            _isInteractive = true;
+
         }
         
         public IReversiPlayer.ActionResult Act(in Board board, Point point)
         {
-            _isInteractive = false;
             if(point.Equals(Point.Passed))
             {
                 board.Pass();

@@ -65,13 +65,17 @@ namespace Reversi
         /// 最初のUpdate直前にコール
         /// 各UIコンポーネントを取得する
         /// </summary>
-        void Start()
+        public void Initialize()
         {
             // コンポーネントを取得・変数に格納
             ObjectReferencer.GetComponentReference<Image>(_backgroundObjRef,ref _backgroundImageRef);
             ObjectReferencer.GetComponentReference<ReversiResultObject>(_resultObjRef,ref _resultCompRef);
             ObjectReferencer.GetComponentReference<TextMeshProUGUI>(_turnObjRef,ref _turnTextRef);
             ObjectReferencer.GetComponentReference<TextMeshProUGUI>(_messageObjRef,ref _messageTextRef);
+
+            HidePassButton();
+            HideResult();
+            Deactivate();
         }
 
         public void Activate()

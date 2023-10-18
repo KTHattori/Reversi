@@ -86,21 +86,58 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private List<Point> _movablePoints = new List<Point>();
 
     /// <summary>
-    /// プレイヤー操作が可能かどうか
+    /// プレイヤーの枠
     /// </summary>
-    private bool _isPlayerInteractable = false;
-
     private IReversiPlayer[] _player = new IReversiPlayer[2];
+
+    /// <summary>
+    /// UIマネージャ
+    /// </summary>
     private ReversiUIManager[] _ui = new ReversiUIManager[2];
 
+    /// <summary>
+    /// 現在の手番
+    /// </summary>
     private int _currentPlayer = 0;
+
+    /// <summary>
+    /// プレイヤー側を表す
+    /// </summary>
     private int _playerSide = -1;
+
+    /// <summary>
+    /// 思考完了フラグ
+    /// </summary>
     private bool _completedThinking = false;
+
+    /// <summary>
+    /// 選択されたマス
+    /// </summary>
     private Point _selectedPoint = null;
-    private SynchronizationContext _context;
+
+    /// <summary>
+    /// メインスレッドへの参照
+    /// </summary>
+    private SynchronizationContext _mainThread;
+
+    /// <summary>
+    /// ターン更新フラグ
+    /// </summary>
     private bool _turnUpdated = false;
 
+    /// <summary>
+    /// タスクキャンセルのトークン元
+    /// </summary>
+    private CancellationTokenSource _thinkCancelTokenSrc = null;
+
+    /// <summary>
+    /// 現在の手番を取得するプロパティ
+    /// </summary>
     public int CurrentPlayer => _currentPlayer;
+
+    /// <summary>
+    /// 現在と反対の手番を取得するプロパティ
+    /// </summary>
     public int OppositePlayer => _currentPlayer == BlackSide ? WhiteSide : BlackSide;
 
 
@@ -113,7 +150,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     {
         _board = new Board();
         _selectedPoint = null;
-        _context = SynchronizationContext.Current;
+        _mainThread = SynchronizationContext.Current;
     }
 
     /// <summary>
@@ -126,25 +163,14 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     }
 
     /// <summary>
-    /// 最初にUpdate前にコール、UIの初期化と選択したモードの開始
-    /// </summary>
-    private void Start()
-    {
-        _ui[BlackSide] = _playerUI0Ref.GetComponent<ReversiUIManager>();
-        _ui[WhiteSide] = _playerUI1Ref.GetComponent<ReversiUIManager>();
-        _ui[BlackSide].Deactivate();
-        _ui[WhiteSide].Deactivate();
-        _ui[BlackSide].HideResult();
-        _ui[WhiteSide].HideResult();
-        _ui[BlackSide].HidePassButton();
-        _ui[WhiteSide].HidePassButton();
-    }
-
-    /// <summary>
     /// ターンが更新されたのを検知したら次のターン処理
     /// </summary>
     private void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            _thinkCancelTokenSrc.Cancel();
+        }
         if(_turnUpdated)
         {
             OnTurn();
@@ -214,6 +240,17 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     }
 
     /// <summary>
+    /// UIの初期化
+    /// </summary>
+    private void InitializeUI()
+    {
+        _ui[BlackSide] = _playerUI0Ref.GetComponent<ReversiUIManager>();
+        _ui[WhiteSide] = _playerUI1Ref.GetComponent<ReversiUIManager>();
+        _ui[BlackSide].Initialize();
+        _ui[WhiteSide].Initialize();
+    }
+
+    /// <summary>
     /// 対人戦の作成
     /// </summary>
     /// <param name="_isNetwork">ネットワークかどうか</param>
@@ -228,6 +265,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _player[BlackSide] = new HumanPlayer();
             _player[WhiteSide] = new HumanPlayer();
         }
+
+        // UI初期化
+        InitializeUI();
 
         // 盤面データの初期化
         _board.Init();
@@ -265,6 +305,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     public void InitializeGameWithHuman(bool _isNetwork)
     {
+        // UI初期化
+        InitializeUI();
+
         // 盤面データの初期化
         _board.Init();
         // 3D盤面の初期化
@@ -320,6 +363,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _playerSide = WhiteSide;
         }
 
+        // UI初期化
+        InitializeUI();
+
         // 盤面データの初期化
         _board.Init();
         _board.SetAIInitiative(!_isInitiative);
@@ -334,7 +380,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _ui[_playerSide].HidePassButton();
         UpdateUI(_mode);
         // スタートメッセージを表示
-        ShowMessage(_mode,"Game Start!");
+        ShowMessage(_mode,$"Game started with {_aiDifficulty.DifficultyName} AI!");
     }
 
     /// <summary>
@@ -343,6 +389,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="_isHumanInitiative"></param>
     public void InitializeGameWithAI(bool _isHumanInitiative)
     {
+        // UI初期化
+        InitializeUI();
+
         // 盤面データの初期化
         _board.Init();
         _board.SetAIInitiative(!_isHumanInitiative);
@@ -440,19 +489,20 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 
         if( _mode == PlayMode.NonPlayerLocal && _currentPlayer != _playerSide)
         {
-            _ui[OppositePlayer].SetMessageText("Thinking...");
+            _ui[OppositePlayer].SetMessageText("AI Thinking...");
             StartWait();
         }
         else if(_board.IsPassable())
         {
             _ui[CurrentPlayer].SetMessageText("No where to place!");
             _ui[CurrentPlayer].ShowPassButton();
+            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking...");
             StartWait();
         }
         else
         {
-            _ui[CurrentPlayer].SetMessageText("Thinking...");
-            _ui[OppositePlayer].SetMessageText("Thinking...");
+            _ui[CurrentPlayer].SetMessageText($"Decide your move.");
+            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking...");
             _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
             StartWait();
         }
@@ -463,8 +513,22 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     private async void StartWait()
     {
-        await Task.Run(() => _player[_currentPlayer].Think(_board));
-        StartCoroutine(WaitForSelect());
+        // 非同期処理をCancelするためのTokenを取得
+        _thinkCancelTokenSrc = new CancellationTokenSource();
+        var thinkCancelToken = _thinkCancelTokenSrc.Token;
+
+        // 別スレッドに移行
+        await Task.Run(
+        () => 
+        {
+            thinkCancelToken.ThrowIfCancellationRequested();    // キャンセル判定すると例外スロー
+            _player[_currentPlayer].Think(_board,thinkCancelToken,_mainThread);
+        }
+        ,thinkCancelToken);
+
+        // オブジェクト破棄後にコルーチン実行しないように
+        if(!thinkCancelToken.IsCancellationRequested) StartCoroutine(WaitForSelect());
+        else ImmediateAct();
     }
 
     /// <summary>
@@ -474,6 +538,17 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private IEnumerator WaitForSelect()
     {
         yield return new WaitUntil(() => _completedThinking);
+        Act(_selectedPoint);
+        _selectedPoint = null;
+        _completedThinking = false;
+        SwapTurn();
+    }
+
+    /// <summary>
+    /// 即時行動
+    /// </summary>
+    private void ImmediateAct()
+    {
         Act(_selectedPoint);
         _selectedPoint = null;
         _completedThinking = false;
@@ -560,5 +635,30 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     public void DisplayEvalScore(Point point,int score)
     {
         _3dboard.DisplayEvalScore(point,score);
+    }
+
+    /// <summary>
+    /// 終了処理
+    /// </summary>
+    private void Finalization()
+    {
+        if(_thinkCancelTokenSrc != null) _thinkCancelTokenSrc.Cancel();
+        StopAllCoroutines();
+    }
+
+    /// <summary>
+    /// オブジェクト破棄時
+    /// </summary>
+    private void OnDestroy()
+    {
+        Finalization();
+    }
+
+    /// <summary>
+    /// アプリケーション終了時
+    /// </summary>
+    private void OnApplicationQuit()
+    {
+        Finalization();
     }
 }

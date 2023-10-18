@@ -124,12 +124,10 @@ public class ReversiBoard3D : MonoBehaviour
             if(order == 0)
             {
                 _discObjBoard[updated.x,updated.y].PlaceDisc(updated.discColor,order);
-                Debug.Log($"Placed {updated.discColor} disc at: {updated.x}, {updated.y}");
             }
             else
             {
                 _discObjBoard[updated.x,updated.y].FlipDisc(updated.discColor,order * _settings.AnimationDelay);
-                Debug.Log($"Flipped disc to {updated.discColor} at: {updated.x}, {updated.y}");
             }
             order++;
         }
@@ -157,8 +155,6 @@ public class ReversiBoard3D : MonoBehaviour
     /// </summary>
     public void HighlightMovable(in List<Point> targets,DiscColor side)
     {
-        Debug.Log("Highlighted");
-
         // current movable
         foreach(Point point in targets)
         {
@@ -171,7 +167,6 @@ public class ReversiBoard3D : MonoBehaviour
     /// </summary>
     public void RemoveHighlight(in List<Point> targets)
     {
-        Debug.Log("Remove Highlight");
         foreach(Point point in targets)
         {
             _discObjBoard[point.x,point.y].SetMovable(false);

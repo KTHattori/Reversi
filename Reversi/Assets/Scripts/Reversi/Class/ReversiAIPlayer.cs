@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 namespace Reversi
 {
@@ -27,10 +28,19 @@ namespace Reversi
             SetDifficulty(difficultySO);
         }
 
-        public void Think(in Board board)
+        /// <summary>
+        /// 思考開始
+        /// </summary>
+        /// <param name="board"></param>
+        public void Think(in Board board,CancellationToken cancelToken,SynchronizationContext mainThread)
         {
-            Point point = _ai.Think(board);
-            ReversiGameManager.Instance.SelectPoint(point);
+            Point point = _ai.Think(board,cancelToken);
+
+            // MonoBehaviourにアクセスするため、メインスレッドから実行
+            mainThread.Post(__ => 
+            {
+                ReversiGameManager.Instance.SelectPoint(point);
+            },null);
         }
 
         public IReversiPlayer.ActionResult Act(in Board board, Point point)

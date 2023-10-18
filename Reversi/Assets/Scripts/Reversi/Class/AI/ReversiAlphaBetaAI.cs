@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace Reversi
@@ -15,10 +16,18 @@ namespace Reversi
         /// </summary>
         private IEvaluator _evaluator;
 
+        /// <summary>
+        /// 探索ノード数
+        /// </summary>
+        private int visited = 0;
+
         protected override Point SearchPoint(in Board board)
         {
             List<Point> movablePoints = BookManager.Instance.Find(board);
             _evaluatedScores.Clear();
+
+            // 探索数リセット
+            visited = 0;
 
             // 打てる場所がなければパス
             if(movablePoints.Count <= 0)
@@ -72,6 +81,8 @@ namespace Reversi
 
             // 最終決定
             Debug.Log($"x:{point.x}, y:{point.y}");
+            // 探索したノードの数
+            Debug.Log($"visited nodes:{visited}");
             return point;
         }
 
@@ -85,8 +96,9 @@ namespace Reversi
         /// <returns></returns>
         private int CalcAlphaBeta(in Board board,int limit,int alpha,int beta)
         {
-            // 深さ制限に達したら評価値を返す
-            if(board.IsGameOver() || limit == 0) return _evaluator.Evaluate(board);
+            visited++;
+            // 深さ制限に達したら・もしくは探索がキャンセルされたら評価値を返す
+            if(board.IsGameOver() || limit == 0 || IsSearchCancelled) return _evaluator.Evaluate(board);
 
             List<Point> points = board.GetMovablePoints();
             int eval;

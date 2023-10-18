@@ -223,22 +223,19 @@ namespace Reversi
         /// <returns></returns>
         public int Evaluate(in Board board)
         {
-            EdgeStat edgeStat;
+            EdgeStat edgeStat = new EdgeStat();
             CornerStat cornerStat;
             int result;
 
             // 辺の評価
-            edgeStat = _edgeTable[GetIndex(board,Board.DirectionQuad.Top)];
+            edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Top)]);
             edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Bottom)]);
             edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Right)]);
             edgeStat.Add(_edgeTable[GetIndex(board,Board.DirectionQuad.Left)]);
 
-            edgeStat._Log();    ////// Debug
 
             // 隅の評価
             cornerStat = EvaluateCorner(board);
-
-            cornerStat._Log();  ////// Debug
 
             // 確定石の補正
             edgeStat[DiscColor.Black].stable -= cornerStat[DiscColor.Black].corner;
@@ -269,8 +266,6 @@ namespace Reversi
                     (int)board.GetCurrentColor()
                 *   board.GetMovablePoints().Count
                 *   _evalWeight.mobility_w;
-
-            UnityEngine.Debug.Log($"Evaluated Score: {result}");
 
             return (int)board.GetCurrentColor() * result;
         }

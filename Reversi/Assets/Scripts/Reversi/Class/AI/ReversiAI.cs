@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Reversi
 {
@@ -37,15 +38,28 @@ namespace Reversi
             }
         }
 
-        private bool _searchCompleted;
+        /// <summary>
+        /// 手の評価値を保存するリスト
+        /// </summary>
         protected List<MoveEval> _evaluatedScores = new List<MoveEval>();
-
-        public bool SearchCompleted{ get {return _searchCompleted;}}
 
         /// <summary>
         /// 難易度設定
         /// </summary>
         public ReversiAIDifficulty difficulty;
+
+        /// <summary>
+        /// 探索キャンセル監視用トークン
+        /// </summary>
+        protected CancellationToken searchCancelToken;
+
+        /// <summary>
+        /// プロパティ探索がキャンセルされたかどうか
+        /// </summary>
+        protected bool IsSearchCancelled
+        {
+            get { return  searchCancelToken.IsCancellationRequested; }
+        }
 
         /// <summary>
         /// 難易度情報ScriptableObjectをセットする
@@ -60,9 +74,10 @@ namespace Reversi
         /// 行動する
         /// </summary>
         /// <param name="board"></param>
-        public Point Think(in Board board)
+        public Point Think(Board board,CancellationToken cancelToken)
         {
             // マス探索
+            searchCancelToken = cancelToken;
             return SearchPoint(board);
         }
         

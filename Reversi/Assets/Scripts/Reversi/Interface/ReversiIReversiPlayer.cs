@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading;
 
 namespace Reversi
 {
@@ -23,7 +24,7 @@ namespace Reversi
         /// </summary>
         /// <param name="board"></param>
         /// <returns></returns>
-        public abstract void Think(in Board board);
+        public abstract void Think(in Board board,CancellationToken cancelToken,SynchronizationContext mainThread);
 
         /// <summary>
         /// 自分の手番が来た時の行動内容。
