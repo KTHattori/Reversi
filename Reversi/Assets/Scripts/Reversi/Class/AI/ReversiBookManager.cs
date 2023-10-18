@@ -44,8 +44,7 @@ namespace Reversi
         /// ロードされているかどうか
         /// </summary>
         private static bool _isLoaded = false;
-
-    
+ 
         /// <summary>
         /// コンストラクタ。
         /// 定石ファイルから読み込みを行う。
@@ -143,6 +142,7 @@ namespace Reversi
                 }
                 if(node == null)    // 定石を外れている
                 {
+                    UnityEngine.Debug.Log("Out of book.");
                     return board.GetMovablePoints();
                 }
             }
@@ -157,6 +157,8 @@ namespace Reversi
 
             List<Point> list = new List<Point>();
             list.Add(nextMove);
+
+            UnityEngine.Debug.Log("Found in book.");
 
             return list;
         }
@@ -180,7 +182,6 @@ namespace Reversi
 
             // 候補の中からランダムで選択
             int index = random.Next(0,int.MaxValue) % candidates.Count;
-            UnityEngine.Debug.Log(index);
             Point point = candidates[index];
             
             return new Point(point.x,point.y);
@@ -213,6 +214,8 @@ namespace Reversi
 
                     while(true)
                     {
+                        if(node.point.Equals(point)) break;
+                        
                         if(node.sibling == null)
                         {
                             node.sibling = new Node();
@@ -227,6 +230,16 @@ namespace Reversi
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// ロードが完了していればルートノードを取得, そうでない場合はnull
+        /// </summary>
+        /// <returns></returns>
+        public Node GetBook()
+        {
+            if(_isLoaded) return _root;
+            return null;
         }
     }
 }

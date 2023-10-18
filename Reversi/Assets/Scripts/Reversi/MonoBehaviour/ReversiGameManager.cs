@@ -78,6 +78,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     [SerializeField]
     private ObjectReferencer _playerUI1Ref;
 
+
     // Private: Non-Serialized
 
     /// <summary>
@@ -417,6 +418,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="point"></param>
     public void SelectPoint(Point point)
     {
+        point._Log("Selected: ");
         _completedThinking = true;
         _selectedPoint = point;
     }

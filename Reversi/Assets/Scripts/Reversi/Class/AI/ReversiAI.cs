@@ -81,15 +81,6 @@ namespace Reversi
             return SearchPoint(board);
         }
         
-        public void RelayEvalScores()
-        {
-            foreach(MoveEval ev in _evaluatedScores)
-            {
-                ReversiGameManager.Instance.DisplayEvalScore(new Point(ev.x,ev.y),ev.eval);
-            }
-        }
-
-
         /// <summary>
         /// 次に置くマスを探索し、結果をPointで返す。
         /// 見つからなければnullで返す。

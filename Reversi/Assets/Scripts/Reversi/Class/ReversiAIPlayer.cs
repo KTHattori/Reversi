@@ -45,7 +45,6 @@ namespace Reversi
 
         public IReversiPlayer.ActionResult Act(in Board board, Point point)
         {
-            _ai.RelayEvalScores();
             if(point != null)
             {
                 board.Move(point);

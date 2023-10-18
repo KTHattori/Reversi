@@ -76,6 +76,11 @@ namespace Reversi
             }
         }
 
+        public void _Log(string prefix = "",string suffix = "")
+        {
+            UnityEngine.Debug.Log($"{prefix}x = {x}, y = {y} ({ToStrCoord()}){suffix}");
+        }
+
         public static Point Top{ get { return new Point(0,1); } }
         public static Point Bottom{ get {return new Point(0,8);} }
         public static Point Left{ get {return new Point(8,0);} }

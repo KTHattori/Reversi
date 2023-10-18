@@ -465,9 +465,9 @@ namespace Reversi
             // 石が打てる位置かどうかを判定する
             // 打てない位置ならfalseで処理抜け
             // 座標の値が正しい範囲かどうかもここでチェック
-            if(point.x < 0 || point.x > Constant.BoardSize) {Debug.Log("out of bounds!"); return false;}
-            if(point.y < 0 || point.y > Constant.BoardSize) {Debug.Log("out of bounds!"); return false;}
-            if(_movableDirection[_currentTurn,point.x,point.y] == Direction.None) {Debug.Log("nowhere to place!"); return false; }
+            if(point.x < 0 || point.x > Constant.BoardSize) return false;
+            if(point.y < 0 || point.y > Constant.BoardSize) return false;
+            if(_movableDirection[_currentTurn,point.x,point.y] == Direction.None) return false;
 
             // 石を返す
             FlipDiscs(point);
