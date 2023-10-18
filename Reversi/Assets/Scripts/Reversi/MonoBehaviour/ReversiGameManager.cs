@@ -152,6 +152,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _board = new Board();
         _selectedPoint = null;
         _mainThread = SynchronizationContext.Current;
+        BookManager.LoadBook();
     }
 
     /// <summary>

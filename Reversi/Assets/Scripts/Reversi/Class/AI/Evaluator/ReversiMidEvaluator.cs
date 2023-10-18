@@ -487,6 +487,7 @@ namespace Reversi
             return index;
         }
 
+        
         private int IndexLine(DiscColor[] line)
         {
             return 3 *(3 *(3 *(3 *(3 *(3 *(3 *

@@ -1,5 +1,7 @@
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System.IO;
 using UnityEngine.Serialization;
 
@@ -108,7 +110,9 @@ namespace RegisterObject
 			// インスタンスを指定したディレクトリに保存
 			if (!Directory.Exists(destPath))
 				Directory.CreateDirectory(destPath);
+		#if UNITY_EDITOR
 			AssetDatabase.CreateAsset(referencerInstance, destPath + fileName);
+		#endif
 
 			Debug.Log($"Created referencer asset at {destPath + fileName}.");
 

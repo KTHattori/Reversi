@@ -450,6 +450,7 @@ namespace Reversi
             // 更新履歴をすべて削除
             _updatedDiscList.Clear();
 
+            // 配置可能地点の再探索
             InitMovable();
         }
 

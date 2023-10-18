@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
+
 
 namespace Reversi
 {
@@ -85,22 +87,33 @@ namespace Reversi
         }
 
         /// <summary>
+        /// 定石読み込み
+        /// </summary>
+        public static void LoadBook()
+        {
+            if(!_isLoaded) _loadedBook = LoadBookFromFile();
+            if(_loadedBook == null) return;
+        }
+
+        /// <summary>
         /// 定石ファイルを読み込んで、各行ごとのstring配列を返す。
         /// </summary>
         /// <returns></returns>
-        private string[] LoadBookFromFile()
+        private static string[] LoadBookFromFile()
         {
-#if UNITY_EDITOR
-            // ファイル読み込み
+            #if UNITY_EDITOR
             string path = "Assets/" + Constant.Book_FileName;
-#else
-             // ファイル読み込み
-            string path = Application.dataPath + "/" + Constant.Book_FileName;           
-#endif
+            #else
+            string path = Application.persistentDataPath + "/" + Constant.Book_FileName;
+            #endif         
             _isLoaded = true;
 
+            Debug.Log("Loading book");
+            // ファイル読み込み
             return File.ReadAllLines(path);
         }
+
+        
 
         /// <summary>
         /// 打てる手を並べたListを返す。
@@ -158,7 +171,7 @@ namespace Reversi
             List<Point> list = new List<Point>();
             list.Add(nextMove);
 
-            UnityEngine.Debug.Log("Found in book.");
+            Debug.Log("Found in book.");
 
             return list;
         }
