@@ -43,17 +43,23 @@ namespace Reversi
             },null);
         }
 
+        /// <summary>
+        /// 思考の結果に基づいて行動する。
+        /// </summary>
+        /// <param name="board"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public IReversiPlayer.ActionResult Act(in Board board, Point point)
         {
-            if(point != null)
-            {
-                board.Move(point);
-                return IReversiPlayer.ActionResult.Placed;
-            }
-            else
+            if(point.Equals(Point.Passed))
             {
                 board.Pass();
                 return IReversiPlayer.ActionResult.Passed;
+            }
+            else
+            {
+                board.Move(point);
+                return IReversiPlayer.ActionResult.Placed;
             }
         }
 
