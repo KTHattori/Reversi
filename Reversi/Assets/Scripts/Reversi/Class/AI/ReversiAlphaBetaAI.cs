@@ -32,7 +32,7 @@ namespace Reversi
             // 打てる場所がなければパス
             if(movablePoints.Count <= 0)
             {
-                return null;
+                return Point.Passed;
             }
 
             // 打てる場所が一か所だけなら探索を行わず、そこに打つ
