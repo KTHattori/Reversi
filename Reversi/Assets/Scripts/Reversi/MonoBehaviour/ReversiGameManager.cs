@@ -299,6 +299,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _playerSide = BlackSide;
         }
 
+        _currentPlayer = BlackSide;
+
         UpdateUI(_mode);
         // スタートメッセージを表示
         ShowMessage(_mode,"Game Start!");
@@ -336,6 +338,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _playerSide = BlackSide;
         }
 
+        _currentPlayer = BlackSide;
+
         // UI更新
         UpdateUI(_mode);
         // スタートメッセージを表示
@@ -367,6 +371,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _playerSide = WhiteSide;
         }
 
+        _currentPlayer = BlackSide;
+
         // UI初期化
         InitializeUI();
 
@@ -393,6 +399,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="_isHumanInitiative"></param>
     public void InitializeGameWithAI(bool _isHumanInitiative)
     {
+        // 手番の初期化
+        _currentPlayer = BlackSide;
+
         // UI初期化
         InitializeUI();
 
