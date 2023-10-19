@@ -1,9 +1,11 @@
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using Reversi;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Collections;
+
 
 public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 {
@@ -78,6 +80,12 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     [SerializeField]
     private ObjectReferencer _playerUI1Ref;
 
+    /// <summary>
+    /// 定石ファイルへの参照
+    /// </summary>
+    [SerializeField]
+    private AssetReference _bookAssetRef;
+
 
     // Private: Non-Serialized
 
@@ -132,6 +140,11 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private CancellationTokenSource _thinkCancelTokenSrc = null;
 
     /// <summary>
+    /// ゲーム終了フラグ
+    /// </summary>
+    private bool _gameDestroyed = false;
+
+    /// <summary>
     /// 現在の手番を取得するプロパティ
     /// </summary>
     public int CurrentPlayer => _currentPlayer;
@@ -152,7 +165,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _board = new Board();
         _selectedPoint = null;
         _mainThread = SynchronizationContext.Current;
-        BookManager.LoadBook();
+        _gameDestroyed = false;
     }
 
     /// <summary>
@@ -358,6 +371,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         // モードをセット
         _mode = PlayMode.NonPlayerLocal;
 
+        // 定石ファイルを読み込み
+        BookManager.Instance.LoadBookFile(_bookAssetRef);
+
         // プレイヤーをセット
         if(_isInitiative)
         {
@@ -426,18 +442,34 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// マスを選択し、思考を終了する
     /// </summary>
     /// <param name="point"></param>
-    public void SelectPoint(Point point)
+    public async void SelectPoint(Point point)
     {
+        await Task.Run(() => WaitAnimationCompleted());
         point._Log("Selected: ");
         _completedThinking = true;
         _selectedPoint = point;
     }
 
     /// <summary>
+    /// アニメーション終了待ち
+    /// </summary>
+    /// <returns></returns>
+    public async Task WaitAnimationCompleted()
+    {
+        while(_3dboard.IsAnimating())
+        {
+            // アニメーションが終了するのを待つ
+            await Task.Delay(10);
+        }
+        Debug.Log("Wait complete");
+    } 
+
+    /// <summary>
     /// Undoとして扱われるマス座標を返す。
     /// </summary>
-    public void Undo()
+    public async void Undo()
     {
+        await Task.Run(() => WaitAnimationCompleted());
         _completedThinking = true;
         _selectedPoint = Point.Undone;
     }
@@ -543,7 +575,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 
         // オブジェクト破棄後にコルーチン実行しないように
         if(!thinkCancelToken.IsCancellationRequested) StartCoroutine(WaitForSelect());
-        else ImmediateAct();
+        else if(!_gameDestroyed) ImmediateAct();
     }
 
     /// <summary>
@@ -610,7 +642,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     private void SwapTurn()
     {
-        _currentPlayer = ++_currentPlayer % 2;
+        _currentPlayer = 1 - _currentPlayer;
         _turnUpdated = true;
         OnSwapTurn();
     }
@@ -658,6 +690,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private void Finalization()
     {
         if(_thinkCancelTokenSrc != null) _thinkCancelTokenSrc.Cancel();
+        _gameDestroyed = true;
         StopAllCoroutines();
     }
 

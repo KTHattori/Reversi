@@ -1,6 +1,4 @@
 /// MonoSingleton.cs
-
-
 using UnityEngine;
 
 /**
@@ -15,7 +13,7 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
     /// <summary>
     /// インスタンス
     /// </summary>
-    static T m_Instance = null;
+    static T _instance = null;
 
     /// <summary>
     /// シーンロード時に破棄しないようにする
@@ -32,9 +30,9 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
         // ゲッター
         get
         {
-            if( m_Instance != null )
+            if( _instance != null )
             {   // インスタンスが存在していれば取得
-                return m_Instance;
+                return _instance;
             }
 
             // 型を取得
@@ -59,7 +57,7 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
             {   // 初期化を行う
                 Initialize(instance);
             }
-            return m_Instance;
+            return _instance;
         }
     }
  
@@ -69,22 +67,31 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
     /// <param name="instance"></param>
     static void Initialize(T instance)
     {
-        if( m_Instance == null )
+        if( _instance == null )
         {   // メンバインスタンスが空なら代入し、インスタンス初期化時関数をコール
-            m_Instance = instance;
+            _instance = instance;
 
-            if(m_Instance.dontDestroyOnLoad)
+            if(_instance.dontDestroyOnLoad)
             {   // dontDestroyOnLoadが有効
-                DontDestroyOnLoad(m_Instance);
+                DontDestroyOnLoad(_instance);
             }
 
-            m_Instance.OnInitialize();  // インスタンス初期化時関数
+            _instance.OnInitialize();  // インスタンス初期化時関数
         }
-        else if( m_Instance != instance )
+        else if( _instance != instance )
         {
             // オブジェクトが見つかったが重複している場合、破棄
             DestroyImmediate( instance.gameObject );
         }
+    }
+
+    /// <summary>
+    /// インスタンスを破棄する
+    /// 破棄はループ最後に行われる。
+    /// </summary>
+    static public void ReleaseInstance()
+    {
+        Destroy(_instance.gameObject);
     }
  
     /// <summary>
@@ -93,11 +100,11 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
     /// <param name="instance"></param>
     static void Destroyed(T instance)
     {
-        if( m_Instance == instance )
+        if( _instance == instance )
         {   // 正しいインスタンスであればインスタンス破棄時関数をコール
-            m_Instance.OnFinalize();
+            _instance.OnFinalize();
  
-            m_Instance = null;
+            _instance = null;
         }
     }
  

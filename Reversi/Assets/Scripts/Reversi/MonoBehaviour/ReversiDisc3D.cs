@@ -70,7 +70,6 @@ public class ReversiDisc3D : MonoBehaviour
     /// <summary>
     /// アニメーションの進行度.  範囲は 0.0f ~ 1.0f で表される
     /// </summary>
-    [SerializeField]
     private float _animProgress = 0.0f;
     /// <summary>
     /// 現在の時間
@@ -123,7 +122,6 @@ public class ReversiDisc3D : MonoBehaviour
     {
         if(_animState == AnimationState.None)
         {
-            // if(Input.GetKeyDown(KeyCode.Space)) PlayAnimation(AnimationState.Flipping,0.0f); // デバッグ用
             return;
         }
         else
@@ -215,7 +213,6 @@ public class ReversiDisc3D : MonoBehaviour
         StartCoroutine(SetAnimationState(state,delay));
     }
 
-
     /// <summary>
     /// アニメーションの状態を設定する
     /// </summary>
@@ -224,14 +221,12 @@ public class ReversiDisc3D : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        _animStateQueue.Enqueue(state);
+        _animState = state;
+        _currentTime = 0.0f;
+        _animProgress = 0.0f;
 
-        if(_animState == AnimationState.None)
-        {
-            _animState = _animStateQueue.Dequeue();
-            _currentTime = 0.0f;
-            _animProgress = 0.0f;
-        }
+        if(_animState != AnimationState.None) ReversiBoard3D.RegisterAnimating(this);
+        else ReversiBoard3D.UnregisterAnimating(this);
     }
 
     /// <summary>
@@ -276,9 +271,7 @@ public class ReversiDisc3D : MonoBehaviour
             break;
         }
 
-        SetAnimationState(AnimationState.None,0.0f);
-
-        if(_animStateQueue.TryDequeue(out _animState)) { _animProgress = 0.0f; _currentTime = 0.0f; }
+        PlayAnimation(AnimationState.None,0.0f);
     }
     
     // Animations

@@ -43,6 +43,11 @@ public class ReversiBoard3D : MonoBehaviour
     private ObjectReferencer _selectorParentObjRef;
 
     /// <summary>
+    /// アニメーション中の石リスト
+    /// </summary>
+    private static Dictionary<string,ReversiDisc3D> _onGoingAnimation = new Dictionary<string,ReversiDisc3D>();
+
+    /// <summary>
     /// オブジェクト破棄時
     /// </summary>
     private void OnDestroy()
@@ -93,6 +98,7 @@ public class ReversiBoard3D : MonoBehaviour
     /// </summary>
     public void InitializeBoard(in Board board)
     {
+        _onGoingAnimation.Clear();
         int order = 0;
         for(int x = 1;x < Constant.BoardSize + 1;x++)
         {
@@ -110,6 +116,33 @@ public class ReversiBoard3D : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// アニメーション中として登録
+    /// </summary>
+    /// <param name="disc3d"></param>
+    public static void RegisterAnimating(ReversiDisc3D disc3d)
+    {
+        _onGoingAnimation.Add(disc3d.gameObject.name,disc3d);
+    }
+
+    /// <summary>
+    /// アニメーション中リストから解除
+    /// </summary>
+    /// <param name="disc3d"></param>
+    public static void UnregisterAnimating(ReversiDisc3D disc3d)
+    {
+        _onGoingAnimation.Remove(disc3d.gameObject.name);
+    }
+
+    /// <summary>
+    /// アニメーション中の石が存在するかどうか
+    /// </summary>
+    public bool IsAnimating()
+    { 
+        Debug.Log(_onGoingAnimation.Count);
+        return _onGoingAnimation.Count != 0;
+    } 
 
     /// <summary>
     /// 石の配置
@@ -141,11 +174,10 @@ public class ReversiBoard3D : MonoBehaviour
         int order = 0;
         foreach(Disc undone in undoneList)
         {
-            Debug.Log($"Undone disc at: {undone.x}, {undone.y} to {undone.discColor}");
-
             // 前の手で配置された石のみ回収処理
             if(order == 0) _discObjBoard[undone.x,undone.y].RecallDisc(undone.discColor,order);
             else _discObjBoard[undone.x,undone.y].FlipDisc(undone.discColor,order * _settings.AnimationDelay);
+
             order++;
         }
     }

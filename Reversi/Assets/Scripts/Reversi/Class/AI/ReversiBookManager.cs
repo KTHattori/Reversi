@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 
 namespace Reversi
@@ -38,14 +40,16 @@ namespace Reversi
         private Node _root = null;
 
         /// <summary>
-        /// ロードされた文字列
+        /// ロードされた定石ファイルアセット
         /// </summary>
-        private static string[] _loadedBook = null;
+        private static TextAsset _loadedBook = null;
 
         /// <summary>
         /// ロードされているかどうか
         /// </summary>
         private static bool _isLoaded = false;
+
+        private static bool _isLoading = false;
  
         /// <summary>
         /// コンストラクタ。
@@ -58,14 +62,41 @@ namespace Reversi
             {
                 point = new Point("f5")
             };
+        }
 
-            // ロードされていなければファイルから読み込み
-            if(!_isLoaded) {_loadedBook = LoadBookFromFile();}
-
-            if(_loadedBook == null) return;
-            
-            foreach(var line in _loadedBook)
+        /// <summary>
+        /// 定石読み込み
+        /// </summary>
+        public async void LoadBookFile(AssetReference assetReference)
+        {
+            _isLoading = true;
+            if(!_isLoaded) Addressables.LoadAssetAsync<TextAsset>(assetReference).Completed += load =>
             {
+                _loadedBook = load.Result;
+
+                _isLoading = false;
+                _isLoaded = true;
+                _instance.CreateBookTree(_loadedBook);
+                Debug.Log("Loaded");
+            };
+
+            while(_isLoading)
+            {
+                await Task.Delay(10);
+            }
+        }
+
+        /// <summary>
+        /// 定石木を作成する
+        /// </summary>
+        /// <param name="bookAsset"></param>
+        private void CreateBookTree(TextAsset bookAsset)
+        {
+            StringReader reader = new StringReader(bookAsset.text);
+            while (reader.Peek() != -1) // reader.Peekが-1になるまで
+            {
+                string line = reader.ReadLine(); // 一行ずつ読み込み
+
                 List<Point> book = new List<Point>();
                 for(int i = 0;i < line.Length;i +=2)
                 {
@@ -87,35 +118,6 @@ namespace Reversi
         }
 
         /// <summary>
-        /// 定石読み込み
-        /// </summary>
-        public static void LoadBook()
-        {
-            if(!_isLoaded) _loadedBook = LoadBookFromFile();
-            if(_loadedBook == null) return;
-        }
-
-        /// <summary>
-        /// 定石ファイルを読み込んで、各行ごとのstring配列を返す。
-        /// </summary>
-        /// <returns></returns>
-        private static string[] LoadBookFromFile()
-        {
-            #if UNITY_EDITOR
-            string path = "Assets/" + Constant.Book_FileName;
-            #else
-            string path = Application.persistentDataPath + "/" + Constant.Book_FileName;
-            #endif         
-            _isLoaded = true;
-
-            Debug.Log("Loading book");
-            // ファイル読み込み
-            return File.ReadAllLines(path);
-        }
-
-        
-
-        /// <summary>
         /// 打てる手を並べたListを返す。
         /// 定石手があればその手のみを返し、ない場合は通常の配置可能なマスが返される。
         /// </summary>
@@ -126,7 +128,7 @@ namespace Reversi
             List<Point> history = board.GetHistory();
             Node node = _root;
 
-            if(history.Count <= 0) return board.GetMovablePoints();
+            if(history.Count <= 0 || !_isLoaded) return board.GetMovablePoints();
 
             Point first = history[0];
             CoordTransformer transformer = new CoordTransformer(first);

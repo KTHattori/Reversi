@@ -377,7 +377,7 @@ namespace Reversi
             cornerStat[DiscColor.White].corner = 0;
             cornerStat[DiscColor.White].dangerXmove = 0;
 
-            Point point = new Point();
+            Point point;
 
             // 左上
             point = Constant.Corner_TopLeft;

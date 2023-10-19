@@ -21,12 +21,12 @@ public class TestMonoSingleton : MonoBehaviour
                 TestMonoSingleton find = FindFirstObjectByType(typeof(TestMonoSingleton),FindObjectsInactive.Include) as TestMonoSingleton;
                 
                 if( find == null )
-                {   // 見つからない場合
+                {   // 見つからない場合、新しく生成
                     GameObject obj = new GameObject("Test");
                     instance = obj.AddComponent<TestMonoSingleton>();
                 }
                 else
-                {
+                {   // みつかったので、チェック
                     Initialize(find);
                 }
 
@@ -37,11 +37,11 @@ public class TestMonoSingleton : MonoBehaviour
 
     private static void Initialize(TestMonoSingleton check)
     {
-        if(instance == null)
+        if(instance == null)        // まだ変数がセットされたなかった場合
         {
             instance = check;
         }
-        else if(check != instance)
+        else if(check != instance)  // 重複があった場合
         {
             DestroyImmediate( check.gameObject );
         }

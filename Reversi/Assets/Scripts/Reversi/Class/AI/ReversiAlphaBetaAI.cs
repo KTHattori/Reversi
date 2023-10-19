@@ -66,7 +66,7 @@ namespace Reversi
             for(int i = 0; i < movablePoints.Count; i++)
             {
                 board.Move(movablePoints[i]);
-                eval = -CalcAlphaBeta(board,limit - 1,int.MinValue,int.MaxValue);
+                eval = -CalcAlphaBeta(board,limit - 1,-int.MaxValue,int.MaxValue);
 
                 board.Undo();
 
@@ -145,7 +145,7 @@ namespace Reversi
                 Point point = movablePoints[i];
 
                 board.Move(point);
-                eval = -CalcAlphaBeta(board,limit - 1,int.MinValue,int.MaxValue);
+                eval = -CalcAlphaBeta(board,limit - 1,-int.MaxValue,int.MaxValue);
                 board.Undo();
 
                 MoveEval move = new MoveEval(point.x,point.y,eval);
