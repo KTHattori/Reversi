@@ -199,6 +199,29 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             OnTurn();
             _turnUpdated = false;
         }
+        else
+        {
+            _ui[CurrentPlayer].ThinkAnimation();
+            _ui[OppositePlayer].ThinkAnimation();
+
+            if( _mode == PlayMode.EvE)
+            {
+                _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
+            }
+            else if( _mode == PlayMode.PvE && _currentPlayer != _playerSide)
+            {
+                _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
+
+            }
+            else if(_board.IsPassable())
+            {
+                _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking{_ui[CurrentPlayer].ThinkSuffix}");
+            }
+            else
+            {
+                _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking{_ui[CurrentPlayer].ThinkSuffix}");
+            }
+        }
     }
 
     /// <summary>
@@ -623,26 +646,26 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 
         if( _mode == PlayMode.EvE)
         {
-            _ui[OppositePlayer].SetMessageText("AI Thinking...");
+            _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
             StartWait();
         }
         else if( _mode == PlayMode.PvE && _currentPlayer != _playerSide)
         {
-            _ui[OppositePlayer].SetMessageText("AI Thinking...");
+            _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
             StartWait();
         }
         else if(_board.IsPassable())
         {
             _ui[CurrentPlayer].SetMessageText("No where to place!");
             _ui[CurrentPlayer].ShowPassButton();
-            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking...");
+            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking{_ui[CurrentPlayer].ThinkSuffix}");
             _ui[_playerSide].ShowUndoButton();
             StartWait();
         }
         else
         {
             _ui[CurrentPlayer].SetMessageText($"Decide your move.");
-            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking...");
+            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking{_ui[CurrentPlayer].ThinkSuffix}");
             _ui[_playerSide].ShowUndoButton();
             _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
             StartWait();

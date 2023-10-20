@@ -828,10 +828,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 564.0,
-            "y": 275.99993896484377,
-            "width": 183.0,
-            "height": 251.00006103515626
+            "x": 449.9999694824219,
+            "y": 259.9999694824219,
+            "width": 182.99996948242188,
+            "height": 251.0
         }
     },
     "m_Slots": [
@@ -2001,9 +2001,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 757.0000610351563,
-            "y": 286.0000305175781,
-            "width": 105.0,
+            "x": 716.9999389648438,
+            "y": 268.9999694824219,
+            "width": 127.0,
             "height": 34.0
         }
     },
@@ -2445,10 +2445,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 377.9999694824219,
-            "y": 278.9999694824219,
-            "width": 149.99996948242188,
-            "height": 34.000030517578128
+            "x": 263.9999694824219,
+            "y": 262.9999694824219,
+            "width": 150.00003051757813,
+            "height": 34.0
         }
     },
     "m_Slots": [
@@ -2779,7 +2779,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
     "m_ObjectId": "975dcededee84b18a2350dbb5fc8f2b1",
     "m_Id": 0,
-    "m_DisplayName": "Color",
+    "m_DisplayName": "LineColor",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",

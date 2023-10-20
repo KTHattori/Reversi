@@ -66,6 +66,18 @@ namespace Reversi
         /// </summary>
         private TextMeshProUGUI _messageTextRef;
 
+        /// <summary>
+        /// 考え中...
+        /// </summary>
+        private static string _thinkSuffix = "...";
+
+        public string ThinkSuffix => _thinkSuffix;
+
+        /// <summary>
+        /// 考え中　点の数
+        /// </summary>
+        private static int _thinkProgress = 0;
+
 
         /// <summary>
         /// 最初のUpdate直前にコール
@@ -85,12 +97,18 @@ namespace Reversi
             Deactivate();
         }
 
+        /// <summary>
+        /// 有効化
+        /// </summary>
         public void Activate()
         {
             gameObject.SetActive(true);
             _playerView.gameObject.SetActive(true);
         }
 
+        /// <summary>
+        /// 無効化
+        /// </summary>
         public void Deactivate()
         {
             gameObject.SetActive(false);
@@ -181,6 +199,17 @@ namespace Reversi
             Vector3 ang = transform.localEulerAngles;
             ang.z = angle;
             transform.localEulerAngles = ang;
+        }
+
+        public void ThinkAnimation()
+        {
+            _thinkProgress = ++_thinkProgress % 4;
+            string add = "";
+            for(int i = 0;i < _thinkProgress;i++)
+            {
+                add += ".";
+            }
+            _thinkSuffix = add;
         }
     }
 

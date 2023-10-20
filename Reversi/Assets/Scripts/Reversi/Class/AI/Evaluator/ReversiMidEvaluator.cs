@@ -224,7 +224,7 @@ namespace Reversi
         public int Evaluate(in Board board)
         {
             EdgeStat edgeStat = new EdgeStat();
-            CornerStat cornerStat;
+            CornerStat cornerStat = new CornerStat();
             int result;
 
             // 辺の評価

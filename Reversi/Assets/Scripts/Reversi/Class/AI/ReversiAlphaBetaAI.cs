@@ -66,7 +66,7 @@ namespace Reversi
             for(int i = 0; i < movablePoints.Count; i++)
             {
                 board.Move(movablePoints[i]);
-                eval = -CalcAlphaBeta(board,limit - 1,-int.MaxValue,int.MaxValue);
+                eval = -CalcAlphaBeta(board,limit - 1,int.MinValue,int.MaxValue);
 
                 board.Undo(searching:true);
 
@@ -138,7 +138,7 @@ namespace Reversi
         {
             List<MoveEval> moveEvals = new List<MoveEval>();
 
-            for(int i = 0;i < movablePoints.Count; i++)
+            for(int i = 0;i < movablePoints.Count - 1; i++)
             {
                 int eval;
                 Point point = movablePoints[i];
