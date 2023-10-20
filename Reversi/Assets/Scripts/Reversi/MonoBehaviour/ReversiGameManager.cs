@@ -15,17 +15,21 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     public enum PlayMode
     {
         /// <summary>
+        /// AI対AI
+        /// </summary>
+        EvE = 0,
+        /// <summary>
         /// AIとのローカル対戦
         /// </summary>
-        NonPlayerLocal = 0,
+        PvE = 1,
         /// <summary>
         /// プレイヤーとのローカル対戦
         /// </summary>
-        PlayerLocal = 1,
+        PvPLocal = 2,
         /// <summary>
         /// プレイヤーとのネットワーク対戦
         /// </summary>
-        PlayerNetwork = 2,
+        PvPNetwork = 3,
     }
 
     // 定数 Constants
@@ -55,7 +59,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private ReversiBoard3D _3dboard;
 
     [SerializeField]
-    private PlayMode _mode = PlayMode.NonPlayerLocal;
+    private PlayMode _mode = PlayMode.PvE;
 
     /// <summary>
     /// 先手かどうか
@@ -64,9 +68,13 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private bool _isInitiative = false;
 
     /// <summary>
-    /// AIの強さを定義したScriptableObject
+    /// AIの強さを定義したScriptableObject 黒側
     /// </summary>
-    private ReversiAIDifficulty _aiDifficulty;
+    private ReversiAIDifficulty _blackAIDifficulty;
+    /// <summary>
+    /// AIの強さを定義したScriptableObject 白側
+    /// </summary>
+    private ReversiAIDifficulty _whiteAIDifficulty;
 
     /// <summary>
     /// プレイヤー0用UIへの参照
@@ -197,9 +205,10 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// 難易度定義オブジェクトをセットする
     /// </summary>
     /// <param name="difficulty"></param>
-    public void SetDifficulty(ReversiAIDifficulty difficulty)
+    public void SetDifficulty(ReversiAIDifficulty diff,DiscColor color)
     {
-        _aiDifficulty = difficulty;
+        if(color == DiscColor.Black) _blackAIDifficulty = diff;
+        if(color == DiscColor.White) _whiteAIDifficulty = diff;
     }
 
     /// <summary>
@@ -214,13 +223,16 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _turnUpdated = true;
         switch(mode)
         {
-        case PlayMode.NonPlayerLocal:
+        case PlayMode.EvE:
+            CreateGameOnlyAI();
+            break;
+        case PlayMode.PvE:
             CreateGameWithAI(isInitiative);
             break;
-        case PlayMode.PlayerLocal:
+        case PlayMode.PvPLocal:
             CreateGameWithHuman(false);
             break;
-        case PlayMode.PlayerNetwork:
+        case PlayMode.PvPNetwork:
             CreateGameWithHuman(true);
             break;
         }
@@ -236,13 +248,13 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _turnUpdated = true;
         switch(mode)
         {
-        case PlayMode.NonPlayerLocal:
+        case PlayMode.PvE:
             InitializeGameWithAI(isInitiative);
             break;
-        case PlayMode.PlayerLocal:
+        case PlayMode.PvPLocal:
             InitializeGameWithHuman(false);
             break;
-        case PlayMode.PlayerNetwork:
+        case PlayMode.PvPNetwork:
             InitializeGameWithHuman(true);
             break;
         }
@@ -275,8 +287,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     public void CreateGameWithHuman(bool _isNetwork)
     {
          // モードをセット
-        if(_isNetwork) _mode = PlayMode.PlayerNetwork;
-        else _mode = PlayMode.PlayerLocal;
+        if(_isNetwork) _mode = PlayMode.PvPNetwork;
+        else _mode = PlayMode.PvPLocal;
 
         // プレイヤーをセット
         {
@@ -303,13 +315,15 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _ui[WhiteSide].HideResult();
             _ui[BlackSide].HidePassButton();
             _ui[WhiteSide].HidePassButton();
+            _ui[BlackSide].HideUndoButton();
+            _ui[WhiteSide].HideUndoButton();
         }
         else
         {
             _ui[BlackSide].Activate();
             _ui[BlackSide].HideResult();
             _ui[BlackSide].HidePassButton();
-
+            _ui[BlackSide].HideUndoButton();
             _playerSide = BlackSide;
         }
 
@@ -342,12 +356,15 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _ui[WhiteSide].HideResult();
             _ui[BlackSide].HidePassButton();
             _ui[WhiteSide].HidePassButton();
+            _ui[BlackSide].HideUndoButton();
+            _ui[WhiteSide].HideUndoButton();
         }
         else
         {
             _ui[BlackSide].Activate();
             _ui[BlackSide].HideResult();
             _ui[BlackSide].HidePassButton();
+            _ui[BlackSide].HideUndoButton();
 
             _playerSide = BlackSide;
         }
@@ -361,6 +378,76 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     }
 
     /// <summary>
+    /// AIvsAIの初期化
+    /// </summary>
+    /// <param name="_isInitiative">先手かどうか</param>
+    public void CreateGameOnlyAI()
+    {
+        Debug.Log("Created Game AI vs AI");
+
+        // モードをセット
+        _mode = PlayMode.EvE;
+
+        // 定石ファイルを読み込み
+        BookManager.Instance.LoadBookFile(_bookAssetRef);
+
+        // AIをセット
+        _player[BlackSide] = new AIPlayer(_blackAIDifficulty);
+        _player[WhiteSide] = new AIPlayer(_whiteAIDifficulty);
+
+        _currentPlayer = BlackSide;
+        _playerSide = BlackSide;
+
+        // UI初期化
+        InitializeUI();
+
+        // 盤面データの初期化
+        _board.Init();
+        _board.SetAIInitiative(!_isInitiative);
+
+        // 3D盤面の作成と初期化
+        _3dboard.CreateBoard(_board);
+        _3dboard.InitializeBoard(_board);
+
+        // UI有効化・更新
+        _ui[_playerSide].Activate();
+        _ui[_playerSide].HideResult();
+        _ui[_playerSide].HidePassButton();
+        _ui[_playerSide].HideUndoButton();
+        UpdateUI(_mode);
+        // スタートメッセージを表示
+        ShowMessage(_mode,$"Game started AI vs AI!");
+    }
+
+    /// <summary>
+    /// 対AI戦の初期化
+    /// </summary>
+    /// <param name="_isInitiative">先手かどうか</param>
+    public void InitializeGameOnlyAI()
+    {
+       _playerSide = BlackSide;
+        // UI初期化
+        InitializeUI();
+
+        // 盤面データの初期化
+        _board.Init();
+        _board.SetAIInitiative(!_isInitiative);
+
+        // 3D盤面の作成と初期化
+        _3dboard.CreateBoard(_board);
+        _3dboard.InitializeBoard(_board);
+
+        // UI有効化・更新
+        _ui[_playerSide].Activate();
+        _ui[_playerSide].HideResult();
+        _ui[_playerSide].HidePassButton();
+        _ui[_playerSide].HideUndoButton();
+        UpdateUI(_mode);
+        // スタートメッセージを表示
+        ShowMessage(_mode,$"Game started AI vs AI!");
+    }
+
+    /// <summary>
     /// 対AI戦の初期化
     /// </summary>
     /// <param name="_isInitiative">先手かどうか</param>
@@ -369,7 +456,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         Debug.Log("Created Game With AI");
 
         // モードをセット
-        _mode = PlayMode.NonPlayerLocal;
+        _mode = PlayMode.PvE;
 
         // 定石ファイルを読み込み
         BookManager.Instance.LoadBookFile(_bookAssetRef);
@@ -378,12 +465,12 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         if(_isInitiative)
         {
             _player[BlackSide] = new HumanPlayer();
-            _player[WhiteSide] = new AIPlayer(_aiDifficulty);
+            _player[WhiteSide] = new AIPlayer(_whiteAIDifficulty);
             _playerSide = BlackSide;
         }
         else
         {
-            _player[BlackSide] = new AIPlayer(_aiDifficulty);
+            _player[BlackSide] = new AIPlayer(_blackAIDifficulty);
             _player[WhiteSide] = new HumanPlayer();
             _playerSide = WhiteSide;
         }
@@ -405,9 +492,10 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _ui[_playerSide].Activate();
         _ui[_playerSide].HideResult();
         _ui[_playerSide].HidePassButton();
+        _ui[_playerSide].HideUndoButton();
         UpdateUI(_mode);
         // スタートメッセージを表示
-        ShowMessage(_mode,$"Game started with {_aiDifficulty.DifficultyName} AI!");
+        ShowMessage(_mode,$"Game started with {_whiteAIDifficulty.DifficultyName} AI!");
     }
 
     /// <summary>
@@ -433,6 +521,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _ui[_playerSide].Activate();
         _ui[_playerSide].HideResult();
         _ui[_playerSide].HidePassButton();
+        _ui[_playerSide].HideUndoButton();
         UpdateUI(_mode);
         // スタートメッセージを表示
         ShowMessage(_mode,"Game Start!");
@@ -485,7 +574,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="content"></param>
     private void ShowMessage(PlayMode playMode, string content)
     {
-        if(playMode != PlayMode.PlayerNetwork)
+        if(playMode != PlayMode.PvPNetwork)
         {
             _ui[_playerSide].SetMessageText(content);
         }
@@ -502,7 +591,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="playMode"></param>
     private void UpdateUI(PlayMode playMode)
     {
-        if(playMode != PlayMode.PlayerNetwork)
+        if(playMode != PlayMode.PvPNetwork)
         {
             _ui[_playerSide].SetTurnNumber(_board.GetCurrentTurn());
             _ui[_playerSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
@@ -529,8 +618,15 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         // メッセージリセット
         _ui[CurrentPlayer].SetMessageText("");
         _ui[OppositePlayer].SetMessageText("");
+        _ui[CurrentPlayer].HideUndoButton();
+        _ui[OppositePlayer].HideUndoButton();
 
-        if( _mode == PlayMode.NonPlayerLocal && _currentPlayer != _playerSide)
+        if( _mode == PlayMode.EvE)
+        {
+            _ui[OppositePlayer].SetMessageText("AI Thinking...");
+            StartWait();
+        }
+        else if( _mode == PlayMode.PvE && _currentPlayer != _playerSide)
         {
             _ui[OppositePlayer].SetMessageText("AI Thinking...");
             StartWait();
@@ -540,12 +636,14 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _ui[CurrentPlayer].SetMessageText("No where to place!");
             _ui[CurrentPlayer].ShowPassButton();
             _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking...");
+            _ui[_playerSide].ShowUndoButton();
             StartWait();
         }
         else
         {
             _ui[CurrentPlayer].SetMessageText($"Decide your move.");
             _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking...");
+            _ui[_playerSide].ShowUndoButton();
             _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
             StartWait();
         }
@@ -618,9 +716,13 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         case IReversiPlayer.ActionResult.Undone:
             _3dboard.UpdateBoardOnUndo(_board.GetUndone());
             await Task.Run(() => WaitAnimationCompleted());
-            _player[_currentPlayer].Act(_board,point);
-            _3dboard.UpdateBoardOnUndo(_board.GetUndone());
-            SwapTurn();
+            if(_mode == PlayMode.PvE)
+            {
+
+                _player[_currentPlayer].Act(_board,point);
+                _3dboard.UpdateBoardOnUndo(_board.GetUndone());
+                SwapTurn();
+            }
             SwapTurn();
             break;
 
@@ -640,6 +742,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _turnUpdated = true;
         UpdateUI(_mode);
         _3dboard.RemoveHighlight(_movablePoints);
+        IsGameOver();
     }
 
     /// <summary>
@@ -649,7 +752,6 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     {
         _currentPlayer = 1 - _currentPlayer;
         EndTurn();
-        IsGameOver();
     }
 
     /// <summary>
@@ -663,13 +765,16 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 
         switch(_mode)
         {
-        case PlayMode.NonPlayerLocal:
+        case PlayMode.EvE:
+            _ui[_playerSide].ShowResult(_board);
+        break;
+        case PlayMode.PvE:
             _ui[_playerSide].ShowResult(_board);
             break;
-        case PlayMode.PlayerLocal:
+        case PlayMode.PvPLocal:
             _ui[_playerSide].ShowResult(_board);
             break;
-        case PlayMode.PlayerNetwork:
+        case PlayMode.PvPNetwork:
             _ui[BlackSide].ShowResult(_board);
             _ui[WhiteSide].ShowResult(_board);
             break;

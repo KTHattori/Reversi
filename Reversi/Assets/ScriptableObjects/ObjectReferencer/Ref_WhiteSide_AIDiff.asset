@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ffa8f0c59f5f234ebcbf70a9711e9d7, type: 3}
-  m_Name: Ref_DifficultySelect
+  m_Name: Ref_WhiteSide_AIDiff
   m_EditorClassIdentifier: 
   <gameObject>k__BackingField: {fileID: 0}

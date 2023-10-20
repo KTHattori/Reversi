@@ -44,6 +44,12 @@ namespace Reversi
         private ObjectReferencer _passButtonObjRef;
 
         /// <summary>
+        /// 一手戻しボタン 参照
+        /// </summary>
+        [SerializeField]
+        private ObjectReferencer _undoButtonObjRef;
+
+        /// <summary>
         /// 背景 Imageコンポーネント参照
         /// </summary>
         private Image _backgroundImageRef;
@@ -74,6 +80,7 @@ namespace Reversi
             ObjectReferencer.GetComponentReference<TextMeshProUGUI>(_messageObjRef,ref _messageTextRef);
 
             HidePassButton();
+            HideUndoButton();
             HideResult();
             Deactivate();
         }
@@ -147,6 +154,22 @@ namespace Reversi
         public void HidePassButton()
         {
             _passButtonObjRef.DeactivateObject();
+        }
+
+        /// <summary>
+        /// やりなおしボタンを表示
+        /// </summary>
+        public void ShowUndoButton()
+        {
+            _undoButtonObjRef.ActivateObject();
+        }
+
+        /// <summary>
+        /// やりなおしボタンを非表示
+        /// </summary>
+        public void HideUndoButton()
+        {
+            _undoButtonObjRef.DeactivateObject();
         }
 
         /// <summary>
