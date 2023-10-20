@@ -442,9 +442,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// マスを選択し、思考を終了する
     /// </summary>
     /// <param name="point"></param>
-    public async void SelectPoint(Point point)
+    public void SelectPoint(Point point)
     {
-        await Task.Run(() => WaitAnimationCompleted());
         point._Log("Selected: ");
         _completedThinking = true;
         _selectedPoint = point;
@@ -461,17 +460,14 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             // アニメーションが終了するのを待つ
             await Task.Delay(10);
         }
-        Debug.Log("Wait complete");
     } 
 
     /// <summary>
     /// Undoとして扱われるマス座標を返す。
     /// </summary>
-    public async void Undo()
+    public void Undo()
     {
-        await Task.Run(() => WaitAnimationCompleted());
-        _completedThinking = true;
-        _selectedPoint = Point.Undone;
+        SelectPoint(Point.Undone);
     }
 
     /// <summary>
@@ -479,8 +475,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     public void Pass()
     {
-        _completedThinking = true;
-        _selectedPoint = Point.Passed;
+        SelectPoint(Point.Passed);
     }
 
     /// <summary>
@@ -528,6 +523,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     private void OnTurn()
     {    
+        _movablePoints.Clear();
         _movablePoints = _board.GetMovablePoints();
 
         // メッセージリセット
@@ -585,10 +581,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private IEnumerator WaitForSelect()
     {
         yield return new WaitUntil(() => _completedThinking);
-        Act(_selectedPoint);
-        _selectedPoint = null;
-        _completedThinking = false;
-        SwapTurn();
+        Act(new Point(_selectedPoint));
     }
 
     /// <summary>
@@ -596,65 +589,74 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     private void ImmediateAct()
     {
-        Act(_selectedPoint);
-        _selectedPoint = null;
-        _completedThinking = false;
-        SwapTurn();
+        Act(new Point(_selectedPoint));
     }
 
     /// <summary>
     /// 実際の行動と、行動に基づいた更新内容
     /// </summary>
     /// <param name="point"></param>
-    private void Act(Point point)
+    private async void Act(Point point)
     {
+        await Task.Run(() => WaitAnimationCompleted());
+
         IReversiPlayer.ActionResult result = _player[_currentPlayer].Act(_board,point);
 
         switch(result)
         {
         case IReversiPlayer.ActionResult.Placed:
             _3dboard.UpdateBoardOnPlace(_board.GetUpdate());
+            SwapTurn();
             break;
 
         case IReversiPlayer.ActionResult.Passed:
             _ui[CurrentPlayer].SetMessageText("Passed!");
             _ui[OppositePlayer].SetMessageText("Passed!");
+            SwapTurn();
             break;
 
         case IReversiPlayer.ActionResult.Undone:
             _3dboard.UpdateBoardOnUndo(_board.GetUndone());
-            if(_currentPlayer == _playerSide)
-            {   // AI戦で、プレイヤーの手番ならもう一度Undo
-                _board.Undo();
-                _3dboard.UpdateBoardOnUndo(_board.GetUndone());
-                SwapTurn();
-            }
+            await Task.Run(() => WaitAnimationCompleted());
+            _player[_currentPlayer].Act(_board,point);
+            _3dboard.UpdateBoardOnUndo(_board.GetUndone());
+            SwapTurn();
+            SwapTurn();
             break;
 
         case IReversiPlayer.ActionResult.Failed:
-            SwapTurn();
+            Debug.Log("FAIL");
+            EndTurn();
             break;
         }
     }
 
     /// <summary>
-    /// 手番の入れ替え
+    /// 手番の終了
+    /// </summary>
+    private void EndTurn()
+    {
+        _completedThinking = false;
+        _turnUpdated = true;
+        UpdateUI(_mode);
+        _3dboard.RemoveHighlight(_movablePoints);
+    }
+
+    /// <summary>
+    /// 手番入れ替え
     /// </summary>
     private void SwapTurn()
     {
         _currentPlayer = 1 - _currentPlayer;
-        _turnUpdated = true;
-        OnSwapTurn();
+        EndTurn();
+        IsGameOver();
     }
 
     /// <summary>
     /// 手番入れ替え時の処理
     /// </summary>
-    private void OnSwapTurn()
+    private void IsGameOver()
     {
-        UpdateUI(_mode);
-        _3dboard.RemoveHighlight(_movablePoints);
-
         if(!_board.IsGameOver()) return;
 
         _turnUpdated = false;

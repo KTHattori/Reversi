@@ -509,10 +509,10 @@ namespace Reversi
         /// 直前の一手を元に戻すことを試み、その結果を返す。
         /// </summary>
         /// <returns>成功するとtrue, 元に戻せない場合はfalse</returns>
-        public bool Undo()
+        public bool Undo(bool searching = false)
         {
             if(_currentTurn == 0) return false;
-            if(_aiInitiative && _currentTurn <= 1){ return false; }
+            if(!searching && _aiInitiative && _currentTurn <= 1){ return false; }
 
             _currentColor = _currentColor.GetInvertedColor();
 

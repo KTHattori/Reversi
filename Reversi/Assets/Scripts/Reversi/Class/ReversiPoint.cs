@@ -11,6 +11,12 @@ namespace Reversi
         public int x;
         public int y;
 
+        public Point(Point point)
+        {
+            this.x = point.x;
+            this.y = point.y;
+        }
+
         public Point(int x = 0, int y = 0)
         {
             this.x = x;

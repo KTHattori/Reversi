@@ -68,7 +68,7 @@ namespace Reversi
                 board.Move(movablePoints[i]);
                 eval = -CalcAlphaBeta(board,limit - 1,-int.MaxValue,int.MaxValue);
 
-                board.Undo();
+                board.Undo(searching:true);
 
                 _evaluatedScores.Add(new MoveEval(movablePoints[i].x,movablePoints[i].y,eval));
 
@@ -80,9 +80,8 @@ namespace Reversi
             }
 
             // 最終決定
-            Debug.Log($"x:{point.x}, y:{point.y}");
             // 探索したノードの数
-            Debug.Log($"visited nodes:{visited}");
+            //Debug.Log($"visited nodes:{visited}");
             return point;
         }
 
@@ -108,7 +107,7 @@ namespace Reversi
             {
                 board.Pass();
                 eval = -CalcAlphaBeta(board,limit,-beta,-alpha);
-                board.Undo();
+                board.Undo(searching:true);
                 return eval;
             }
 
@@ -117,7 +116,7 @@ namespace Reversi
             {
                 board.Move(points[i]);
                 eval = -CalcAlphaBeta(board,limit - 1,-beta,-alpha);
-                board.Undo();
+                board.Undo(searching:true);
 
                 alpha = Mathf.Max(alpha,eval);
 
@@ -146,7 +145,7 @@ namespace Reversi
 
                 board.Move(point);
                 eval = -CalcAlphaBeta(board,limit - 1,-int.MaxValue,int.MaxValue);
-                board.Undo();
+                board.Undo(searching:true);
 
                 MoveEval move = new MoveEval(point.x,point.y,eval);
                 moveEvals.Add(move);

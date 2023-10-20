@@ -13,8 +13,8 @@ namespace Reversi
         {
             if(point.Equals(Point.Passed))
             {
-                board.Pass();
-                return IReversiPlayer.ActionResult.Passed;
+                if(board.Pass()) return IReversiPlayer.ActionResult.Passed;
+                else return IReversiPlayer.ActionResult.Failed;
             }
             else if(point.Equals(Point.Undone))
             {
@@ -23,8 +23,8 @@ namespace Reversi
             }
             else
             {
-                board.Move(point);
-                return IReversiPlayer.ActionResult.Placed;
+                if(board.Move(point)) return IReversiPlayer.ActionResult.Placed;
+                else return IReversiPlayer.ActionResult.Failed;
             }
         }
     }
