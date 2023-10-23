@@ -138,7 +138,7 @@ namespace Reversi
         {
             List<MoveEval> moveEvals = new List<MoveEval>();
 
-            for(int i = 0;i < movablePoints.Count - 1; i++)
+            for(int i = 0;i < movablePoints.Count; i++)
             {
                 int eval;
                 Point point = movablePoints[i];

@@ -77,6 +77,7 @@ namespace Reversi
                 _isLoading = false;
                 _isLoaded = true;
                 _instance.CreateBookTree(_loadedBook);
+                assetReference.ReleaseAsset();
                 Debug.Log("Loaded");
             };
 
@@ -96,7 +97,6 @@ namespace Reversi
             while (reader.Peek() != -1) // reader.Peekが-1になるまで
             {
                 string line = reader.ReadLine(); // 一行ずつ読み込み
-
                 List<Point> book = new List<Point>();
                 for(int i = 0;i < line.Length;i +=2)
                 {
