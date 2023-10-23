@@ -148,6 +148,11 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     private CancellationTokenSource _thinkCancelTokenSrc = null;
 
     /// <summary>
+    /// ターンでの経過時間
+    /// </summary>
+    private float _turnTime = 0.0f;
+
+    /// <summary>
     /// ゲーム終了フラグ
     /// </summary>
     private bool _gameDestroyed = false;
@@ -190,17 +195,19 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// </summary>
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            _thinkCancelTokenSrc.Cancel();
-        }
         if(_turnUpdated)
         {
             OnTurn();
             _turnUpdated = false;
+            _turnTime = 0.0f;
         }
         else
         {
+            if(_turnTime > Constant.TurnTimeOver)
+            {
+                
+                return;
+            }
             _ui[CurrentPlayer].ThinkAnimation();
             _ui[OppositePlayer].ThinkAnimation();
 
@@ -222,6 +229,11 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
                 _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking{_ui[CurrentPlayer].ThinkSuffix}");
             }
         }
+    }
+
+    public void StopThink()
+    {
+        _thinkCancelTokenSrc.Cancel();
     }
 
     /// <summary>
@@ -271,6 +283,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _turnUpdated = true;
         switch(mode)
         {
+        case PlayMode.EvE:
+            InitializeGameOnlyAI();
+            break;
         case PlayMode.PvE:
             InitializeGameWithAI(isInitiative);
             break;

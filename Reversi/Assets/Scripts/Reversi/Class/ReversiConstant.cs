@@ -15,6 +15,11 @@
         public static readonly int MaxTurn = 60;
 
         /// <summary>
+        /// タイムオーバーになるまでの時間
+        /// </summary>
+        public static readonly float TurnTimeOver = 30.0f;
+
+        /// <summary>
         /// 左上隅の座標
         /// </summary>
         public static readonly Point Corner_TopLeft = new Point(1,1);
