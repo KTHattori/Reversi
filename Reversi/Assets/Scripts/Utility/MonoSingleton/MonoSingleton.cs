@@ -8,7 +8,7 @@ dontDestroyOnLoadの部分と、各コメント以外は下記サイトを引用
 参考：https://caitsithware.com/wordpress/archives/118
 </summary>
 */
-public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
+public abstract class MonoSingleton<T> : MonoBehaviour, IMonoSingletonMethod where T : MonoSingleton<T>
 {
     /// <summary>
     /// インスタンス
@@ -107,16 +107,11 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
             _instance = null;
         }
     }
- 
-    /// <summary>
-    /// インスタンス初期化時にコールされる関数
-    /// </summary>
-    protected virtual void OnInitialize() {}
 
-    /// <summary>
-    /// インスタンス破棄時にコールされる関数
-    /// </summary>
-    protected virtual void OnFinalize() {}
+    // interface methods
+    public abstract void OnInitialize();
+    public abstract void OnFinalize();
+
  
     /// <summary>
     /// ループ初期にコール

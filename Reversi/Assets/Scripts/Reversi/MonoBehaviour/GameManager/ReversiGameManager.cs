@@ -173,7 +173,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <summary>
     /// インスタンス生成時の処理
     /// </summary>
-    protected override void OnInitialize()
+    public override void OnInitialize()
     {
         _board = new Board();
         _selectedPoint = null;
@@ -184,7 +184,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <summary>
     /// インスタンス破棄時の処理
     /// </summary>
-    protected override void OnFinalize()
+    public override void OnFinalize()
     {
         StopAllCoroutines();
         Destroy(_3dboard);

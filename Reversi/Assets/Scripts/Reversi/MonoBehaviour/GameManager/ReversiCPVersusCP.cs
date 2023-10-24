@@ -35,42 +35,17 @@ public class ReversiCPVersusCP : ReversiGameManager
     [SerializeField]
     private ReversiBoard3D _3dboard;
 
-    [SerializeField]
-    private PlayMode _mode = PlayMode.PvE;
-
-    /// <summary>
-    /// 先手かどうか
-    /// </summary>
-    [SerializeField]
-    private bool _isInitiative = false;
-
-    /// <summary>
-    /// AIの強さを定義したScriptableObject 黒側
-    /// </summary>
-    private ReversiAIDifficulty _blackAIDifficulty;
-    /// <summary>
-    /// AIの強さを定義したScriptableObject 白側
-    /// </summary>
-    private ReversiAIDifficulty _whiteAIDifficulty;
-
     /// <summary>
     /// プレイヤー0用UIへの参照
     /// </summary>
     [SerializeField]
-    private ObjectReferencer _playerUI0Ref;
-
-    /// <summary>
-    /// プレイヤー1用UIへの参照
-    /// </summary>
-    [SerializeField]
-    private ObjectReferencer _playerUI1Ref;
+    private ObjectReferencer _UIRef;
 
     /// <summary>
     /// 定石ファイルへの参照
     /// </summary>
     [SerializeField]
     private AssetReference _bookAssetRef;
-
 
     // Private: Non-Serialized
 
@@ -87,17 +62,23 @@ public class ReversiCPVersusCP : ReversiGameManager
     /// <summary>
     /// UIマネージャ
     /// </summary>
-    private ReversiUIManager[] _ui = new ReversiUIManager[2];
+    private ReversiUIManager _ui = new ReversiUIManager();
+
+    /// <summary>
+    /// AIの強さを定義したScriptableObject 黒側
+    /// </summary>
+    private ReversiAIDifficulty _blackAIDifficulty;
+    
+    /// <summary>
+    /// AIの強さを定義したScriptableObject 白側
+    /// </summary>
+    private ReversiAIDifficulty _whiteAIDifficulty;
+
 
     /// <summary>
     /// 現在の手番
     /// </summary>
     private int _currentPlayer = 0;
-
-    /// <summary>
-    /// プレイヤー側を表す
-    /// </summary>
-    private int _playerSide = -1;
 
     /// <summary>
     /// 思考完了フラグ
@@ -150,7 +131,7 @@ public class ReversiCPVersusCP : ReversiGameManager
     /// <summary>
     /// インスタンス生成時の処理
     /// </summary>
-    protected override void OnInitialize()
+    public override void OnInitialize()
     {
         _board = new Board();
         _selectedPoint = null;
@@ -161,7 +142,7 @@ public class ReversiCPVersusCP : ReversiGameManager
     /// <summary>
     /// インスタンス破棄時の処理
     /// </summary>
-    protected override void OnFinalize()
+    public override void OnFinalize()
     {
         StopAllCoroutines();
         Destroy(_3dboard);
@@ -185,10 +166,10 @@ public class ReversiCPVersusCP : ReversiGameManager
                 StopThink();
                 return;
             }
-            _ui[CurrentPlayer].ThinkAnimation();
-            _ui[OppositePlayer].ThinkAnimation();
+            _ui.ThinkAnimation();
+            _ui.ThinkAnimation();
 
-            _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
+            _ui.SetMessageText($"AI Thinking{_ui.ThinkSuffix}");
         }
     }
 
@@ -214,8 +195,6 @@ public class ReversiCPVersusCP : ReversiGameManager
     /// <param name="isInitiative"></param>
     public void StartMode(PlayMode mode,bool isInitiative)
     {
-        _mode = mode;
-        _isInitiative = isInitiative;
         _turnUpdated = true;
         CreateGameOnlyAI();
     }
@@ -237,7 +216,7 @@ public class ReversiCPVersusCP : ReversiGameManager
     public void RestartCurrent()
     {
         Debug.Log("Restarting...");
-        RestartMode(_mode,_isInitiative);
+        RestartMode(PlayMode.EvE,true);
     }
 
     /// <summary>
@@ -245,119 +224,24 @@ public class ReversiCPVersusCP : ReversiGameManager
     /// </summary>
     private void InitializeUI()
     {
-        _ui[BlackSide] = _playerUI0Ref.GetComponent<ReversiUIManager>();
-        _ui[WhiteSide] = _playerUI1Ref.GetComponent<ReversiUIManager>();
-        _ui[BlackSide].Initialize();
-        _ui[WhiteSide].Initialize();
-    }
-
-    /// <summary>
-    /// 対人戦の作成
-    /// </summary>
-    /// <param name="_isNetwork">ネットワークかどうか</param>
-    public void CreateGameWithHuman(bool _isNetwork)
-    {
-         // モードをセット
-        if(_isNetwork) _mode = PlayMode.PvPNetwork;
-        else _mode = PlayMode.PvPLocal;
-
-        // プレイヤーをセット
-        {
-            _player[BlackSide] = new HumanPlayer();
-            _player[WhiteSide] = new HumanPlayer();
-        }
-
-        // UI初期化
-        InitializeUI();
-
-        // 盤面データの初期化
-        _board.Init();
-
-        // 3D盤面の作成と初期化
-        _3dboard.CreateBoard(_board);
-        _3dboard.InitializeBoard(_board);
+        // コンポーネント
+        _ui = _UIRef.GetComponent<ReversiUIManager>();
+        _ui.Initialize();
 
         // UI有効化・更新
-        if(_isNetwork)
-        {
-            _ui[BlackSide].Activate();
-            _ui[WhiteSide].Activate();
-            _ui[BlackSide].HideResult();
-            _ui[WhiteSide].HideResult();
-            _ui[BlackSide].HidePassButton();
-            _ui[WhiteSide].HidePassButton();
-            _ui[BlackSide].HideUndoButton();
-            _ui[WhiteSide].HideUndoButton();
-        }
-        else
-        {
-            _ui[BlackSide].Activate();
-            _ui[BlackSide].HideResult();
-            _ui[BlackSide].HidePassButton();
-            _ui[BlackSide].HideUndoButton();
-            _playerSide = BlackSide;
-        }
-
-        _currentPlayer = BlackSide;
-
-        UpdateUI(_mode);
-        // スタートメッセージを表示
-        ShowMessage(_mode,"Game Start!");
+        _ui.Activate();
+        _ui.HideResult();
+        _ui.HidePassButton();
+        _ui.HideUndoButton();
     }
 
-    /// <summary>
-    /// 対人戦の初期化
-    /// </summary>
-    public void InitializeGameWithHuman(bool _isNetwork)
-    {
-        // UI初期化
-        InitializeUI();
-
-        // 盤面データの初期化
-        _board.Init();
-        // 3D盤面の初期化
-        _3dboard.InitializeBoard(_board);
-
-        // UI有効化・更新
-        if(_isNetwork)
-        {
-            _ui[BlackSide].Activate();
-            _ui[WhiteSide].Activate();
-            _ui[BlackSide].HideResult();
-            _ui[WhiteSide].HideResult();
-            _ui[BlackSide].HidePassButton();
-            _ui[WhiteSide].HidePassButton();
-            _ui[BlackSide].HideUndoButton();
-            _ui[WhiteSide].HideUndoButton();
-        }
-        else
-        {
-            _ui[BlackSide].Activate();
-            _ui[BlackSide].HideResult();
-            _ui[BlackSide].HidePassButton();
-            _ui[BlackSide].HideUndoButton();
-
-            _playerSide = BlackSide;
-        }
-
-        _currentPlayer = BlackSide;
-
-        // UI更新
-        UpdateUI(_mode);
-        // スタートメッセージを表示
-        ShowMessage(_mode,"Game Start!");
-    }
-
+    
     /// <summary>
     /// AIvsAIの初期化
     /// </summary>
-    /// <param name="_isInitiative">先手かどうか</param>
     public void CreateGameOnlyAI()
     {
         Debug.Log("Created Game AI vs AI");
-
-        // モードをセット
-        _mode = PlayMode.EvE;
 
         // 定石ファイルを読み込み
         BookManager.Instance.LoadBookFile(_bookAssetRef);
@@ -367,27 +251,23 @@ public class ReversiCPVersusCP : ReversiGameManager
         _player[WhiteSide] = new AIPlayer(_whiteAIDifficulty);
 
         _currentPlayer = BlackSide;
-        _playerSide = BlackSide;
 
         // UI初期化
         InitializeUI();
 
         // 盤面データの初期化
         _board.Init();
-        _board.SetAIInitiative(!_isInitiative);
+        _board.SetAIInitiative(!true);
 
         // 3D盤面の作成と初期化
         _3dboard.CreateBoard(_board);
         _3dboard.InitializeBoard(_board);
 
-        // UI有効化・更新
-        _ui[_playerSide].Activate();
-        _ui[_playerSide].HideResult();
-        _ui[_playerSide].HidePassButton();
-        _ui[_playerSide].HideUndoButton();
-        UpdateUI(_mode);
+        // UI更新
+        UpdateUI(PlayMode.EvE);
+
         // スタートメッセージを表示
-        ShowMessage(_mode,$"Game started AI vs AI!");
+        ShowMessage(PlayMode.EvE,$"Game started AI vs AI!");
     }
 
     /// <summary>
@@ -396,106 +276,21 @@ public class ReversiCPVersusCP : ReversiGameManager
     /// <param name="_isInitiative">先手かどうか</param>
     public void InitializeGameOnlyAI()
     {
-       _playerSide = BlackSide;
         // UI初期化
         InitializeUI();
 
         // 盤面データの初期化
         _board.Init();
-        _board.SetAIInitiative(!_isInitiative);
+        _board.SetAIInitiative(!true);
 
         // 3D盤面の作成と初期化
         _3dboard.CreateBoard(_board);
         _3dboard.InitializeBoard(_board);
 
-        // UI有効化・更新
-        _ui[_playerSide].Activate();
-        _ui[_playerSide].HideResult();
-        _ui[_playerSide].HidePassButton();
-        _ui[_playerSide].HideUndoButton();
-        UpdateUI(_mode);
+        // UI更新
+        UpdateUI(PlayMode.EvE);
         // スタートメッセージを表示
-        ShowMessage(_mode,$"Game started AI vs AI!");
-    }
-
-    /// <summary>
-    /// 対AI戦の初期化
-    /// </summary>
-    /// <param name="_isInitiative">先手かどうか</param>
-    public void CreateGameWithAI(bool _isInitiative)
-    {
-        Debug.Log("Created Game With AI");
-
-        // モードをセット
-        _mode = PlayMode.PvE;
-
-        // 定石ファイルを読み込み
-        BookManager.Instance.LoadBookFile(_bookAssetRef);
-
-        // プレイヤーをセット
-        if(_isInitiative)
-        {
-            _player[BlackSide] = new HumanPlayer();
-            _player[WhiteSide] = new AIPlayer(_whiteAIDifficulty);
-            _playerSide = BlackSide;
-        }
-        else
-        {
-            _player[BlackSide] = new AIPlayer(_blackAIDifficulty);
-            _player[WhiteSide] = new HumanPlayer();
-            _playerSide = WhiteSide;
-        }
-
-        _currentPlayer = BlackSide;
-
-        // UI初期化
-        InitializeUI();
-
-        // 盤面データの初期化
-        _board.Init();
-        _board.SetAIInitiative(!_isInitiative);
-
-        // 3D盤面の作成と初期化
-        _3dboard.CreateBoard(_board);
-        _3dboard.InitializeBoard(_board);
-
-        // UI有効化・更新
-        _ui[_playerSide].Activate();
-        _ui[_playerSide].HideResult();
-        _ui[_playerSide].HidePassButton();
-        _ui[_playerSide].HideUndoButton();
-        UpdateUI(_mode);
-        // スタートメッセージを表示
-        ShowMessage(_mode,$"Game started with {_whiteAIDifficulty.DifficultyName} AI!");
-    }
-
-    /// <summary>
-    /// 対AI戦の初期化
-    /// </summary>
-    /// <param name="_isHumanInitiative"></param>
-    public void InitializeGameWithAI(bool _isHumanInitiative)
-    {
-        // 手番の初期化
-        _currentPlayer = BlackSide;
-
-        // UI初期化
-        InitializeUI();
-
-        // 盤面データの初期化
-        _board.Init();
-        _board.SetAIInitiative(!_isHumanInitiative);
-
-        // 3D盤面の初期化
-        _3dboard.InitializeBoard(_board);
-
-        // UI有効化・更新
-        _ui[_playerSide].Activate();
-        _ui[_playerSide].HideResult();
-        _ui[_playerSide].HidePassButton();
-        _ui[_playerSide].HideUndoButton();
-        UpdateUI(_mode);
-        // スタートメッセージを表示
-        ShowMessage(_mode,"Game Start!");
+        ShowMessage(PlayMode.EvE,$"Game started AI vs AI!");
     }
 
     /// <summary>
@@ -545,15 +340,7 @@ public class ReversiCPVersusCP : ReversiGameManager
     /// <param name="content"></param>
     private void ShowMessage(PlayMode playMode, string content)
     {
-        if(playMode != PlayMode.PvPNetwork)
-        {
-            _ui[_playerSide].SetMessageText(content);
-        }
-        else
-        {
-            _ui[BlackSide].SetMessageText(content);
-            _ui[WhiteSide].SetMessageText(content);
-        }
+        _ui.SetMessageText(content);
     }
 
     /// <summary>
@@ -564,17 +351,17 @@ public class ReversiCPVersusCP : ReversiGameManager
     {
         if(playMode != PlayMode.PvPNetwork)
         {
-            _ui[_playerSide].SetTurnNumber(_board.GetCurrentTurn());
-            _ui[_playerSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
-            _ui[_playerSide].HidePassButton();
+            _ui.SetTurnNumber(_board.GetCurrentTurn());
+            _ui.SetBackgroundColor(_board.GetCurrentColor().ToColor());
+            _ui.HidePassButton();
         }
         else
         {
-            _ui[BlackSide].SetTurnNumber(_board.GetCurrentTurn());
-            _ui[BlackSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
-            _ui[WhiteSide].SetTurnNumber(_board.GetCurrentTurn());
-            _ui[WhiteSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
-            _ui[CurrentPlayer].HidePassButton();
+            _ui.SetTurnNumber(_board.GetCurrentTurn());
+            _ui.SetBackgroundColor(_board.GetCurrentColor().ToColor());
+            _ui.SetTurnNumber(_board.GetCurrentTurn());
+            _ui.SetBackgroundColor(_board.GetCurrentColor().ToColor());
+            _ui.HidePassButton();
         }
     }
 
@@ -587,37 +374,14 @@ public class ReversiCPVersusCP : ReversiGameManager
         _movablePoints = _board.GetMovablePoints();
 
         // メッセージリセット
-        _ui[CurrentPlayer].SetMessageText("");
-        _ui[OppositePlayer].SetMessageText("");
-        _ui[CurrentPlayer].HideUndoButton();
-        _ui[OppositePlayer].HideUndoButton();
+        _ui.SetMessageText("");
+        _ui.SetMessageText("");
+        _ui.HideUndoButton();
+        _ui.HideUndoButton();
 
-        if( _mode == PlayMode.EvE)
-        {
-            _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
-            StartWait();
-        }
-        else if( _mode == PlayMode.PvE && _currentPlayer != _playerSide)
-        {
-            _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
-            StartWait();
-        }
-        else if(_board.IsPassable())
-        {
-            _ui[CurrentPlayer].SetMessageText("No where to place!");
-            _ui[CurrentPlayer].ShowPassButton();
-            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking{_ui[CurrentPlayer].ThinkSuffix}");
-            _ui[_playerSide].ShowUndoButton();
-            StartWait();
-        }
-        else
-        {
-            _ui[CurrentPlayer].SetMessageText($"Decide your move.");
-            _ui[OppositePlayer].SetMessageText($"{CurrentPlayer} Thinking{_ui[CurrentPlayer].ThinkSuffix}");
-            _ui[_playerSide].ShowUndoButton();
-            _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
-            StartWait();
-        }
+        // メッセージ設定
+        _ui.SetMessageText($"AI Thinking{_ui.ThinkSuffix}");
+        StartWait();
     }
 
     /// <summary>
@@ -679,21 +443,19 @@ public class ReversiCPVersusCP : ReversiGameManager
             break;
 
         case IReversiPlayer.ActionResult.Passed:
-            _ui[CurrentPlayer].SetMessageText("Passed!");
-            _ui[OppositePlayer].SetMessageText("Passed!");
+            _ui.SetMessageText("Passed!");
+            _ui.SetMessageText("Passed!");
             SwapTurn();
             break;
 
         case IReversiPlayer.ActionResult.Undone:
             _3dboard.UpdateBoardOnUndo(_board.GetUndone());
+            
             await Task.Run(() => WaitAnimationCompleted());
-            if(_mode == PlayMode.PvE)
-            {
+            _player[_currentPlayer].Act(_board,point);
+            _3dboard.UpdateBoardOnUndo(_board.GetUndone());
+            SwapTurn();
 
-                _player[_currentPlayer].Act(_board,point);
-                _3dboard.UpdateBoardOnUndo(_board.GetUndone());
-                SwapTurn();
-            }
             SwapTurn();
             break;
 
@@ -711,7 +473,7 @@ public class ReversiCPVersusCP : ReversiGameManager
     {
         _completedThinking = false;
         _turnUpdated = true;
-        UpdateUI(_mode);
+        UpdateUI(PlayMode.EvE);
         _3dboard.RemoveHighlight(_movablePoints);
         IsGameOver();
     }
@@ -733,23 +495,7 @@ public class ReversiCPVersusCP : ReversiGameManager
         if(!_board.IsGameOver()) return;
 
         _turnUpdated = false;
-
-        switch(_mode)
-        {
-        case PlayMode.EvE:
-            _ui[_playerSide].ShowResult(_board);
-        break;
-        case PlayMode.PvE:
-            _ui[_playerSide].ShowResult(_board);
-            break;
-        case PlayMode.PvPLocal:
-            _ui[_playerSide].ShowResult(_board);
-            break;
-        case PlayMode.PvPNetwork:
-            _ui[BlackSide].ShowResult(_board);
-            _ui[WhiteSide].ShowResult(_board);
-            break;
-        }
+        _ui.ShowResult(_board);
     }
 
     /// <summary>
