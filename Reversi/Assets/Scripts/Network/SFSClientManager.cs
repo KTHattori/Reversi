@@ -3,14 +3,15 @@ using Sfs2X.Core;
 using Sfs2X.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using T0R1;
 
 /// <summary>
 /// 
 /// </summary>
-public class SFSClientManager : MonoSingleton<SFSClientManager>
+public class SFClientManager : MonoSingleton<SFClientManager>
 {
     #region // Private variables
-    private SmartFox _sfsInstance;
+    private SmartFox _sfInstance;
     private string _connLostMsg;
     #endregion
 
@@ -24,9 +25,9 @@ public class SFSClientManager : MonoSingleton<SFSClientManager>
     void Update()
     {
         // sfsイベントキューを処理し続ける
-        if(_sfsInstance != null)
+        if(_sfInstance != null)
         {
-            _sfsInstance.ProcessEvents();
+            _sfInstance.ProcessEvents();
         }
     }
 
@@ -37,8 +38,8 @@ public class SFSClientManager : MonoSingleton<SFSClientManager>
     private void OnConnectionLost(BaseEvent evt)
     {
         // Remove CONNECTION_LOST listener
-        _sfsInstance.RemoveEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
-        _sfsInstance = null;
+        _sfInstance.RemoveEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
+        _sfInstance = null;
 
         // Get disconnection reason
         string connLostReason = (string)evt.Params["reason"];
@@ -55,11 +56,11 @@ public class SFSClientManager : MonoSingleton<SFSClientManager>
                 if (connLostReason == ClientDisconnectionReason.IDLE)
                     _connLostMsg += "ほうちじょうたいだったためせつぞくがきれました。";
                 else if (connLostReason == ClientDisconnectionReason.KICK)
-                    _connLostMsg += "サーバーかんりしゃにKICKされました。";
+                    _connLostMsg += "KICKされました。";
                 else if (connLostReason == ClientDisconnectionReason.BAN)
-                    _connLostMsg += "サーバーかんりしゃにBANされました。";
+                    _connLostMsg += "BANされました。";
                 else
-                    _connLostMsg += "げんいんはわかりませんが、あなたはせつだんされました。";
+                    _connLostMsg += "セツダンされました。";
             }
 
             // Switch to the LOGIN scene
@@ -77,8 +78,8 @@ public class SFSClientManager : MonoSingleton<SFSClientManager>
 
     public override void OnFinalize()
     {
-        if (_sfsInstance != null && _sfsInstance.IsConnected) // sfsインスタンスがあって、接続状態である
-            _sfsInstance.Disconnect();  // 切断処理
+        if (_sfInstance != null && _sfInstance.IsConnected) // sfsインスタンスがあって、接続状態である
+            _sfInstance.Disconnect();  // 切断処理
     }
     #endregion
 
@@ -97,11 +98,11 @@ public class SFSClientManager : MonoSingleton<SFSClientManager>
     /// SFSクライアントを作成
     /// </summary>
     /// <returns></returns>
-    public SmartFox CreateSFSClient()
+    public SmartFox CreateSFClient()
     {
-        _sfsInstance = new SmartFox();
-        _sfsInstance.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
-        return _sfsInstance;
+        _sfInstance = new SmartFox();
+        _sfInstance.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
+        return _sfInstance;
     }
 
     /// <summary>
@@ -109,20 +110,20 @@ public class SFSClientManager : MonoSingleton<SFSClientManager>
     /// </summary>
     /// <param name="useWebSocket"></param>
     /// <returns></returns>
-    public SmartFox CreateSfsClient(UseWebSocket useWebSocket)
+    public SmartFox CreateSFClient(UseWebSocket useWebSocket)
     {
-        _sfsInstance = new SmartFox(useWebSocket);
-        _sfsInstance.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
-        return _sfsInstance;
+        _sfInstance = new SmartFox(useWebSocket);
+        _sfInstance.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
+        return _sfInstance;
     }
 
     /// <summary>
     /// SFSクライアントを取得
     /// </summary>
     /// <returns></returns>
-    public SmartFox GetSfsClient()
+    public SmartFox GetSFClient()
     {
-        return _sfsInstance;
+        return _sfInstance;
     }
     #endregion
 }

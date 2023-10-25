@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Reversi;
+using T0R1;
 
 
 public class ReversiGameManager : MonoSingleton<ReversiGameManager>

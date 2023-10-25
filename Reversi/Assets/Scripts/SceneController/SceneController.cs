@@ -1,22 +1,21 @@
 using UnityEngine;
+using T0R1;
 
-public abstract class SceneController : MonoSingleton<SceneController>
+public abstract class SceneController : MonoSingleton<SceneController>,ISFEventTriggerable
 {
-    private SFSClientManager sfsClient;
+    protected SFClientManager _sfManager;
 
     /// <summary>
     /// インスタンスをセット
     /// </summary>
     void Awake()
     {
-        sfsClient = SFSClientManager.Instance;
+        _sfManager = SFClientManager.Instance;
     }
 
     protected virtual void Update()
 	{
-		// Escapeキーが押されたら、モーダルなUIを非表示にする
-		if (Input.GetKeyDown(KeyCode.Escape))
-			HideModals();
+
 	}
 
     /// <summary>
@@ -25,16 +24,16 @@ public abstract class SceneController : MonoSingleton<SceneController>
 	protected virtual void OnDestroy()
 	{
 		// Remove SFS2X listeners
-		RemoveSFSListeners();
+		RemoveSFListeners();
 	}
 
-	/// <summary>
-    /// SFSに登録したイベントリスナーを破棄
+    /// <summary>
+    /// イベントを割り当てる
     /// </summary>
-	protected abstract void RemoveSFSListeners();
+    public abstract void AddSFListeners();
 
     /// <summary>
-    /// モーダルなUIを非表示にする
+    /// 割り当てたイベントを解除する
     /// </summary>
-	protected abstract void HideModals();
+    public abstract void RemoveSFListeners();
 }
