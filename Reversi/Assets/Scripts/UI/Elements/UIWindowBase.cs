@@ -16,7 +16,7 @@ namespace T0R1.UI
 
         public UnityEvent OnCloseEvent => _onClose;
 
-        void Awake()
+        protected override void OnAwake()
         {
             if(_closeButton != null) _closeButton.onClick.AddListener(OnCloseClick);
             else Debug.LogError("There is no close button set!");
@@ -26,11 +26,21 @@ namespace T0R1.UI
         /// 閉じるボタンが押されたときに実行される関数
         /// 登録した関数を実行後、非表示にする
         /// </summary>
-        public void OnCloseClick()
+        protected void OnCloseClick()
         {
             _onClose.Invoke();
             Hide();
             Debug.Log("Closing");
+        }
+
+        public void EnableClose()
+        {
+            _closeButton.interactable = true;
+        }
+
+        public void DisableClose()
+        {
+            _closeButton.interactable = false;
         }
     }
 

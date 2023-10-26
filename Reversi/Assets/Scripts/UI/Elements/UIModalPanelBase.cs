@@ -4,11 +4,16 @@ using UnityEngine;
 
 namespace T0R1.UI
 {
-    public class ModalPanel : Panel
+    public class ModalPanel : Panel, IModal
     {
-        void Awake()
+        protected override void OnAwake()
         {
             _isModal = true;
+        }
+
+        public void HideModal()
+        {
+            Hide();
         }
     }
 }

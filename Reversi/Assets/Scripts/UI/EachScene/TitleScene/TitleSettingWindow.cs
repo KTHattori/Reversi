@@ -11,7 +11,7 @@ public class TitleSettingWindow : ModalWindow
     public TMP_InputField NameInputField => _nameInputField;
     
 
-    void Start()
+    protected override void OnStart()
     {
         NameInputField.onSubmit.AddListener(OnNameInputEndEdit);
     }
@@ -19,6 +19,6 @@ public class TitleSettingWindow : ModalWindow
 	public void OnNameInputEndEdit(string name)
 	{
 		if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-            _baseUI.GetComponent<TitleSceneUI>().SetPlayerNameText(NameInputField.text);
+            GetBaseUI<TitleSceneUI>().SetPlayerNameText(NameInputField.text);
 	}
 }

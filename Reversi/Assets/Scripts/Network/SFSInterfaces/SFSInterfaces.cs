@@ -16,12 +16,12 @@ public interface ISFEventTriggerable
 }
 
 /// <summary>
-/// 
+/// SmartFoxサーバー接続用インタフェース
 /// </summary>
 public interface ISFConnectable : ISFEventTriggerable
 {
     /// <summary>
-    /// サーバーへの接続成功時
+    /// サーバーへの接続時
     /// </summary>
     /// <param name="evt"></param>
     public abstract void OnSFConnection(BaseEvent evt);
@@ -33,12 +33,12 @@ public interface ISFConnectable : ISFEventTriggerable
 }
 
 /// <summary>
-/// 
+/// SmartFoxサーバーログイン用インタフェース
 /// </summary>
 public interface ISFLoginable : ISFEventTriggerable
 {
     /// <summary>
-    /// ログイン成功時
+    /// ログイン時
     /// </summary>
     /// <param name="evt"></param>
     public abstract void OnSFLogin(BaseEvent evt);
@@ -47,4 +47,67 @@ public interface ISFLoginable : ISFEventTriggerable
     /// </summary>
     /// <param name="evt"></param>
     public abstract void OnSFLoginError(BaseEvent evt);
+}
+
+/// <summary>
+/// SmartFoxルーム閲覧用インターフェス
+/// </summary>
+public interface ISFRoomFetchable : ISFEventTriggerable
+{
+    /// <summary>
+    /// ルーム追加時
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFRoomAdded(BaseEvent evt);
+    /// <summary>
+    /// ルーム削除時
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFRoomRemoved(BaseEvent evt);
+}
+
+/// <summary>
+/// SmartFoxルーム管理用インタフェース
+/// </summary>
+public interface ISFRoomCreatable : ISFRoomFetchable
+{
+    /// <summary>
+    /// ルーム作成失敗時
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFRoomCreationError(BaseEvent evt);
+}
+
+/// <summary>
+/// SmartFoxルーム参加用インタフェース
+/// </summary>
+public interface ISFRoomJoinable : ISFRoomFetchable
+{
+    /// <summary>
+    /// ルーム参加時
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFRoomJoin(BaseEvent evt);
+    /// <summary>
+    /// ルーム参加失敗時
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFRoomJoinError(BaseEvent evt);
+}
+
+/// <summary>
+/// SmartFoxルーム参加監視用インタフェース
+/// </summary>
+public interface ISFRoomAccessWatchable : ISFEventTriggerable
+{
+    /// <summary>
+    /// ルーム参加時
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFUserEnterRoom(BaseEvent evt);
+    /// <summary>
+    /// ルーム参加失敗時
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFUserExitRoom(BaseEvent evt);
 }

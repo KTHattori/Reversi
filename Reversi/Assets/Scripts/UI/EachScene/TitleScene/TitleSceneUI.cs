@@ -9,6 +9,8 @@ public class TitleSceneUI : SceneUIBase
     [SerializeField]
     private TitleSettingWindow _settingWindow;
     [SerializeField]
+    private TitleOnlinePlayWindow _onlinePlayWindow;
+    [SerializeField]
     private TextMeshProUGUI _playerNameText;
     [SerializeField]
     private TextMeshProUGUI _errorText;
@@ -25,6 +27,8 @@ public class TitleSceneUI : SceneUIBase
     #endregion
 
     #region // Public properties
+    public TitleSettingWindow SettingWindow => _settingWindow;
+    public TitleOnlinePlayWindow OnlinePlayWindow => _onlinePlayWindow;
     public string PlayerNameText => _playerNameText.text;
     public Button PlayLocalButton => _playLocalButton;
     public Button PlayOnlineButton => _playOnlineButton;
@@ -36,6 +40,16 @@ public class TitleSceneUI : SceneUIBase
     {
         _settingWindow.SetBaseUI(this);
         _settingWindow.Hide();
+        MarkAsModal(_settingWindow);
+        
+        _onlinePlayWindow.SetBaseUI(this);
+        _onlinePlayWindow.Hide();
+        MarkAsModal(_onlinePlayWindow);
+
+        _errorWindow.SetBaseUI(this);
+        _errorWindow.Hide();
+        MarkAsModal(_errorWindow);
+
         TryBindActionToButton(_playLocalButton,OnPlayLocalClicked);
         TryBindActionToButton(_playOnlineButton,OnPlayOnlineClicked);
         TryBindActionToButton(_playerSettingButton,OnSettingClicked);
@@ -46,7 +60,6 @@ public class TitleSceneUI : SceneUIBase
     void OnPlayLocalClicked()
     {
         Debug.Log("PLAY LOCAL");
-        // SceneManager.LoadScene("GameScene");
     }
 
     void OnPlayOnlineClicked()
@@ -62,16 +75,18 @@ public class TitleSceneUI : SceneUIBase
     #endregion
 
     #region // Protected override methods
-    public override void HideModals()
-    {
-        _settingWindow.Hide();
-    }
     #endregion
 
     #region // Public methods
     public void SetErrorText(string text)
     {
         _errorText.SetText(text);
+    }
+
+    public void ShowErrorWindow(string text)
+    {
+        _errorWindow.Show(text);
+        Debug.Log("Showing Error Window");
     }
 
     public void SetPlayerNameText(string text)

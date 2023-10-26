@@ -7,7 +7,7 @@ namespace T0R1.UI
     {
         [SerializeField]
         protected TextMeshProUGUI _errorText;
-        public void ShowWindow(string content)
+        public void Show(string content)
         {
             Show();
             _errorText.SetText(content);

@@ -4,13 +4,18 @@ using UnityEngine;
 
 namespace T0R1.UI
 {
-    public class ModalWindow : Window
+    public class ModalWindow : Window, IModal
     {
-        void Awake()
+        protected override void OnAwake()
         {
             _isModal = true;
             if(_closeButton != null) _closeButton.onClick.AddListener(OnCloseClick);
             else Debug.LogError("There is no close button set!");
+        }
+
+        public void HideModal()
+        {
+            Hide();
         }
     }
 
