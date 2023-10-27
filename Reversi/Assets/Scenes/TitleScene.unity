@@ -2618,6 +2618,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c858a711a6591f499e3500a1bb3ae48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _errorWindow: {fileID: 256421423}
   _settingWindow: {fileID: 1277868729}
   _onlinePlayWindow: {fileID: 559397715}
   _playerNameText: {fileID: 1882711202}
@@ -2625,7 +2626,6 @@ MonoBehaviour:
   _playLocalButton: {fileID: 1250219970}
   _playOnlineButton: {fileID: 1197145120}
   _playerSettingButton: {fileID: 1917392976}
-  _errorWindow: {fileID: 256421423}
 --- !u!4 &454501426
 Transform:
   m_ObjectHideFlags: 0
@@ -5417,9 +5417,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa2a06a4d48ef645a6e2faaa3969dbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 0
   _sceneUI: {fileID: 454501425}
-  host: 127.0.0.1
+  host: sfs2x.m-craft.com
   tcpPort: 9933
   httpPort: 8080
   zone: Reversi

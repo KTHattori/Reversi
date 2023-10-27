@@ -29,7 +29,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
     [SerializeField]
     TitleSceneUI _sceneUI;
     [Tooltip("IP address or domain name of the SmartFoxServer instance")]
-	public string host = "127.0.0.1";
+	public string host = "sfs2x.m-craft.com";
 
 	[Tooltip("TCP listening port of the SmartFoxServer instance, used for TCP socket connection in all builds except WebGL")]
 	public int tcpPort = 9933;
