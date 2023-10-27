@@ -1,22 +1,51 @@
 using UnityEngine;
 using T0R1;
+using T0R1.UI;
 
-public abstract class SceneController : MonoSingleton<SceneController>,ISFEventTriggerable
+public abstract class SceneController : SealableMonoBehaviour,ISFEventTriggerable
 {
     protected SFClientManager _sfManager;
 
-    /// <summary>
-    /// インスタンスをセット
-    /// </summary>
-    void Awake()
+    protected sealed override void Reset()
+    {
+        OnReset();
+    }
+    
+    protected sealed override void Awake()
     {
         _sfManager = SFClientManager.Instance;
+        OnAwake();
     }
 
-    protected virtual void Update()
-	{
+    protected sealed override void Start()
+    {
+        OnStart();
+    }
 
-	}
+    protected sealed override void Update()
+    {
+        OnUpdate();
+    }
+
+    protected virtual void OnReset()
+    {
+
+    }
+
+    protected virtual void OnAwake()
+    {
+
+    }
+
+    protected virtual void OnStart()
+    {
+
+    }
+
+    protected virtual void OnUpdate()
+    {
+
+    }
 
     /// <summary>
     /// シーン変更時にSFSに登録したイベントリスナーを破棄

@@ -22,8 +22,6 @@ public class TitleSceneUI : SceneUIBase
     [SerializeField]
     private Button _playerSettingButton;
     
-    [SerializeField]
-    private ErrorWindow _errorWindow;
     #endregion
 
     #region // Public properties
@@ -36,7 +34,7 @@ public class TitleSceneUI : SceneUIBase
     #endregion
 
     #region // Unity methods
-    void Start()
+    protected override void OnStart()
     {
         _settingWindow.SetBaseUI(this);
         _settingWindow.Hide();
@@ -45,11 +43,7 @@ public class TitleSceneUI : SceneUIBase
         _onlinePlayWindow.SetBaseUI(this);
         _onlinePlayWindow.Hide();
         MarkAsModal(_onlinePlayWindow);
-
-        _errorWindow.SetBaseUI(this);
-        _errorWindow.Hide();
-        MarkAsModal(_errorWindow);
-
+        
         TryBindActionToButton(_playLocalButton,OnPlayLocalClicked);
         TryBindActionToButton(_playOnlineButton,OnPlayOnlineClicked);
         TryBindActionToButton(_playerSettingButton,OnSettingClicked);
@@ -99,6 +93,7 @@ public class TitleSceneUI : SceneUIBase
         _playLocalButton.interactable = true;
         _playOnlineButton.interactable = true;
         _playerSettingButton.interactable = true;
+        _onlinePlayWindow.MatchMakingButton.BaseComponent.interactable = true;
     }
 
     public override void Disable()
@@ -106,6 +101,7 @@ public class TitleSceneUI : SceneUIBase
         _playLocalButton.interactable = false;
         _playOnlineButton.interactable = false;
         _playerSettingButton.interactable = false;
+        _onlinePlayWindow.MatchMakingButton.BaseComponent.interactable = false;
     }
     #endregion
 }

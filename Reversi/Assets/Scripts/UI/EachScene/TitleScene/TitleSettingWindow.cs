@@ -1,6 +1,5 @@
 using UnityEngine;
 using T0R1.UI;
-using UnityEngine.UI;
 using TMPro;
 
 
@@ -10,10 +9,10 @@ public class TitleSettingWindow : ModalWindow
     private TMP_InputField _nameInputField;
     public TMP_InputField NameInputField => _nameInputField;
     
-
     protected override void OnStart()
     {
         NameInputField.onSubmit.AddListener(OnNameInputEndEdit);
+        GetBaseUI<TitleSceneUI>().SetPlayerNameText(NameInputField.text);
     }
 
 	public void OnNameInputEndEdit(string name)

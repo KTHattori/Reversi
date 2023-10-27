@@ -63,7 +63,7 @@ public class ReversiPointSelector : MonoBehaviour
     /// <param name="point"></param>
     public void SelectPoint(Point point)
     {
-        ReversiGameManager.Instance.SelectPoint(point);
+        ReversiGamePVP.Instance.SelectPoint(point);
     }
 
     /// <summary>

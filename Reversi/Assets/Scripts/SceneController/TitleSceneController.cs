@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using Sfs2X;
 using Sfs2X.Core;
 using Sfs2X.Entities;
@@ -6,9 +8,9 @@ using Sfs2X.Entities.Match;
 using Sfs2X.Requests;
 using Sfs2X.Requests.Game;
 using Sfs2X.Util;
+using Sfs2X.Entities.Variables;
 
-using UnityEngine;
-using UnityEngine.SceneManagement;
+
 
 public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreatable,ISFRoomJoinable,ISFRoomAccessWatchable
 {
@@ -19,6 +21,8 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 
     #region // Private variables
     private SmartFox _server;
+	private string _manualDCReason = "";
+	private bool _lobbyConnected = false;
     #endregion
 
     #region // Serialized variables
@@ -45,12 +49,15 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
     #endregion
 
     #region // Unity callback methods
-    private void Start()
+    protected override void OnStart()
 	{
         // ボタンにサーバー接続関数を割り当て
 		_sceneUI.PlayOnlineButton.onClick.AddListener(OnSelectedOnline);
 
-		// 検索開始ボタンにログイン関数を割り当て
+		// オンラインプレイウィンドウが閉じたときに切断する関数を割り当て
+		_sceneUI.OnlinePlayWindow.AddActionOnHidden(OnCloseOnlineWindow);
+
+		// 検索開始関数を割り当て
 		_sceneUI.OnlinePlayWindow.MatchMakingButton.AddListenerOnClick(StartMatchMaking);
 
         // 接続失敗メッセージがあれば表示
@@ -58,7 +65,12 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		if (connLostMsg != null)
 			_sceneUI.SetErrorText(connLostMsg);
 
-		UserName = _sceneUI.PlayerNameText;
+		UserName = $"Player#{Mathf.RoundToInt(System.DateTime.Now.Millisecond)}";
+		_sceneUI.SetPlayerNameText(UserName);
+		_sceneUI.SettingWindow.NameInputField.SetTextWithoutNotify(UserName);
+
+		_manualDCReason = "";
+		_lobbyConnected = false;
 	}
     #endregion
 
@@ -154,16 +166,11 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 	/// </summary>
 	private void StartMatchMaking()
 	{
-		// ログイン
-		if(_server.IsConnected)
-		{
-			_server.Send(new LoginRequest(_sceneUI.PlayerNameText));
-			SetMatchButtonCancellable(true);
-		}
-		else
-		{
-			SetMatchButtonCancellable(false);
-		}
+		// UI無効
+		_sceneUI.Disable();
+		SetMatchButtonLabel("Matching...");
+		DisableMatchButton();
+		StartSearchingRooms();
 	}
 
 	/// <summary>
@@ -171,19 +178,12 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 	/// </summary>
 	private void CancelMatchMaking()
 	{
-		// 切断する。OnConnectionLostもコールされる。
-		_server.Disconnect();
+		ManuallyDisconnect("Matching Cancelled.");
+	}
 
-		// エラー表示
-		string error = "Matching Cancelled.";
-		_sceneUI.SetErrorText(error);
-		_sceneUI.ShowErrorWindow(error);
-
-		// UI有効化
-		_sceneUI.Enable();
-
-		SetMatchButtonCancellable(false);
-		DisableMatchButton();
+	private void OnCloseOnlineWindow()
+	{
+		ManuallyDisconnect("");
 	}
 
 	private void JoinLobby()
@@ -191,20 +191,38 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		_server.Send(new JoinRoomRequest(DEFAULT_ROOM));
 		Debug.Log("Joining Lobby...");
 	}
+	private void ManuallyDisconnect(string reason)
+	{
+		if(_server == null) return;
+		if(!_server.IsConnected) return;
+
+		// UI無効か
+		_sceneUI.Disable();
+		// 切断する。OnConnectionLostもコールされる。
+		_server.Disconnect();
+		// 切断理由をセット
+		_manualDCReason = reason;
+
+		// エラー表示
+		_sceneUI.SetErrorText(_manualDCReason);
+		_sceneUI.ShowErrorWindow(_manualDCReason);
+
+		// 切断理由をリセット
+		_manualDCReason = "";
+	}
 
 	/// <summary>
 	/// ルーム検索、参加
 	/// </summary>
 	private void StartSearchingRooms()
 	{
-		DisableMatchButton();
+		_sceneUI.Disable();
 		TryConnectRoom();
+		_sceneUI.OnlinePlayWindow.Message.SetText("Searching rooms...");
 	}
 
 	private void TryConnectRoom()
 	{
-		_sceneUI.OnlinePlayWindow.Message.SetText("Searching rooms...");
-
 		// ルーム作成情報
 		string roomName = _server.MySelf.Name + "'s game";
 
@@ -219,10 +237,9 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		settings.IsGame = true;
 
 		MatchExpression exp = new MatchExpression(RoomProperties.IS_GAME, BoolMatch.EQUALS, true)
-        	.And(RoomProperties.HAS_FREE_PLAYER_SLOTS, BoolMatch.EQUALS, true)
-        	.And("isGameStarted", BoolMatch.EQUALS, false);
+        	.And(RoomProperties.HAS_FREE_PLAYER_SLOTS, BoolMatch.EQUALS, true);
 		
-		_server.Send(new QuickJoinOrCreateRoomRequest(matchExpression: exp, new List<string>() { GAME_ROOMS_GROUP_NAME },settings,_server.LastJoinedRoom));
+		_server.Send(new QuickJoinOrCreateRoomRequest(matchExpression: exp, new List<string>(){ GAME_ROOMS_GROUP_NAME },settings,_server.LastJoinedRoom));
 	}
 
 	private void CreatePrivateRoom()
@@ -244,9 +261,28 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		_sceneUI.OnlinePlayWindow.Message.SetText("Creating a room...");
 	}
 
-	private void StartOnlineMatch()
+	private void StartMatch()
 	{
+		_sceneUI.Disable();
 		SceneManager.LoadScene("GameOnlineScene");
+	}
+
+	private void ReadyToMatchMaking()
+	{
+		SetMatchButtonCancellable(false);
+		EnableMatchButton();
+		SetMatchButtonLabel("Start MatchMaking");
+	}
+
+	private bool CheckGameStart(Room room)
+	{
+		return room.IsGame && room.UserCount == room.MaxUsers;
+	}
+
+	private void SetTurnVariable(int turn)
+	{
+		UserVariable startingTurn = new SFSUserVariable("turn", turn);
+		_server.MySelf.SetVariable(startingTurn);
 	}
     #endregion
 
@@ -282,19 +318,25 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 			_server.RemoveEventListener(SFSEvent.ROOM_JOIN, OnSFRoomJoin);
 			_server.RemoveEventListener(SFSEvent.ROOM_JOIN_ERROR, OnSFRoomJoinError);
 			_server.RemoveEventListener(SFSEvent.ROOM_CREATION_ERROR, OnSFRoomCreationError);
+
+			_server.RemoveEventListener(SFSEvent.USER_ENTER_ROOM, OnSFUserEnterRoom);
+			_server.RemoveEventListener(SFSEvent.USER_EXIT_ROOM, OnSFUserExitRoom);
 		} 
     }
 
     // 接続時
     public void OnSFConnection(BaseEvent evt)
     {
+		Debug.Log("Connection");
         // 接続できているかチェック
 		if ((bool)evt.Params["success"])
 		{
 			Debug.Log("SFS2X API version: " + _server.Version);
 			Debug.Log("Connection mode is: " + _server.ConnectionMode);
-			SetMatchButtonLabel("Start MatchMaking");
-			EnableMatchButton();
+
+			// ログイン
+			_server.Send(new LoginRequest(UserName));
+			Debug.Log(UserName);
 		}
 		else
 		{
@@ -302,7 +344,8 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 			string error = "CONNECTION FAILED: Check if the server is running.";
 			_sceneUI.SetErrorText(error);
 			_sceneUI.ShowErrorWindow(error);
-			SetMatchButtonLabel("Retry");
+
+			_sceneUI.OnlinePlayWindow.Hide();
 			DisableMatchButton();
 
 			// UI有効化
@@ -313,19 +356,27 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
     // 接続切断時
     public void OnSFConnectionLost(BaseEvent evt)
     {
+		Debug.Log("Connection Lost");
 		// イベントリスナーを削除
 		RemoveSFListeners();
 
+		// 一旦ウィンドウをすべて閉じる
+		_sceneUI.HideModals();
+		
 		// エラー取得、表示
 		string reason = (string)evt.Params["reason"];
 		
 		if (reason != ClientDisconnectionReason.MANUAL)
+		{
 			_sceneUI.SetErrorText("Connection lost: " + reason);
 			_sceneUI.ShowErrorWindow("Connection lost: " + reason);
+		}
+		else
+		{
+			
+		}
 
-		SetMatchButtonLabel("Start MatchMaking");
-		SetMatchButtonCancellable(false);
-		EnableMatchButton();
+		ReadyToMatchMaking();
 		_sceneUI.OnlinePlayWindow.Message.SetText("");
 
 		// UI有効化
@@ -335,13 +386,15 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
     // ログイン成功
     public void OnSFLogin(BaseEvent evt)
     {
+		Debug.Log("Login");
 		JoinLobby();
-		StartSearchingRooms();
+		_sceneUI.Enable();
     }
 
     // ログイン失敗
     public void OnSFLoginError(BaseEvent evt)
     {
+		Debug.Log("Login Error");
 		// 切断する。OnConnectionLostもコールされる。
 		_server.Disconnect();
 
@@ -356,6 +409,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 	
     public void OnSFRoomCreationError(BaseEvent evt)
     {
+		Debug.Log("Room Creation Error");
         // エラー表示
 		string error = "Room creation failed: " + (string)evt.Params["errorMessage"];
 		_sceneUI.SetErrorText(error);
@@ -363,88 +417,76 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 
 		_sceneUI.OnlinePlayWindow.Message.SetText("");
 
-		SetMatchButtonLabel("Start MatchMaking");
-		SetMatchButtonCancellable(false);
-		EnableMatchButton();
+		ReadyToMatchMaking();
+
+		_sceneUI.Enable();
     }
 
     public void OnSFRoomAdded(BaseEvent evt)
     {
-    	Debug.Log("Room created. Waiting...");
-        SetMatchButtonLabel("Cancel");
-		EnableMatchButton();
-		SetMatchButtonCancellable(true);
+		Debug.Log("Room Added");
     }
 
     public void OnSFRoomRemoved(BaseEvent evt)
     {
-        
+        Debug.Log("Room Remove");
     }
 
     public void OnSFRoomJoin(BaseEvent evt)
     {
+		Debug.Log("Room Join");
         Room room = (Room)evt.Params["room"];
     	Debug.Log("Room joined: " + room.Name);
 
-		SetMatchButtonLabel("Cancel");
-		EnableMatchButton();
-		SetMatchButtonCancellable(true);
-
 		// If a game Room was joined, go to the Game scene, otherwise ignore this event
-		if (room.IsGame)
+		if (_lobbyConnected && room.IsGame)
 		{
 			SetMatchButtonLabel("Cancel");
 			EnableMatchButton();
 			SetMatchButtonCancellable(true);
+			_sceneUI.OnlinePlayWindow.Message.SetText("Waiting for other player...");
+
+			if(_server.MySelf.IsPlayerInRoom(room)) SetTurnVariable(0);
+			else SetTurnVariable(1);
+
+			if(CheckGameStart(room)) Invoke("StartMatch",1.0f);
+		}
+		else
+		{
+			ReadyToMatchMaking();
+			_lobbyConnected = true;
 		}
     }
 
     public void OnSFRoomJoinError(BaseEvent evt)
     {
+		Debug.Log("Room Join Error");
 		// エラー表示
 		string error = $"Failed to join room : " + (string)evt.Params["errorMessage"];
 		_sceneUI.SetErrorText(error);
 		_sceneUI.ShowErrorWindow(error);
 
-
 		_sceneUI.OnlinePlayWindow.Message.SetText("");
-		SetMatchButtonLabel("Start MatchMaking");
-		EnableMatchButton();
-		SetMatchButtonCancellable(false);
+		ReadyToMatchMaking();
+
+		_sceneUI.Enable();
     }
 
     public void OnSFUserEnterRoom(BaseEvent evt)
     {
-		User user = (User)evt.Params["user"];
+		Debug.Log("User Enter Room");
 		Room room = (Room)evt.Params["room"];
 
 		// Display system message
-		_sceneUI.OnlinePlayWindow.Message.SetText("Match found!");
+		if(room.IsGame) _sceneUI.OnlinePlayWindow.Message.SetText("Match found!");
 
-		if (user.IsPlayerInRoom(room))
-		{
-			Debug.Log("Room joined: " + room.Name);
-			// Load game scene
-			Invoke("StartOnlineMatch",2.0f);
-		}
+		if(CheckGameStart(room)) Invoke("StartMatch",1.0f);
 
     }
 
     public void OnSFUserExitRoom(BaseEvent evt)
     {
-        
-    }
-    #endregion
-
-    #region // Interface methods : IMonoSingletonMethods
-    public override void OnInitialize()
-    {
-
-    }
-
-    public override void OnFinalize()
-    {
-        throw new System.NotImplementedException();
+		Debug.Log("User Exit Room");
     }
     #endregion
 

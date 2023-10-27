@@ -5,17 +5,59 @@ using System.Collections.Generic;
 
 namespace T0R1.UI
 {
-    public abstract class SceneUIBase : MonoBehaviour
+    public abstract class SceneUIBase : SealableMonoBehaviour
     {
         // モーダルな要素を格納するリスト
         protected List<IModal> _modalElements = new List<IModal>();
 
-        // Update is called once per frame
-        void Update()
+        [SerializeField]
+        protected ErrorWindow _errorWindow;
+
+        protected sealed override void Reset()
+        {
+            OnReset();
+        }
+
+        protected sealed override void Awake()
+        {
+            OnAwake();
+        }
+
+        protected sealed override void Start()
+        {
+            _errorWindow.SetBaseUI(this);
+            _errorWindow.Hide();
+            MarkAsModal(_errorWindow);
+
+            OnStart();
+        }
+
+        protected sealed override void Update()
         {
             // Escapeキーが押されたら、モーダルなUIを非表示にする
             if (Input.GetKeyDown(KeyCode.Escape))
                 HideModals();
+            OnUpdate();
+        }
+
+        protected virtual void OnReset()
+        {
+
+        }
+
+        protected virtual void OnAwake()
+        {
+
+        }
+
+        protected virtual void OnStart()
+        {
+
+        }
+
+        protected virtual void OnUpdate()
+        {
+
         }
 
         /// <summary>
@@ -37,6 +79,17 @@ namespace T0R1.UI
             {
                 modal.HideModal();
             }
+            _errorWindow.Hide();
+        }
+
+        public void ShowError(string error)
+        {
+            _errorWindow.Show(error);
+        }
+
+        public void HideError()
+        {
+            _errorWindow.Hide();
         }
 
         /// <summary>

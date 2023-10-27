@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using T0R1.UI;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace T0R1.UI
 {
@@ -11,6 +12,9 @@ namespace T0R1.UI
         protected SceneUIBase _baseUI = null;
         public Element Parent => _parent;
         public SceneUIBase BaseUI => _baseUI;
+
+        protected UnityAction _onHidden = () => {};
+        protected UnityAction _onShown = () => {};
 
         protected sealed override void Reset()
         {
@@ -52,11 +56,29 @@ namespace T0R1.UI
         public virtual void Show()
         {
             this.gameObject.SetActive(true);
+            _onShown.Invoke();
         }
 
         public virtual void Hide()
         {
+            _onHidden.Invoke();
             this.gameObject.SetActive(false);
+        }
+        public void AddActionOnHidden(UnityAction call)
+        {
+            _onHidden += call;
+        }
+        public void AddActionOnShown(UnityAction call)
+        {
+            _onShown += call;
+        }
+        public void RemoveActionOnHidden(UnityAction call)
+        {
+            _onHidden -= call;
+        }
+        public void RemoveActionOnShown(UnityAction call)
+        {
+            _onShown -= call;
         }
 
         public virtual bool IsVisible

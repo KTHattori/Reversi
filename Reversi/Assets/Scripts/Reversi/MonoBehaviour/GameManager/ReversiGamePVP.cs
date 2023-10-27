@@ -30,6 +30,9 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// </summary>
     private static Board _board = null;
 
+    [SerializeField]
+    private GameSceneController _controller;
+
     /// <summary>
     /// 3D盤面オブジェクトのマネージャ
     /// </summary>
@@ -43,7 +46,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     private bool _isInitiative = false;
 
     /// <summary>
-    /// プレイヤー0用UIへの参照
+    /// プレイヤー用UIへの参照
     /// </summary>
     [SerializeField]
     private ObjectReferencer _playerUI;
@@ -73,7 +76,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// <summary>
     /// プレイヤー側を表す
     /// </summary>
-    private int _playerSide = -1;
+    private int _clientSide = -1;
 
     /// <summary>
     /// 思考完了フラグ
@@ -178,12 +181,11 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// </summary>
     /// <param name="mode"></param>
     /// <param name="isInitiative"></param>
-    public void StartMode(bool isInitiative)
+    public void StartMode(int startTurn)
     {
-
-        _isInitiative = isInitiative;
+        _isInitiative = startTurn == BlackSide;
         _turnUpdated = true;
-        CreateGameWithHuman();
+        CreateGame(startTurn);
     }
     
     /// <summary>
@@ -191,10 +193,10 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// </summary>
     /// <param name="mode"></param>
     /// <param name="isInitiative"></param>
-    public void RestartMode()
+    public void RestartMode(int startTurn)
     {
         _turnUpdated = true;
-        InitializeGameWithHuman();
+        InitializeGame(startTurn);
     }
 
     /// <summary>
@@ -203,7 +205,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     public void RestartCurrent()
     {
         Debug.Log("Restarting...");
-        RestartMode();
+        RestartMode(_clientSide);
     }
 
     /// <summary>
@@ -218,8 +220,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// <summary>
     /// 対人戦の作成
     /// </summary>
-    /// <param name="_isNetwork">ネットワークかどうか</param>
-    public void CreateGameWithHuman()
+    public void CreateGame(int startTurn)
     {
         // プレイヤーをセット
         {
@@ -242,19 +243,20 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         _ui.HideResult();
         _ui.HidePassButton();
         _ui.HideUndoButton();
-        _playerSide = BlackSide;
+        _clientSide = startTurn;
+
+        ShowMessage($"ClientSide:{_clientSide}");
 
         _currentPlayer = BlackSide;
 
         UpdateUI();
         // スタートメッセージを表示
-
     }
 
     /// <summary>
     /// 対人戦の初期化
     /// </summary>
-    public void InitializeGameWithHuman()
+    public void InitializeGame(int startTurn)
     {
         // UI初期化
         InitializeUI();
@@ -269,13 +271,12 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         _ui.HidePassButton();
         _ui.HideUndoButton();
 
-        _playerSide = BlackSide;
+        _clientSide = startTurn;
 
         _currentPlayer = BlackSide;
 
         // UI更新
         UpdateUI();
-        // スタートメッセージを表示
     }
 
     /// <summary>
@@ -284,9 +285,27 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// <param name="point"></param>
     public void SelectPoint(Point point)
     {
+        if(_currentPlayer != _clientSide) return;
         point._Log("Selected: ");
         _completedThinking = true;
         _selectedPoint = point;
+        _controller.SendSFMessage(point.ToStrCoord());
+    }
+
+    /// <summary>
+    /// マスを選択し、思考を終了する
+    /// </summary>
+    /// <param name="point"></param>
+    public void ReceivePoint(Point point)
+    {
+        point._Log("Received: ");
+        _completedThinking = true;
+        _selectedPoint = point;
+    }
+
+    public void OnCallBack()
+    {
+        _completedThinking = true;
     }
 
     /// <summary>
@@ -307,6 +326,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// </summary>
     public void Undo()
     {
+        if(_currentPlayer != _clientSide) return;
         SelectPoint(Point.Undone);
     }
 
@@ -315,6 +335,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// </summary>
     public void Pass()
     {
+        if(_currentPlayer != _clientSide) return;
         SelectPoint(Point.Passed);
     }
 
@@ -344,6 +365,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// </summary>
     private void OnTurn()
     {    
+        MessageViewer.Instance.SetText(_currentPlayer.ToString());
         _movablePoints.Clear();
         _movablePoints = _board.GetMovablePoints();
 
@@ -353,22 +375,30 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         _ui.HideUndoButton();
         _ui.HideUndoButton();
 
-        if(_board.IsPassable())
+        if(_currentPlayer == _clientSide)
         {
-            _ui.SetMessageText("No where to place!");
-            _ui.ShowPassButton();
-            _ui.SetMessageText($"{CurrentPlayer}");
-            _ui.ShowUndoButton();
-            StartWait();
+            if(_board.IsPassable())
+            {
+                _ui.SetMessageText("No where to place!");
+                _ui.ShowPassButton();
+                _ui.ShowUndoButton();
+                StartWait();
+            }
+            else
+            {
+                _ui.SetMessageText($"Decide your move.");
+                _ui.SetMessageText($"{CurrentPlayer}");
+                _ui.ShowUndoButton();
+                _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
+                StartWait();
+            }
         }
         else
         {
-            _ui.SetMessageText($"Decide your move.");
-            _ui.SetMessageText($"{CurrentPlayer}");
-            _ui.ShowUndoButton();
-            _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
+            _ui.SetMessageText($"Your Opponent is thinking.");
             StartWait();
         }
+
     }
 
     /// <summary>
@@ -451,6 +481,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// </summary>
     private void EndTurn()
     {
+        _controller.SendCallBack();
         _completedThinking = false;
         _turnUpdated = true;
         UpdateUI();

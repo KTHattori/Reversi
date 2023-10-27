@@ -106,8 +106,17 @@ public interface ISFRoomAccessWatchable : ISFEventTriggerable
     /// <param name="evt"></param>
     public abstract void OnSFUserEnterRoom(BaseEvent evt);
     /// <summary>
-    /// ルーム参加失敗時
+    /// ルーム退出時
     /// </summary>
     /// <param name="evt"></param>
     public abstract void OnSFUserExitRoom(BaseEvent evt);
+}
+
+public interface ISFMessageReceiver : ISFEventTriggerable
+{
+    /// <summary>
+    /// メッセージ受信時（自分のものも含む）
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFMessageReceived(BaseEvent evt);
 }
