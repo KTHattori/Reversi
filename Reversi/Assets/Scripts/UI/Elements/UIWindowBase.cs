@@ -16,14 +16,14 @@ namespace T0R1.UI
 
         public UnityEvent OnCloseEvent => _onClose;
 
-        protected override void OnAwake()
-        {
-            _closeButton.SetParent(this);
-        }
-
         protected override void FetchComponents()
         {
             _closeButton = GetComponentInChildren<CloseButton>();
+        }
+
+        protected override void OnAwake()
+        {
+            _closeButton.SetParent(this);
         }
 
         protected override void OnActivated()

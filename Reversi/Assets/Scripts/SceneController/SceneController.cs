@@ -1,10 +1,22 @@
 using UnityEngine;
 using T0R1;
 using T0R1.UI;
+using UnityEngine.SceneManagement;
 
 public abstract class SceneController : SealableMonoBehaviour,ISFEventTriggerable
 {
     protected SFClientManager _sfManager;
+    
+    protected void TransitScene(string sceneName)
+    {
+        LoadScreen.Show();
+        SceneManager.LoadScene(sceneName);
+    }
+
+    protected void OnSceneLoaded()
+    {
+        LoadScreen.Hide();
+    }
 
     protected sealed override void Reset()
     {
@@ -19,6 +31,7 @@ public abstract class SceneController : SealableMonoBehaviour,ISFEventTriggerabl
 
     protected sealed override void Start()
     {
+        OnSceneLoaded();
         OnStart();
     }
 

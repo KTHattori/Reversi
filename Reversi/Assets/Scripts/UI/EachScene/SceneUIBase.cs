@@ -25,11 +25,13 @@ namespace T0R1.UI
 
         protected sealed override void Start()
         {
+            LoadScreen.Show();
             _errorWindow.SetBaseUI(this);
             _errorWindow.Hide();
             MarkAsModal(_errorWindow);
 
             OnStart();
+            LoadScreen.Hide();
         }
 
         protected sealed override void Update()

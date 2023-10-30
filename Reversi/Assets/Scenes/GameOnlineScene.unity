@@ -1701,7 +1701,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68b2ccf499970904788659f5c7c14a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _closeButton: {fileID: 0}
+  _closeButton: {fileID: 1924709098}
   _onClose:
     m_PersistentCalls:
       m_Calls: []
@@ -3640,7 +3640,6 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194229}
   - component: {fileID: 963194230}
-  - component: {fileID: 963194231}
   m_Layer: 0
   m_Name: Camera_GameView
   m_TagString: MainCamera
@@ -3745,23 +3744,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_MaxRayIntersections: 0
---- !u!114 &963194231
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _deactivateAfterRegister: 1
-  _referencer: {fileID: 11400000, guid: b672829295f823c4991bd5b9a604e180, type: 2}
-  _assetCreation:
-    destPath: ScriptableObjects/ObjectReferencer/
-    prefix: Ref_
 --- !u!1 &997083519
 GameObject:
   m_ObjectHideFlags: 0
@@ -8237,7 +8219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1930093426e5619449f56ce568d1ebc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _closeButton: {fileID: 0}
+  _closeButton: {fileID: 1701413297}
   _onClose:
     m_PersistentCalls:
       m_Calls: []

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Sfs2X;
 using Sfs2X.Core;
 using Sfs2X.Entities;
@@ -14,11 +13,6 @@ using Sfs2X.Entities.Variables;
 
 public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreatable,ISFRoomJoinable,ISFRoomAccessWatchable
 {
-	#region // Constants
-	public static string DEFAULT_ROOM = "LOBBY";
-	public static string GAME_ROOMS_GROUP_NAME = "games";
-	#endregion
-
     #region // Private variables
     private SmartFox _server;
 	private string _manualDCReason = "";
@@ -28,20 +22,6 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
     #region // Serialized variables
     [SerializeField]
     TitleSceneUI _sceneUI;
-    [Tooltip("IP address or domain name of the SmartFoxServer instance")]
-	public string host = "sfs2x.m-craft.com";
-
-	[Tooltip("TCP listening port of the SmartFoxServer instance, used for TCP socket connection in all builds except WebGL")]
-	public int tcpPort = 9933;
-
-	[Tooltip("HTTP listening port of the SmartFoxServer instance, used for WebSocket (WS) connections in WebGL build")]
-	public int httpPort = 8080;
-
-	[Tooltip("Name of the SmartFoxServer Zone to join")]
-	public string zone = "Reversi";
-
-	[Tooltip("Display SmartFoxServer client debug messages")]
-	public bool debug = false;
     #endregion
 
     #region // Public properties
@@ -79,7 +59,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 	private void OnSelectedLocal()
 	{
 		_sceneUI.Deactivate();
-		SceneManager.LoadScene("GameLocalScene");
+		TransitScene("GameLocalScene");
 	}
 	private void OnSelectedOnline()
 	{
@@ -101,14 +81,11 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		_sceneUI.SetErrorText("");
 
 		// 接続情報を設定
-		ConfigData cfg = new ConfigData();
-		cfg.Host = host;
-		cfg.Port = tcpPort;
-		cfg.Zone = zone;
-		cfg.Debug = debug;
+		ConfigData cfg = SFClientManager.TCPConfigData;
 
 #if UNITY_WEBGL
-		cfg.Port = httpPort;
+		// 接続情報を設定
+		ConfigData cfg = SFClientManager.HTTPConfigData;
 #endif
 
 		// クライアントを初期化
@@ -119,7 +96,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 #endif
 
 		// Loggerの設定
-		_server.Logger.EnableConsoleTrace = debug;
+		_server.Logger.EnableConsoleTrace = cfg.Debug;
 
 		// イベント割り当て
 		AddSFListeners();
@@ -194,7 +171,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 
 	private void JoinLobby()
 	{
-		_server.Send(new JoinRoomRequest(DEFAULT_ROOM));
+		_server.Send(new JoinRoomRequest(SFClientManager.DEFAULT_ROOM));
 		Debug.Log("Joining Lobby...");
 	}
 	private void ManuallyDisconnect(string reason)
@@ -233,7 +210,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		string roomName = _server.MySelf.Name + "'s game";
 
 		SFSGameSettings settings = new SFSGameSettings(roomName);
-		settings.GroupId = GAME_ROOMS_GROUP_NAME;
+		settings.GroupId = SFClientManager.GAME_ROOMS_GROUP_NAME;
 		settings.MaxUsers = 2;
 		settings.MaxSpectators = 10;
 		settings.MinPlayersToStartGame = 2;
@@ -245,7 +222,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		MatchExpression exp = new MatchExpression(RoomProperties.IS_GAME, BoolMatch.EQUALS, true)
         	.And(RoomProperties.HAS_FREE_PLAYER_SLOTS, BoolMatch.EQUALS, true);
 		
-		_server.Send(new QuickJoinOrCreateRoomRequest(matchExpression: exp, new List<string>(){ GAME_ROOMS_GROUP_NAME },settings,_server.LastJoinedRoom));
+		_server.Send(new QuickJoinOrCreateRoomRequest(matchExpression: exp, new List<string>(){ SFClientManager.GAME_ROOMS_GROUP_NAME },settings,_server.LastJoinedRoom));
 	}
 
 	private void CreatePrivateRoom()
@@ -254,7 +231,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		string roomName = _server.MySelf.Name + "'s game";
 
 		SFSGameSettings settings = new SFSGameSettings(roomName);
-		settings.GroupId = GAME_ROOMS_GROUP_NAME;
+		settings.GroupId = SFClientManager.GAME_ROOMS_GROUP_NAME;
 		settings.MaxUsers = 2;
 		settings.MaxSpectators = 10;
 		settings.MinPlayersToStartGame = 2;
@@ -270,7 +247,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 	private void StartMatch()
 	{
 		_sceneUI.Deactivate();
-		SceneManager.LoadScene("GameOnlineScene");
+		TransitScene("GameOnlineScene");
 	}
 
 	private void ReadyToMatchMaking()
@@ -287,8 +264,14 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 
 	private void SetTurnVariable(int turn)
 	{
-		UserVariable startingTurn = new SFSUserVariable("turn", turn);
-		_server.MySelf.SetVariable(startingTurn);
+		UserVariable variable = new SFSUserVariable("turn",turn);
+		_server.MySelf.SetVariable(variable);
+
+		List<UserVariable> vars = new List<UserVariable>();
+		vars.Add(variable);
+
+		// Set User Variables
+		_server.Send(new SetUserVariablesRequest(vars));
 	}
     #endregion
 
@@ -397,6 +380,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
     public void OnSFLogin(BaseEvent evt)
     {
 		Debug.Log("Login");
+		_server.MySelf.SetVariable(new SFSUserVariable("turn", 0));
 		JoinLobby();
 		_sceneUI.Activate();
     }
@@ -463,6 +447,7 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 		else
 		{
 			ReadyToMatchMaking();
+			SetTurnVariable(0);
 			_lobbyConnected = true;
 		}
     }

@@ -8,5 +8,5 @@ public class GameMenuWindow : ModalWindow
     [SerializeField]
     ButtonTextEdit _disconnectButton;
 
-    public ButtonTextEdit DisconnectButton { get; }
+    public ButtonTextEdit DisconnectButton { get { return _disconnectButton; } }
 }

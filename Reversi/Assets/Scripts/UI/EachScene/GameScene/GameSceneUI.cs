@@ -15,9 +15,9 @@ public class GameSceneUI : SceneUIBase
     [SerializeField]
     GameMenuWindow _menuWindow;
 
-    public GameStartPanel StartPanel{get;}
-    public GameReversiUI ReversiPanel{get;}
-    public GameMenuWindow MenuWindow{get;}
+    public GameStartPanel StartPanel{ get { return _startPanel; }}
+    public GameReversiUI ReversiPanel{get{ return _reversiUI; }}
+    public GameMenuWindow MenuWindow{get{ return _menuWindow; }}
 
     public override void Deactivate()
     {

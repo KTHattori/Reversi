@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Reversi;
 using T0R1;
+using T0R1.UI;
 
 
 public class ReversiGameManager : MonoSingleton<ReversiGameManager>
@@ -535,6 +536,8 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         UpdateUI(_mode);
         // スタートメッセージを表示
         ShowMessage(_mode,$"Game started with {_whiteAIDifficulty.DifficultyName} AI!");
+
+        LoadScreen.Hide();
     }
 
     /// <summary>

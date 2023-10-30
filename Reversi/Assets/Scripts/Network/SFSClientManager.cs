@@ -4,18 +4,67 @@ using Sfs2X.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using T0R1;
+using T0R1.UI;
 
 /// <summary>
 /// 
 /// </summary>
 public class SFClientManager : MonoSingleton<SFClientManager>
 {
+    #region // Constants
+	public static string DEFAULT_ROOM = "LOBBY";
+	public static string GAME_ROOMS_GROUP_NAME = "games";
+	#endregion
+
     #region // Private variables
-    private SmartFox _sfInstance;
+    private SmartFox _sfInstance = null;
     private string _connLostMsg;
     #endregion
 
-    #region // Public variables
+    #region // Serialized variables
+    [Tooltip("IP address or domain name of the SmartFoxServer instance")]
+	public string host = "sfs2x.m-craft.com";
+
+	[Tooltip("TCP listening port of the SmartFoxServer instance, used for TCP socket connection in all builds except WebGL")]
+	public int tcpPort = 9933;
+
+	[Tooltip("HTTP listening port of the SmartFoxServer instance, used for WebSocket (WS) connections in WebGL build")]
+	public int httpPort = 8080;
+
+	[Tooltip("Name of the SmartFoxServer Zone to join")]
+	public string zone = "Reversi";
+
+	[Tooltip("Display SmartFoxServer client debug messages")]
+	public bool debug = false;
+    #endregion
+
+    #region // Public properties
+    public static ConfigData TCPConfigData
+    {
+        get
+        {
+            ConfigData cfg = new ConfigData();
+            cfg.Host = Instance.host;
+            cfg.Port = Instance.tcpPort;
+            cfg.Zone = Instance.zone;
+            cfg.Debug = Instance.debug;
+
+            return cfg;
+        }
+    }
+    public static ConfigData HTTPConfigData
+    {
+        get
+        {
+            ConfigData cfg = new ConfigData();
+            cfg.Host = Instance.host;
+            cfg.Port = Instance.httpPort;
+            cfg.Zone = Instance.zone;
+            cfg.Debug = Instance.debug;
+
+            return cfg;
+        }
+    }
     #endregion
 
     #region // Private methods, properties
@@ -64,6 +113,7 @@ public class SFClientManager : MonoSingleton<SFClientManager>
             }
 
             // Switch to the LOGIN scene
+            LoadScreen.Show();
             SceneManager.LoadScene("TitleScene");
         }
     }
@@ -123,7 +173,15 @@ public class SFClientManager : MonoSingleton<SFClientManager>
     /// <returns></returns>
     public SmartFox GetSFClient()
     {
-        return _sfInstance;
+        if(_sfInstance != null) return _sfInstance;
+        return null;
+    }
+    #endregion
+
+    #region // Unity Callbacks
+    void OnApplicationQuit()
+    {
+        if(_sfInstance != null && _sfInstance.IsConnected) _sfInstance.Disconnect();
     }
     #endregion
 }

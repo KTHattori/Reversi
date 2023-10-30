@@ -1,14 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Sfs2X;
 using Sfs2X.Core;
 using Sfs2X.Entities;
-using Sfs2X.Entities.Match;
 using Sfs2X.Requests;
-using Sfs2X.Requests.Game;
-using Sfs2X.Util;
-
 public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessWatchable,ISFMessageReceiver
 {
     #region // Constants
@@ -36,7 +31,7 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
 
         _reversi = ReversiGamePVP.Instance;
 
-        if(_server.IsConnected)
+        if(_server != null && _server.IsConnected)
         {
             _sceneUI.StartPanel.AddActionOnHidden(ReadyToStart);
             _sceneUI.MenuWindow.DisconnectButton.AddActionOnHidden(ExitGame);
@@ -82,15 +77,17 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         else
         {
             _sceneUI.Deactivate();
-            SceneManager.LoadScene("TitleScene");
+            TransitScene("TitleScene");
         }
     }
     private void OnSendMessage(string msg)
     {
+        Debug.Log($"Sent: {msg}");
         // ReversiGamePVP.Instance.SelectPoint(new Reversi.Point(msg));
     }
     private void OnReceiveMessage(string msg)
     {
+        Debug.Log($"Received: {msg}");
         if(msg == MSG_RECV_CALLBACK)
         {
             OnCallBackReceived();
@@ -117,6 +114,7 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
     }
     public override void RemoveSFListeners()
     {
+        if(_server == null) return;
         _server.RemoveEventListener(SFSEvent.CONNECTION,OnSFConnection);
         _server.RemoveEventListener(SFSEvent.CONNECTION_LOST,OnSFConnectionLost);
         _server.RemoveEventListener(SFSEvent.USER_ENTER_ROOM,OnSFUserEnterRoom);
@@ -147,16 +145,20 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
 
     public void OnSFUserExitRoom(BaseEvent evt)
     {
-        User user = (User)evt.Params["user"];
+        // User user = (User)evt.Params["user"];
 
-        if(user != _server.MySelf)
-        {
-            _sceneUI.ShowError("You have been disconnected.");
-        }
-        else
-        {
-            _sceneUI.ShowError("Opponent has been disconnected.");
-        }
+        // if()
+
+        // if(user != _server.MySelf)
+        // {
+        //     _sceneUI.ShowError("You have been disconnected.");
+        // }
+        // else
+        // {
+        //     _sceneUI.ShowError("Opponent has been disconnected.");
+        // }
+
+        // _server.Disconnect();
     }
 
     public void OnSFMessageReceived(BaseEvent evt)
@@ -164,7 +166,7 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         User sender = (User)evt.Params["sender"];
 		string message = (string)evt.Params["message"];
 
-        MessageViewer.Instance.SetText(message);
+        Debug.Log("Message");
 
         if(sender != _server.MySelf)
         {

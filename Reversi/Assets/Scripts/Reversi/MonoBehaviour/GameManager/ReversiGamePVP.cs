@@ -178,7 +178,6 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     {
         _turnUpdated = true;
         CreateGame(startTurn);
-        MessageViewer.Instance.SetText(startTurn.ToString());
     }
     
     /// <summary>
