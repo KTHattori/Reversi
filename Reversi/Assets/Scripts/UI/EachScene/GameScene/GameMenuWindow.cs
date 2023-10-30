@@ -5,5 +5,8 @@ using UnityEngine;
 
 public class GameMenuWindow : ModalWindow
 {
-    
+    [SerializeField]
+    ButtonTextEdit _disconnectButton;
+
+    public ButtonTextEdit DisconnectButton { get; }
 }

@@ -299,7 +299,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 4941807775176567828}
           m_TargetAssemblyTypeName: ReversiPointSelector, Assembly-CSharp
-          m_MethodName: OnPress
+          m_MethodName: OnPressPvP
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -321,4 +321,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e27a1ca91bbb6c7478877203e5af3547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dispText: {fileID: 1232582180056257454}

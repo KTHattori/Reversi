@@ -9,8 +9,7 @@ namespace T0R1.UI
         protected override void OnAwake()
         {
             _isModal = true;
-            if(_closeButton != null) _closeButton.onClick.AddListener(OnCloseClick);
-            else Debug.LogError("There is no close button set!");
+            _closeButton.SetParent(this);
         }
 
         public void HideModal()

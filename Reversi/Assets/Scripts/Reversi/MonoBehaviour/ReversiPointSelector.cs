@@ -18,10 +18,6 @@ public class ReversiPointSelector : MonoBehaviour
     /// </summary>
     private bool _isSelectable;
 
-    /// <summary>
-    /// デバッグ表示用テキスト
-    /// </summary>
-    public TMPro.TextMeshPro _dispText;
 
     /// <summary>
     /// Update前にコールされる関数
@@ -30,7 +26,6 @@ public class ReversiPointSelector : MonoBehaviour
     private void Start()
     {
         _isSelectable = false;
-        if(!_dispText) _dispText = GetComponentInChildren<TMPro.TextMeshPro>();
     }
 
     /// <summary>
@@ -49,29 +44,22 @@ public class ReversiPointSelector : MonoBehaviour
     public void SetPoint(Point point)
     {
         _point = point;
-        _dispText.SetText(point.ToStrCoord());
-    }
-
-    public void SetDisplayText(string text)
-    {
-        _dispText.SetText(text);
-    }
-
-    /// <summary>
-    /// このマスを選ぶ
-    /// </summary>
-    /// <param name="point"></param>
-    public void SelectPoint(Point point)
-    {
-        ReversiGamePVP.Instance.SelectPoint(point);
     }
 
     /// <summary>
     /// このオブジェクトが押されたときにコールされる関数
     /// </summary>
-    public void OnPress()
+    public void OnPressNetwork()
     {
-        SelectPoint(_point);
+        ReversiGamePVP.Instance.SelectPoint(_point);
+    }
+
+    /// <summary>
+    /// このオブジェクトが押されたときにコールされる関数
+    /// </summary>
+    public void OnPressPvP()
+    {
+        ReversiGameManager.Instance.SelectPoint(_point);
     }
 
     /// <summary>

@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Mat_HalftoneInGame
-  m_Shader: {fileID: -6465566751694194690, guid: 948e45b3a4be4164c8812d1a2bd80487, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: f025d6811f138e3458da79b92edb169e, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -74,7 +74,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Angle: 135
+    - _Angle: 0
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
     - _BumpScale: 1
@@ -86,9 +86,9 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HideDistance: 0.92
-    - _HideOffset: -0.3
-    - _MaxCircleSize: 0.726
+    - _HideDistance: 0.0001
+    - _HideOffset: 1
+    - _MaxCircleSize: 0.075
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -101,10 +101,11 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
+    - _BackgroundColor: {r: 0.14150935, g: 0.14150935, b: 0.14150935, a: 1}
     - _BaseColor: {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MoveSpeed: {r: 0.1, g: -0.1, b: 0, a: 0}
-    - _OneColor: {r: 0, g: 0, b: 0, a: 0}
+    - _MoveSpeed: {r: 0.1, g: 0.1, b: 0, a: 0}
+    - _OneColor: {r: 0, g: 0, b: 0, a: 1}
     - _ZeroColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

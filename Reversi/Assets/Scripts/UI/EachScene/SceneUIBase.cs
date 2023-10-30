@@ -63,12 +63,12 @@ namespace T0R1.UI
         /// <summary>
         /// 有効化する
         /// </summary>
-        public abstract void Enable();
+        public abstract void Activate();
 
         /// <summary>
         /// 無効化する
         /// </summary>
-        public abstract void Disable();
+        public abstract void Deactivate();
 
         /// <summary>
         /// モーダルなUIを非表示にする

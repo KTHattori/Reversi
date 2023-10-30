@@ -77,18 +77,12 @@ public class TitleSceneUI : SceneUIBase
         _errorText.SetText(text);
     }
 
-    public void ShowErrorWindow(string text)
-    {
-        _errorWindow.Show(text);
-        Debug.Log("Showing Error Window");
-    }
-
     public void SetPlayerNameText(string text)
     {
         _playerNameText.SetText(text);
     }
 
-    public override void Enable()
+    public override void Activate()
     {
         _playLocalButton.interactable = true;
         _playOnlineButton.interactable = true;
@@ -96,7 +90,7 @@ public class TitleSceneUI : SceneUIBase
         _onlinePlayWindow.MatchMakingButton.BaseComponent.interactable = true;
     }
 
-    public override void Disable()
+    public override void Deactivate()
     {
         _playLocalButton.interactable = false;
         _playOnlineButton.interactable = false;

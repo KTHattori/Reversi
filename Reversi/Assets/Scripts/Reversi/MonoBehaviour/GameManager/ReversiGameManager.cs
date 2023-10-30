@@ -821,16 +821,6 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     }
 
     /// <summary>
-    /// 評価値を指定したマスに表示
-    /// </summary>
-    /// <param name="point"></param>
-    /// <param name="score"></param>
-    public void DisplayEvalScore(Point point,int score)
-    {
-        _3dboard.DisplayEvalScore(point,score);
-    }
-
-    /// <summary>
     /// 終了処理
     /// </summary>
     private void Finalization()

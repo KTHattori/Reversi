@@ -203,14 +203,4 @@ public class ReversiBoard3D : MonoBehaviour
             _discObjBoard[point.x,point.y].SetMovable(false);
         }
     }
-
-    /// <summary>
-    /// 指定したPointの評価値を表示する
-    /// </summary>
-    /// <param name="point"></param>
-    /// <param name="score"></param>
-    public void DisplayEvalScore(Point point,int score)
-    {
-        _discObjBoard[point.x,point.y].SetDisplayText(score.ToString());
-    }
 }

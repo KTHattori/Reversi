@@ -12,11 +12,10 @@ namespace T0R1.UI
         protected TextMeshProUGUI _textMP;
 
         /// <summary>
-        /// ボタンコンポーネントを取得
+        /// コンポーネントを取得
         /// </summary>
         protected override void OnReset()
         {
-            _button = GetComponent<Button>();
             _textMP = GetComponentInChildren<TextMeshProUGUI>();
         }
 

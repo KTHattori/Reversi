@@ -94,8 +94,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 018a566102712af42abfdb0d7318cf30, type: 2}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: ef81b1666a918e84bada48b57af4dcce, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -2510,8 +2510,8 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.9637687, b: 0.7783019, a: 1}
-  m_Intensity: 2.55
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3015,7 +3015,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 102.65941
+  field of view: 87.79577
   orthographic: 0
   orthographic size: 9.777778
   m_Depth: -1
@@ -3060,7 +3060,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _deactivateAfterRegister: 0
+  _deactivateAfterRegister: 1
   _referencer: {fileID: 11400000, guid: 3d44a746b93129b41a54d248803bfbd1, type: 2}
   _assetCreation:
     destPath: ScriptableObjects/ObjectReferencer/
@@ -4361,7 +4361,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 102.65941
+  field of view: 87.79577
   orthographic: 0
   orthographic size: 9.79
   m_Depth: -1
@@ -4437,7 +4437,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84b281f1f261034cbb2e92c52c29ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _deactivateAfterRegister: 1
+  _deactivateAfterRegister: 0
   _referencer: {fileID: 11400000, guid: b672829295f823c4991bd5b9a604e180, type: 2}
   _assetCreation:
     destPath: ScriptableObjects/ObjectReferencer/
@@ -8883,7 +8883,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   _3dboard: {fileID: 1835345046}
-  _mode: 0
+  _mode: 1
   _isInitiative: 0
   _playerUI0Ref: {fileID: 11400000, guid: 621d3c1e39501ea4989e7debdfaaa2bd, type: 2}
   _playerUI1Ref: {fileID: 11400000, guid: f91924af59e2dff40ac94298b71e4a32, type: 2}
@@ -8909,55 +8909,6 @@ MonoBehaviour:
   _assetCreation:
     destPath: ScriptableObjects/ObjectReferencer/
     prefix: Ref_
---- !u!1 &1908768473
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1908768475}
-  - component: {fileID: 1908768474}
-  m_Layer: 0
-  m_Name: Post Process Volume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1908768474
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1908768473}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sharedProfile: {fileID: 11400000, guid: ee8069442c46ae84e90d7e4f39abdc1e, type: 2}
-  isGlobal: 1
-  blendDistance: 0
-  weight: 1
-  priority: 0
---- !u!4 &1908768475
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1908768473}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1938166774
 GameObject:
   m_ObjectHideFlags: 0
@@ -9953,4 +9904,3 @@ SceneRoots:
   - {fileID: 380585113}
   - {fileID: 582522127}
   - {fileID: 1835345045}
-  - {fileID: 1908768475}

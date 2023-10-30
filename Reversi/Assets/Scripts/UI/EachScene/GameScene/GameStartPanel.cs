@@ -23,6 +23,11 @@ public class GameStartPanel : ModalPanel
         _oldSecondInt = Mathf.RoundToInt(_disappearTimer);
     }
 
+    protected override void OnStart()
+    {
+        _confirmButton.OnClickEvent.AddListener(OnStartClicked);
+    }
+
     protected override void OnUpdate()
     {
         if(_onGoingCount)
@@ -41,6 +46,17 @@ public class GameStartPanel : ModalPanel
                 _oldSecondInt = secondInt;
             }
         }
+    }
+
+    public void SetInitiative(bool initiative)
+    {
+        if(initiative) _turnNotifyText.SetText("センコウ");
+        else _turnNotifyText.SetText("コウコウ");
+    }
+
+    public void OnStartClicked()
+    {
+        _disappearTimer = -1.0f;
     }
 
 

@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace T0R1.UI
 {
-    public class Element : SealableMonoBehaviour
+    public abstract class Element : SealableMonoBehaviour
     {
         protected Element _parent = null;
         protected SceneUIBase _baseUI = null;
@@ -16,8 +16,10 @@ namespace T0R1.UI
         protected UnityAction _onHidden = () => {};
         protected UnityAction _onShown = () => {};
 
+
         protected sealed override void Reset()
         {
+            FetchComponents();
             OnReset();
         }
 
@@ -36,9 +38,30 @@ namespace T0R1.UI
             OnUpdate();
         }
 
+        public void Activate()
+        {
+            OnActivated();
+        }
+
+        public void Deactivate()
+        {
+            OnDeactivated();
+        }
+
         protected T GetBaseUI<T>()
         {
             return _baseUI.GetComponent<T>();
+        }
+
+        [ContextMenu("Fetch Components")]
+        public void FetchComponentBase()
+        {
+            FetchComponents();
+        }
+
+        protected virtual void FetchComponents()
+        {
+
         }
 
         public void SetParent(Element element)
@@ -105,6 +128,17 @@ namespace T0R1.UI
         {
 
         }
+
+        protected virtual void OnActivated()
+        {
+
+        }
+
+        protected virtual void OnDeactivated()
+        {
+
+        }
+
     }
 
 }

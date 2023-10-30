@@ -9,7 +9,7 @@ namespace T0R1.UI
     public class Window : Panel
     {
         [SerializeField]
-        protected Button _closeButton;
+        protected CloseButton _closeButton;
 
         [SerializeField]
         protected UnityEvent _onClose;
@@ -18,8 +18,22 @@ namespace T0R1.UI
 
         protected override void OnAwake()
         {
-            if(_closeButton != null) _closeButton.onClick.AddListener(OnCloseClick);
-            else Debug.LogError("There is no close button set!");
+            _closeButton.SetParent(this);
+        }
+
+        protected override void FetchComponents()
+        {
+            _closeButton = GetComponentInChildren<CloseButton>();
+        }
+
+        protected override void OnActivated()
+        {
+            EnableClose();
+        }
+
+        protected override void OnDeactivated()
+        {
+            DisableClose();
         }
 
         /// <summary>
@@ -35,12 +49,12 @@ namespace T0R1.UI
 
         public void EnableClose()
         {
-            _closeButton.interactable = true;
+            _closeButton.Activate();
         }
 
         public void DisableClose()
         {
-            _closeButton.interactable = false;
+            _closeButton.Deactivate();
         }
     }
 

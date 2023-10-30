@@ -208,15 +208,6 @@ public class ReversiDisc3D : MonoBehaviour
     }
     
     /// <summary>
-    /// 表示テキストを変更する
-    /// </summary>
-    /// <param name="text"></param>
-    public void SetDisplayText(string text)
-    {
-        _pointSelector.SetDisplayText(text);
-    }
-
-    /// <summary>
     /// アニメーションの状態を設定する
     /// </summary>
     /// <param name="state">アニメーションの状態</param>
@@ -225,24 +216,15 @@ public class ReversiDisc3D : MonoBehaviour
         _animState = state;
         _currentTime = 0.0f;
 
-        switch(_animState)
+        if(_animState == AnimationState.None)
         {
-        case AnimationState.None:
             _animation = null;
             _isAnimating = false;
-            break;
-        case AnimationState.Placing:
-            _animation = new PlaceAnimation(this);
-            break;
-        case AnimationState.Flipping:
-            _animation = new FlipAnimation(this);
-            break;
-        case AnimationState.Recalling:
-            _animation = new RecallAnimation(this);
-            break;
         }
-
-        if(_animation != null) StartAnimation(delay);
+        else
+        {
+            StartAnimation(delay);
+        }
     }
 
     /// <summary>

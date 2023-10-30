@@ -26,33 +26,30 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
     GameSceneUI _sceneUI;
     #endregion
 
+    public GameSceneUI SceneUI { get {return _sceneUI; } }
+
     #region // Override Unity Methods
     protected override void OnStart()
     {
        	// 取得
 		_server = _sfManager.GetSFClient();
-        AddSFListeners();
 
-        var turn = _server.MySelf.GetVariable("turn");
         _reversi = ReversiGamePVP.Instance;
-        _reversi.gameObject.SetActive(true);
-        _reversi.StartMode(turn.GetIntValue());
-    }
 
-    protected override void OnUpdate()
-    {
-        if(Input.GetKeyDown(KeyCode.A))
+        if(_server.IsConnected)
         {
-            SendSFMessage("A");
+            _sceneUI.StartPanel.AddActionOnHidden(ReadyToStart);
+            _sceneUI.MenuWindow.DisconnectButton.AddActionOnHidden(ExitGame);
+
+            AddSFListeners();
         }
-        if(Input.GetKeyDown(KeyCode.B))
+        else
         {
-            SendSFMessage("B");
+            _sceneUI.StartPanel.Hide();
+            _sceneUI.MenuWindow.DisconnectButton.AddActionOnHidden(ExitGame);
+            _sceneUI.MenuWindow.DisconnectButton.SetLabel("Exit Game");
         }
-        if(Input.GetKeyDown(KeyCode.C))
-        {
-            SendSFMessage("C");
-        }
+
     }
     #endregion
 
@@ -70,6 +67,24 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
     #endregion
 
     #region // Private methods
+    private void ReadyToStart()
+    {
+        var turn = _server.MySelf.GetVariable("turn");
+        _reversi.gameObject.SetActive(true);
+        _reversi.StartMode(turn.GetIntValue());
+    }
+    private void ExitGame()
+    {
+        if(_server.IsConnected)
+        {
+            _server.Send(new LeaveRoomRequest());
+        }
+        else
+        {
+            _sceneUI.Deactivate();
+            SceneManager.LoadScene("TitleScene");
+        }
+    }
     private void OnSendMessage(string msg)
     {
         // ReversiGamePVP.Instance.SelectPoint(new Reversi.Point(msg));
@@ -117,7 +132,12 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
 
     public void OnSFConnectionLost(BaseEvent evt)
     {
-        //throw new System.NotImplementedException();
+        Debug.Log("Connection Lost");
+		// イベントリスナーを削除
+		if(_server.IsConnected) RemoveSFListeners();
+
+		// 一旦ウィンドウをすべて閉じる
+		_sceneUI.HideModals();
     }
 
     public void OnSFUserEnterRoom(BaseEvent evt)
@@ -127,7 +147,16 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
 
     public void OnSFUserExitRoom(BaseEvent evt)
     {
-        //throw new System.NotImplementedException();
+        User user = (User)evt.Params["user"];
+
+        if(user != _server.MySelf)
+        {
+            _sceneUI.ShowError("You have been disconnected.");
+        }
+        else
+        {
+            _sceneUI.ShowError("Opponent has been disconnected.");
+        }
     }
 
     public void OnSFMessageReceived(BaseEvent evt)

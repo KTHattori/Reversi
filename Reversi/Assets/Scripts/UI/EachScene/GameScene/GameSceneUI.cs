@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Reversi;
 using T0R1.UI;
 using UnityEngine;
 
@@ -9,16 +10,23 @@ public class GameSceneUI : SceneUIBase
     GameStartPanel _startPanel;
 
     [SerializeField]
+    GameReversiUI _reversiUI;
+
+    [SerializeField]
     GameMenuWindow _menuWindow;
 
-    public override void Disable()
+    public GameStartPanel StartPanel{get;}
+    public GameReversiUI ReversiPanel{get;}
+    public GameMenuWindow MenuWindow{get;}
+
+    public override void Deactivate()
     {
-        throw new System.NotImplementedException();
+        ReversiPanel.Deactivate();
     }
 
-    public override void Enable()
+    public override void Activate()
     {
-        throw new System.NotImplementedException();
+        ReversiPanel.Activate();
     }
 
     #region // Unity methods
@@ -27,6 +35,9 @@ public class GameSceneUI : SceneUIBase
         _menuWindow.SetBaseUI(this);
         _menuWindow.Hide();
         MarkAsModal(_menuWindow);
+
+        _reversiUI.SetBaseUI(this);
+        _reversiUI.Hide();
 
         _startPanel.SetBaseUI(this);
         MarkAsModal(_startPanel);

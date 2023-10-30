@@ -94,8 +94,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 96703a99152b3e6408bb7c31ddb0ec3a, type: 2}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: ef81b1666a918e84bada48b57af4dcce, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -767,6 +767,7 @@ GameObject:
   - component: {fileID: 81410848}
   - component: {fileID: 81410847}
   - component: {fileID: 81410846}
+  - component: {fileID: 81410850}
   m_Layer: 5
   m_Name: Error_CLOSE
   m_TagString: Untagged
@@ -895,6 +896,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 81410844}
   m_CullTransparentMesh: 1
+--- !u!114 &81410850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81410844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2062b2945c2046b409229884e6b17fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _button: {fileID: 81410847}
+  _image: {fileID: 81410848}
+  _onClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &169341320
 GameObject:
   m_ObjectHideFlags: 0
@@ -1338,7 +1356,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1930093426e5619449f56ce568d1ebc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _closeButton: {fileID: 81410847}
+  _closeButton: {fileID: 81410850}
   _onClose:
     m_PersistentCalls:
       m_Calls: []
@@ -1793,6 +1811,7 @@ GameObject:
   - component: {fileID: 385896337}
   - component: {fileID: 385896336}
   - component: {fileID: 385896335}
+  - component: {fileID: 385896339}
   m_Layer: 5
   m_Name: OnlinePlay_CLOSE
   m_TagString: Untagged
@@ -1921,6 +1940,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 385896333}
   m_CullTransparentMesh: 1
+--- !u!114 &385896339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385896333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2062b2945c2046b409229884e6b17fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _button: {fileID: 385896336}
+  _image: {fileID: 385896337}
+  _onClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &411555541
 GameObject:
   m_ObjectHideFlags: 0
@@ -2635,7 +2671,7 @@ Transform:
   m_GameObject: {fileID: 454501424}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.591435, y: 10.773817, z: -8.591436}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3309,7 +3345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdfa316ca1f31d94ea11adbde3877ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _closeButton: {fileID: 385896336}
+  _closeButton: {fileID: 385896339}
   _onClose:
     m_PersistentCalls:
       m_Calls: []
@@ -4104,6 +4140,7 @@ GameObject:
   - component: {fileID: 911986850}
   - component: {fileID: 911986849}
   - component: {fileID: 911986848}
+  - component: {fileID: 911986852}
   m_Layer: 5
   m_Name: PlayerSettings_CLOSE
   m_TagString: Untagged
@@ -4232,6 +4269,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 911986846}
   m_CullTransparentMesh: 1
+--- !u!114 &911986852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911986846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2062b2945c2046b409229884e6b17fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _button: {fileID: 911986849}
+  _image: {fileID: 911986850}
+  _onClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &923073492
 GameObject:
   m_ObjectHideFlags: 0
@@ -5065,6 +5119,7 @@ GameObject:
   - component: {fileID: 1160648784}
   - component: {fileID: 1160648783}
   - component: {fileID: 1160648782}
+  - component: {fileID: 1160648786}
   m_Layer: 5
   m_Name: PlayerSettings_CLOSE
   m_TagString: Untagged
@@ -5193,6 +5248,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1160648780}
   m_CullTransparentMesh: 1
+--- !u!114 &1160648786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160648780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2062b2945c2046b409229884e6b17fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _button: {fileID: 1160648783}
+  _image: {fileID: 1160648784}
+  _onClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1168907888
 GameObject:
   m_ObjectHideFlags: 0
@@ -5418,11 +5490,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sceneUI: {fileID: 454501425}
-  host: sfs2x.m-craft.com
+  host: localhost
   tcpPort: 9933
   httpPort: 8080
   zone: Reversi
-  debug: 1
+  debug: 0
 --- !u!4 &1238646208
 Transform:
   m_ObjectHideFlags: 0
@@ -5924,7 +5996,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d95fbdc7ee5289409680bfabe657de8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _closeButton: {fileID: 911986849}
+  _closeButton: {fileID: 911986852}
   _onClose:
     m_PersistentCalls:
       m_Calls: []
@@ -6291,6 +6363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _button: {fileID: 1365381596}
+  _image: {fileID: 0}
   _onClick:
     m_PersistentCalls:
       m_Calls: []
@@ -8409,6 +8482,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 172907553}
   - {fileID: 51561332}
-  - {fileID: 454501426}
   - {fileID: 377110899}
   - {fileID: 1238646208}
+  - {fileID: 454501426}
