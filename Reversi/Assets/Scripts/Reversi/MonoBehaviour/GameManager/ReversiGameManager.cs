@@ -181,7 +181,6 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _selectedPoint = null;
         _mainThread = SynchronizationContext.Current;
         _gameDestroyed = false;
-        LoadScreen.Hide();
     }
 
     /// <summary>
