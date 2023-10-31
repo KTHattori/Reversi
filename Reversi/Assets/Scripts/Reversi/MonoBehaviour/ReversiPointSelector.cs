@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 /// リバーシのマス選択用オブジェクト
 /// </summary>
 [RequireComponent(typeof(EventTrigger))]
-public class ReversiPointSelector : MonoBehaviour,IPointSelector
+public class ReversiPointSelector : MonoBehaviour
 {
     /// <summary>
     /// 割り当てられたマス座標
@@ -17,6 +17,7 @@ public class ReversiPointSelector : MonoBehaviour,IPointSelector
     /// 選択可能かどうか
     /// </summary>
     private bool _isSelectable;
+
 
     /// <summary>
     /// Update前にコールされる関数
@@ -34,7 +35,6 @@ public class ReversiPointSelector : MonoBehaviour,IPointSelector
     private void OnChangeSelectable(bool flag)
     {
         gameObject.SetActive(flag);
-        Debug.Log(flag);
     }
 
     /// <summary>
@@ -47,20 +47,19 @@ public class ReversiPointSelector : MonoBehaviour,IPointSelector
     }
 
     /// <summary>
-    /// このマスを選ぶ
+    /// このオブジェクトが押されたときにコールされる関数
     /// </summary>
-    /// <param name="point"></param>
-    public void SelectPoint(Point point)
+    public void OnPressNetwork()
     {
-        ReversiBoard3D.SelectPoint(point);
+        ReversiGameNetwork.Instance.SelectPoint(_point);
     }
 
     /// <summary>
     /// このオブジェクトが押されたときにコールされる関数
     /// </summary>
-    public void OnPress()
+    public void OnPressLocal()
     {
-        SelectPoint(_point);
+        ReversiGameManager.Instance.SelectPoint(_point);
     }
 
     /// <summary>

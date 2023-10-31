@@ -12,8 +12,6 @@ namespace Reversi
         White = -1,
         Black = 1,
         Wall = 2,
-        White_Placeable = -10,
-        Black_Placeable = 10,
     }
 
     /// <summary>
@@ -22,7 +20,7 @@ namespace Reversi
     public static class DiscColorUtil
     {
         // extension method
-
+        
         /// <summary>
         /// 反対の石色を取得する。<br/>
         /// 空や、壁の場合はそのまま返す。
@@ -60,32 +58,11 @@ namespace Reversi
                 return new Color(0.0f,0.0f,0.0f,0.0f);
             case DiscColor.Wall:
                 return Color.red;
-            case DiscColor.White_Placeable:
-                return new Color(1.0f,1.0f,1.0f,0.5f);
-            case DiscColor.Black_Placeable:
-                return new Color(0.0f,0.0f,0.0f,0.5f);
             default:
                 return Color.gray;
             }
         }
 
-        /// <summary>
-        /// 石色に対応した配置可能状態を返す。
-        /// </summary>
-        /// <param name="color"></param>
-        /// <returns></returns>
-        public static DiscColor GetPlaceable(this DiscColor color)
-        {
-            switch(color)
-            {
-            case DiscColor.White:
-                return DiscColor.White_Placeable;
-            case DiscColor.Black:
-                return DiscColor.Black_Placeable;
-            default:
-                return color;
-            }
-        }
     }
 }
 

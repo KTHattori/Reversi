@@ -1,14 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Reversi
 {
     /// <summary>
-    /// 色ごとの石数を保存するためのクラス
+    /// 色ごとに情報を管理するためのジェネリック クラス
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DiscColorStorage<T>
+    public class ColoredContainer<T>
     {
         private T[] _data = new T[3];
 

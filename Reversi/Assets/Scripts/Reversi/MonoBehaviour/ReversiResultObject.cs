@@ -89,8 +89,9 @@ public class ReversiResultObject : MonoBehaviour
     /// <summary>
     /// リザルト表示
     /// </summary>
-    public void Show()
+    public void Show(in Reversi.Board board)
     {
+        SetResult(board.CountDisc(Reversi.DiscColor.Black),board.CountDisc(Reversi.DiscColor.White));
         _resultPanel.SetActive(true);
     }
 

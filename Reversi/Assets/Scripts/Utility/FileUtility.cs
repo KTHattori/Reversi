@@ -14,7 +14,7 @@ public static class FileUtility
     /// <param name="filePath">この関数をコールしたスクリプトへのファイルパス（自動的に設定される）</param>
     /// <returns>ファイルパス</returns>
     /// <see cref="roslyn - C# for scripting (csx) location of script file - Stack Overflow - https://stackoverflow.com/questions/46728845/c-sharp-for-scripting-csx-location-of-script-file>"/>
-    public static string GetFilePath([System.Runtime.CompilerServices.CallerFilePath] string filePath = null)
+    public static string GetCallerFilePath([System.Runtime.CompilerServices.CallerFilePath] string filePath = null)
     {
         return filePath;
     }
@@ -49,7 +49,7 @@ public static class FileUtility
     /// </summary>
     /// <param name="filePath">コールしたスクリプトへのファイルパスが自動で代入されます</param>
     /// <returns>コールしたスクリプトへのアセットパス</returns>
-    public static string GetAssetPath([System.Runtime.CompilerServices.CallerFilePath] string filePath = null)
+    public static string GetCallerAssetPath([System.Runtime.CompilerServices.CallerFilePath] string filePath = null)
     {
         return filePath.Replace(System.IO.Path.DirectorySeparatorChar, '/').Replace(Application.dataPath, "Assets");
     }

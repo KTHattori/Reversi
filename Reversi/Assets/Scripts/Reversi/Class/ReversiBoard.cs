@@ -19,7 +19,7 @@ namespace Reversi
         /// 方向を表すビットフラグ列挙体
         /// </summary>
         [Flags]
-        private enum Direction
+        public enum Direction
         {
             None        = 0,
             Upper       = 1 << 0,
@@ -33,22 +33,34 @@ namespace Reversi
         }
 
         /// <summary>
+        /// 4方向を表すビットフラグ列挙体
+        /// </summary>
+        [Flags]
+        public enum DirectionQuad
+        {
+            Top       = 1 << 0,
+            Left        = 1 << 2,
+            Bottom       = 1 << 4,
+            Right       = 1 << 6,
+        }
+
+        /// <summary>
         /// 上下左右4方向のうち、maskDirで指定した方向を含んでいるかをチェックする拡張メソッド
         /// 4方向以外が指定された場合はfalseを返す
         /// </summary>
         /// <param name="maskDir">チェックする方向（上下左右）</param>
         /// <returns>含んでいればtrue, いなければfalse</returns>
-        private bool GetMask(Direction dir,Direction maskDir)
+        private bool GetMask(Direction dir,DirectionQuad maskDir)
         {
             switch(maskDir)
             {
-            case Direction.Upper:
+            case DirectionQuad.Top:
                 return dir.HasFlag(Direction.Upper | Direction.UpperLeft | Direction.UpperRight);
-            case Direction.Left:
+            case DirectionQuad.Left:
                 return dir.HasFlag(Direction.Left | Direction.UpperLeft | Direction.LowerLeft);
-            case Direction.Lower:
+            case DirectionQuad.Bottom:
                 return dir.HasFlag(Direction.Lower | Direction.LowerLeft | Direction.LowerRight);
-            case Direction.Right:
+            case DirectionQuad.Right:
                 return dir.HasFlag(Direction.Right | Direction.UpperRight | Direction.LowerRight);
             default:
                 return false;
@@ -61,6 +73,11 @@ namespace Reversi
         /// ボード上の各マスの石色情報を格納する配列
         /// </summary>
         private DiscColor[,] _rawBoard = new DiscColor[Constant.BoardSize + 2, Constant.BoardSize + 2];
+
+        /// <summary>
+        /// マスごとの開放度
+        /// </summary>
+        private int[,] liberty = new int[Constant.BoardSize + 2, Constant.BoardSize + 2];
 
         /// <summary>
         /// 現在のターン数
@@ -106,7 +123,12 @@ namespace Reversi
         /// <summary>
         /// 黒石, 白石, 空のマスの個数を保存する変数
         /// </summary>
-        private DiscColorStorage<int> _discAmount = new DiscColorStorage<int>();
+        private ColoredContainer<int> _discAmount = new ColoredContainer<int>();
+
+        /// <summary>
+        /// AI戦の場合、プレイヤーが先手かどうか
+        /// </summary>
+        private bool _aiInitiative = false;
 
 
         /// <summary>
@@ -124,8 +146,6 @@ namespace Reversi
 
             _rawBoard[point.x,point.y] = _currentColor;
             update.Add(new Disc(point.x,point.y,_currentColor));
-
-            Debug.Log(dir);
 
             // 上に置ける場合
             if(dir.HasFlag(Direction.Upper))
@@ -323,6 +343,22 @@ namespace Reversi
         }
 
         /// <summary>
+        /// 指定した地点の開放度を設定する
+        /// </summary>
+        /// <param name="point"></param>
+        private void UpdateLiberty(in Point point)
+        {
+            liberty[point.x,point.y - 1]--;
+            liberty[point.x - 1,point.y - 1]--;
+            liberty[point.x - 1,point.y]--;
+            liberty[point.x - 1,point.y + 1]--;
+            liberty[point.x,point.y + 1]--;
+            liberty[point.x + 1,point.y + 1]--;
+            liberty[point.x + 1,point.y]--;
+            liberty[point.x + 1,point.y - 1]--;
+        }
+
+        /// <summary>
         /// 現在の手番における着手可能な手を調べなおす。<br/>
         /// movablePoint, movableDirection を更新する。
         /// </summary>
@@ -333,9 +369,9 @@ namespace Reversi
             Direction dir;
             _movablePointList[_currentTurn].Clear();
 
-            for(int x = 1; x <= Constant.BoardSize; x++)
+            for(int y = 1; y <= Constant.BoardSize; y++)
             {
-                for(int y = 1 ; y <= Constant.BoardSize; y++)
+                for(int x = 1 ; x <= Constant.BoardSize; x++)
                 {
                     disc = new Disc(x,y,_currentColor);
                     dir = CheckMobility(disc);
@@ -414,6 +450,7 @@ namespace Reversi
             // 更新履歴をすべて削除
             _updatedDiscList.Clear();
 
+            // 配置可能地点の再探索
             InitMovable();
         }
 
@@ -429,12 +466,13 @@ namespace Reversi
             // 石が打てる位置かどうかを判定する
             // 打てない位置ならfalseで処理抜け
             // 座標の値が正しい範囲かどうかもここでチェック
-            if(point.x < 0 || point.x > Constant.BoardSize) {Debug.Log("out of bounds!"); return false;}
-            if(point.y < 0 || point.y > Constant.BoardSize) {Debug.Log("out of bounds!"); return false;}
-            if(_movableDirection[_currentTurn,point.x,point.y] == Direction.None) {Debug.Log("nowhere to place!"); return false; }
+            if(point.x < 0 || point.x > Constant.BoardSize) return false;
+            if(point.y < 0 || point.y > Constant.BoardSize) return false;
+            if(_movableDirection[_currentTurn,point.x,point.y] == Direction.None) return false;
 
             // 石を返す
             FlipDiscs(point);
+            UpdateLiberty(point);
 
             // 手番の色や現在の手数などを更新
             _currentTurn++;
@@ -471,9 +509,10 @@ namespace Reversi
         /// 直前の一手を元に戻すことを試み、その結果を返す。
         /// </summary>
         /// <returns>成功するとtrue, 元に戻せない場合はfalse</returns>
-        public bool Undo()
+        public bool Undo(bool searching = false)
         {
             if(_currentTurn == 0) return false;
+            if(!searching && _aiInitiative && _currentTurn <= 1){ return false; }
 
             _currentColor = _currentColor.GetInvertedColor();
 
@@ -519,7 +558,7 @@ namespace Reversi
             // やり直しを行った石をリストに追加
             foreach(Disc disc in update)
             {
-                _undoneDiscList.Add(new Disc(disc.x,disc.y,GetColor(disc.x,disc.y)));
+                _undoneDiscList.Add(new Disc(disc.x,disc.y,GetColorAt(disc.x,disc.y)));
             }
 
 
@@ -570,11 +609,30 @@ namespace Reversi
         }
 
         /// <summary>
+        /// 現在の手番での石数の差を返す。
+        /// </summary>
+        /// <returns></returns>
+        public int GetDiscDiff()
+        {
+            return (int)_currentColor * CountDisc(DiscColor.Black) - CountDisc(DiscColor.White);
+        }
+
+        /// <summary>
+        /// point で指定された座標での開放度を返す。
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public int GetLibertyAt(in Point point)
+        {
+            return liberty[point.x,point.y];
+        }
+
+        /// <summary>
         /// point で指定された座標の色を返す。
         /// </summary>
         /// <param name="point">指定されたボード座標上の色</param>
         /// <returns></returns>
-        public DiscColor GetColor(in Point point)
+        public DiscColor GetColorAt(in Point point)
         {
             return _rawBoard[point.x,point.y];
         }
@@ -585,7 +643,7 @@ namespace Reversi
         /// <param name="x">x座標</param>
         /// <param name="y">y座標</param>
         /// <returns>指定されたボード座標上の色</returns>
-        public DiscColor GetColor(int x,int y)
+        public DiscColor GetColorAt(int x,int y)
         {
             return _rawBoard[x,y];
         }
@@ -594,7 +652,7 @@ namespace Reversi
         /// 石が打てる座標が並んだListを返す。
         /// </summary>
         /// <returns>石が打てる座標を格納したListのコピー</returns>
-        public List<Point> GetMovablePoint()
+        public List<Point> GetMovablePoints()
         {
             return new List<Point>(_movablePointList[_currentTurn]);
         }
@@ -651,6 +709,33 @@ namespace Reversi
             if(IsGameOver()) return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// これまでに打たれた手のリストを返す
+        /// </summary>
+        /// <returns></returns>
+        public List<Point> GetHistory()
+        {
+            List<Point> history = new List<Point>();
+
+            for(int i = 0;i < _updatedDiscList.Count; i++)
+            {
+                List<Disc> update = _updatedDiscList[i];
+                if(update.Count <= 0) continue; // パスの場合は飛ばす
+                history.Add(update[0]);
+            }
+
+            return history;
+        }
+
+        /// <summary>
+        /// AIが先手かどうかを設定する
+        /// </summary>
+        /// <param name="flag"></param>
+        public void SetAIInitiative(bool flag)
+        {
+            _aiInitiative = flag;
         }
     }
 }
