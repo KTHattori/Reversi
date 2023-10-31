@@ -59,7 +59,7 @@ public class ReversiPointSelector : MonoBehaviour
     /// </summary>
     public void OnPressLocal()
     {
-        ReversiGameManager.Instance.SelectPoint(_point);
+        ReversiGameLocal.Instance.SelectPoint(_point);
     }
 
     /// <summary>

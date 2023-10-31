@@ -39,7 +39,7 @@ namespace Reversi
             // MonoBehaviourにアクセスするため、メインスレッドから実行
             mainThread.Post(__ => 
             {
-                ReversiGameManager.Instance.SelectPoint(point);
+                ReversiGameLocal.Instance.SelectPoint(point);
             },null);
         }
 

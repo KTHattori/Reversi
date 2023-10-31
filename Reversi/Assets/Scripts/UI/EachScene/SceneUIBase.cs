@@ -13,6 +13,7 @@ namespace T0R1.UI
         [SerializeField]
         protected ErrorWindow _errorWindow;
 
+
         protected sealed override void Reset()
         {
             OnReset();

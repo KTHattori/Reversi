@@ -8883,7 +8883,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   _3dboard: {fileID: 1835345046}
-  _mode: 1
   _isInitiative: 0
   _playerUI0Ref: {fileID: 11400000, guid: 621d3c1e39501ea4989e7debdfaaa2bd, type: 2}
   _playerUI1Ref: {fileID: 11400000, guid: f91924af59e2dff40ac94298b71e4a32, type: 2}

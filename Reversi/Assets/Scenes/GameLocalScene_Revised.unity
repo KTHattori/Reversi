@@ -8974,13 +8974,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1835345043}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f642839a023b96447aba2545e73cdd58, type: 3}
+  m_Script: {fileID: 11500000, guid: 57044542decc1e549b64952fb887cd64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
-  _controller: {fileID: 1544872718}
   _3dboard: {fileID: 1835345046}
-  _ui: {fileID: 1874240496}
+  _isInitiative: 0
+  _playerUI0Ref: {fileID: 0}
+  _playerUI1Ref: {fileID: 0}
+  _bookAssetRef:
+    m_AssetGUID: e1909e950ca422c47a75d44e8ee603b3
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
 --- !u!1 &1874240493
 GameObject:
   m_ObjectHideFlags: 0

@@ -41,10 +41,11 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         opponentReady = false;
         started = false;
 
-        _reversi = ReversiGameNetwork.Instance;
+
 
         if(_server != null && _server.IsConnected)
         {
+            _reversi = ReversiGameNetwork.Instance;
             _sceneUI.StartPanel.AddActionOnHidden(ReadyToStart);
             _sceneUI.MenuWindow.DisconnectButton.AddActionOnHidden(ExitGame);
 

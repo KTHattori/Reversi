@@ -1,3 +1,4 @@
+using T0R1.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,6 +47,8 @@ public class ReversiOutGameUI : MonoBehaviour
 
             OnPlayerChanged();
             OnDifficultyChanged();
+
+            LoadScreen.Hide();
         }
 
         /// <summary>
@@ -105,13 +108,13 @@ public class ReversiOutGameUI : MonoBehaviour
     /// <summary>
     /// スタートモードを取得
     /// </summary>
-    public ReversiGameManager.PlayMode StartingMode
+    public ReversiGameLocal.PlayMode StartingMode
     {
         get
         {
-            if(_blackside.IsAI && _whiteside.IsAI) return ReversiGameManager.PlayMode.EvE;
-            else if (_blackside.IsAI || _whiteside.IsAI) return ReversiGameManager.PlayMode.PvE;
-            else return ReversiGameManager.PlayMode.PvPLocal;
+            if(_blackside.IsAI && _whiteside.IsAI) return ReversiGameLocal.PlayMode.AIvsAI;
+            else if (_blackside.IsAI || _whiteside.IsAI) return ReversiGameLocal.PlayMode.PvsAI;
+            else return ReversiGameLocal.PlayMode.PvPLocal;
         }
     }
 
@@ -142,7 +145,7 @@ public class ReversiOutGameUI : MonoBehaviour
     {
         get
         {
-            if(StartingMode == ReversiGameManager.PlayMode.PvE)
+            if(StartingMode == ReversiGameLocal.PlayMode.PvsAI)
             {
                 if(_blackside.IsAI) return false;
                 else return true;
@@ -170,7 +173,7 @@ public class ReversiOutGameUI : MonoBehaviour
     public void StartGame()
     {
         _inGameObjRef.ActivateObject();
-        ReversiGameManager manager = _inGameObjRef.GetComponent<ReversiGameManager>();
+        ReversiGameLocal manager = _inGameObjRef.GetComponent<ReversiGameLocal>();
 
         manager.SetDifficulty(GetDifficultyObj(_blackside.Difficulty),Reversi.DiscColor.Black);
         manager.SetDifficulty(GetDifficultyObj(_whiteside.Difficulty),Reversi.DiscColor.White);

@@ -9,7 +9,7 @@ using T0R1;
 using T0R1.UI;
 
 
-public class ReversiGameManager : MonoSingleton<ReversiGameManager>
+public class ReversiGameLocal : MonoSingleton<ReversiGameLocal>
 {
     /// <summary>
     /// プレイモードの種類
@@ -19,19 +19,15 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         /// <summary>
         /// AI対AI
         /// </summary>
-        EvE = 0,
+        AIvsAI = 0,
         /// <summary>
         /// AIとのローカル対戦
         /// </summary>
-        PvE = 1,
+        PvsAI = 1,
         /// <summary>
         /// プレイヤーとのローカル対戦
         /// </summary>
         PvPLocal = 2,
-        /// <summary>
-        /// プレイヤーとのネットワーク対戦
-        /// </summary>
-        PvPNetwork = 3,
     }
 
     // 定数 Constants
@@ -60,8 +56,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     [SerializeField]
     private ReversiBoard3D _3dboard;
 
-    [SerializeField]
-    private PlayMode _mode = PlayMode.PvE;
+    private PlayMode _mode = PlayMode.PvsAI;
 
     /// <summary>
     /// 先手かどうか
@@ -213,11 +208,11 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
             _ui[CurrentPlayer].ThinkAnimation();
             _ui[OppositePlayer].ThinkAnimation();
 
-            if( _mode == PlayMode.EvE)
+            if( _mode == PlayMode.AIvsAI)
             {
                 _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
             }
-            else if( _mode == PlayMode.PvE && _currentPlayer != _playerSide)
+            else if( _mode == PlayMode.PvsAI && _currentPlayer != _playerSide)
             {
                 _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
 
@@ -260,19 +255,17 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _turnUpdated = true;
         switch(mode)
         {
-        case PlayMode.EvE:
+        case PlayMode.AIvsAI:
             CreateGameOnlyAI();
             break;
-        case PlayMode.PvE:
+        case PlayMode.PvsAI:
             CreateGameWithAI(isInitiative);
             break;
         case PlayMode.PvPLocal:
             CreateGameWithHuman(false);
             break;
-        case PlayMode.PvPNetwork:
-            CreateGameWithHuman(true);
-            break;
         }
+        LoadScreen.Hide();
     }
     
     /// <summary>
@@ -285,17 +278,14 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _turnUpdated = true;
         switch(mode)
         {
-        case PlayMode.EvE:
+        case PlayMode.AIvsAI:
             InitializeGameOnlyAI();
             break;
-        case PlayMode.PvE:
+        case PlayMode.PvsAI:
             InitializeGameWithAI(isInitiative);
             break;
         case PlayMode.PvPLocal:
             InitializeGameWithHuman(false);
-            break;
-        case PlayMode.PvPNetwork:
-            InitializeGameWithHuman(true);
             break;
         }
     }
@@ -326,9 +316,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="_isNetwork">ネットワークかどうか</param>
     public void CreateGameWithHuman(bool _isNetwork)
     {
-         // モードをセット
-        if(_isNetwork) _mode = PlayMode.PvPNetwork;
-        else _mode = PlayMode.PvPLocal;
+        _mode = PlayMode.PvPLocal;
 
         // プレイヤーをセット
         {
@@ -426,7 +414,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         Debug.Log("Created Game AI vs AI");
 
         // モードをセット
-        _mode = PlayMode.EvE;
+        _mode = PlayMode.AIvsAI;
 
         // 定石ファイルを読み込み
         BookManager.Instance.LoadBookFile(_bookAssetRef);
@@ -496,7 +484,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         Debug.Log("Created Game With AI");
 
         // モードをセット
-        _mode = PlayMode.PvE;
+        _mode = PlayMode.PvsAI;
 
         // 定石ファイルを読み込み
         BookManager.Instance.LoadBookFile(_bookAssetRef);
@@ -616,15 +604,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="content"></param>
     private void ShowMessage(PlayMode playMode, string content)
     {
-        if(playMode != PlayMode.PvPNetwork)
-        {
-            _ui[_playerSide].SetMessageText(content);
-        }
-        else
-        {
-            _ui[BlackSide].SetMessageText(content);
-            _ui[WhiteSide].SetMessageText(content);
-        }
+        _ui[_playerSide].SetMessageText(content);
     }
 
     /// <summary>
@@ -633,20 +613,9 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
     /// <param name="playMode"></param>
     private void UpdateUI(PlayMode playMode)
     {
-        if(playMode != PlayMode.PvPNetwork)
-        {
-            _ui[_playerSide].SetTurnNumber(_board.GetCurrentTurn());
-            _ui[_playerSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
-            _ui[_playerSide].HidePassButton();
-        }
-        else
-        {
-            _ui[BlackSide].SetTurnNumber(_board.GetCurrentTurn());
-            _ui[BlackSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
-            _ui[WhiteSide].SetTurnNumber(_board.GetCurrentTurn());
-            _ui[WhiteSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
-            _ui[CurrentPlayer].HidePassButton();
-        }
+        _ui[_playerSide].SetTurnNumber(_board.GetCurrentTurn());
+        _ui[_playerSide].SetBackgroundColor(_board.GetCurrentColor().ToColor());
+        _ui[_playerSide].HidePassButton();
     }
 
     /// <summary>
@@ -663,12 +632,12 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         _ui[CurrentPlayer].HideUndoButton();
         _ui[OppositePlayer].HideUndoButton();
 
-        if( _mode == PlayMode.EvE)
+        if( _mode == PlayMode.AIvsAI)
         {
             _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
             StartWait();
         }
-        else if( _mode == PlayMode.PvE && _currentPlayer != _playerSide)
+        else if( _mode == PlayMode.PvsAI && _currentPlayer != _playerSide)
         {
             _ui[OppositePlayer].SetMessageText($"AI Thinking{_ui[_playerSide].ThinkSuffix}");
             StartWait();
@@ -758,7 +727,7 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
         case IReversiPlayer.ActionResult.Undone:
             _3dboard.UpdateBoardOnUndo(_board.GetUndone());
             await Task.Run(() => WaitAnimationCompleted());
-            if(_mode == PlayMode.PvE)
+            if(_mode == PlayMode.PvsAI)
             {
 
                 _player[_currentPlayer].Act(_board,point);
@@ -807,18 +776,14 @@ public class ReversiGameManager : MonoSingleton<ReversiGameManager>
 
         switch(_mode)
         {
-        case PlayMode.EvE:
+        case PlayMode.AIvsAI:
             _ui[_playerSide].ShowResult(_board);
         break;
-        case PlayMode.PvE:
+        case PlayMode.PvsAI:
             _ui[_playerSide].ShowResult(_board);
             break;
         case PlayMode.PvPLocal:
             _ui[_playerSide].ShowResult(_board);
-            break;
-        case PlayMode.PvPNetwork:
-            _ui[BlackSide].ShowResult(_board);
-            _ui[WhiteSide].ShowResult(_board);
             break;
         }
     }

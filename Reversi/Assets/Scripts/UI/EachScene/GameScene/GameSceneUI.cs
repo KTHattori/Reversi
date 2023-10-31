@@ -52,6 +52,7 @@ public class GameSceneUI : SceneUIBase
         MarkAsModal(_resultPanel);
 
         ReversiPanel.MenuButton.AddListenerOnClick(ShowMenu);
+
     }
     #endregion
 
