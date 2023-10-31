@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using T0R1.UI;
 using TMPro;
+using UnityEngine.UI;
+using Interpolation;
 
 namespace Reversi
 {
@@ -13,17 +15,45 @@ namespace Reversi
         /// </summary>
         [SerializeField]
         private TextMeshProUGUI _turnTextRef;
+        [SerializeField]
+        private TextMeshProUGUI _timeTextRef;
         /// <summary>
         /// メッセージ表示テキスト参照
         /// </summary>
         [SerializeField]
         private TextMeshProUGUI _messageTextRef;
+        [SerializeField]
+        private TextMeshProUGUI _clientSideText;
+
+        [SerializeField]
+        private Image _backgroundImg;
+        [SerializeField]
+        private Image _clientSideImg;
+
+
+        [SerializeField]
+        private ButtonTextEdit _menuButton;
 
         [SerializeField]
         private ButtonTextEdit _passButton;
 
         [SerializeField]
         private ButtonTextEdit _undoButton;
+
+        [SerializeField]
+        private Color _blackSideColor = Color.black;
+
+        [SerializeField]
+        private Color _whiteSideColor = Color.white;
+        
+        public ButtonTextEdit MenuButton { get => _menuButton; }
+        public ButtonTextEdit PassButton { get => _passButton; }
+        public ButtonTextEdit UndoButton { get => _undoButton; }
+
+        private DiscColor _currentBGColorState = DiscColor.Black;
+        private Color currentColor = Color.black;
+
+        private float _colorChangeCount = 0.0f;
 
         /// <summary>
         /// 最初のUpdate直前にコール
@@ -34,6 +64,23 @@ namespace Reversi
             HidePassButton();
             HideUndoButton();
             Deactivate();
+            currentColor = _blackSideColor;
+        }
+
+        protected override void OnUpdate()
+        {
+            if(_colorChangeCount > 1.0f) return;
+
+            if(_currentBGColorState == DiscColor.Black)
+            {
+                _backgroundImg.color = Easing.Ease(currentColor,_blackSideColor,_colorChangeCount,1.0f,Easing.Curve.EaseOutCirc);
+            }
+            else
+            {
+                _backgroundImg.color = Easing.Ease(currentColor,_whiteSideColor,_colorChangeCount,1.0f,Easing.Curve.EaseOutCirc);
+            }
+
+            _colorChangeCount += Time.deltaTime;
         }
 
         /// <summary>
@@ -61,6 +108,15 @@ namespace Reversi
         public void SetTurnNumber(int turnNum)
         {
             _turnTextRef.SetText(turnNum.ToString());
+        }
+
+        /// <summary>
+        /// 制限時間カウントを更新
+        /// </summary>
+        /// <param name="count"></param>
+        public void SetTimeCount(int count)
+        {
+            _timeTextRef.SetText(count.ToString());
         }
 
         /// <summary>
@@ -105,6 +161,17 @@ namespace Reversi
         }
 
         /// <summary>
+        /// 背景色
+        /// </summary>
+        /// <param name="color"></param>
+        public void TurnBackgroundColor(DiscColor color)
+        {
+            _currentBGColorState = color;
+            _colorChangeCount = 1.0f - Mathf.Clamp01(_colorChangeCount);
+            currentColor = _backgroundImg.color;
+        }
+
+        /// <summary>
         /// 回転を設定
         /// </summary>
         /// <param name="angle"></param>
@@ -113,6 +180,22 @@ namespace Reversi
             Vector3 ang = transform.localEulerAngles;
             ang.z = angle;
             transform.localEulerAngles = ang;
+        }
+
+        public void SetClientSide(DiscColor color)
+        {
+            if(color == DiscColor.Black)
+            {
+                _clientSideImg.color = _blackSideColor;
+                _clientSideText.color = _whiteSideColor;
+                _clientSideText.SetText("YOUR SIDE: BLACK");
+            }
+            else
+            {
+                _clientSideImg.color = _whiteSideColor;
+                _clientSideText.color = _blackSideColor;
+                _clientSideText.SetText("YOUR SIDE: WHITE");
+            }
         }
     }
 }

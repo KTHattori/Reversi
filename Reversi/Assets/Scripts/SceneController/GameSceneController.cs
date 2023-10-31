@@ -4,16 +4,24 @@ using Sfs2X;
 using Sfs2X.Core;
 using Sfs2X.Entities;
 using Sfs2X.Requests;
-public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessWatchable,ISFMessageReceiver
+using Sfs2X.Entities.Variables;
+public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessWatcher,ISFMessageReceiver,ISFUserVariableWatcher
 {
     #region // Constants
 	public static string MSG_RECV_CALLBACK = "MSG_RCV";
+    public static string MSG_TIMEOVER = "MSG_TIMEOVER";
+    private static readonly int VAR_TURN_BLACKSIDE = 0;
+	private static readonly int VAR_TURN_WHITESIDE = 1;
 	#endregion
 
     #region // Private variables
     private SmartFox _server;
-    private ReversiGamePVP _reversi;
+    private ReversiGameNetwork _reversi;
 	private string _manualDCReason = "";
+    private int _side = -1;
+    private bool clientReady = false;
+    private bool opponentReady = false;
+    private bool started = false;
     #endregion
 
     #region // Serialized variables
@@ -29,7 +37,11 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
        	// 取得
 		_server = _sfManager.GetSFClient();
 
-        _reversi = ReversiGamePVP.Instance;
+        clientReady = false;
+        opponentReady = false;
+        started = false;
+
+        _reversi = ReversiGameNetwork.Instance;
 
         if(_server != null && _server.IsConnected)
         {
@@ -37,6 +49,13 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
             _sceneUI.MenuWindow.DisconnectButton.AddActionOnHidden(ExitGame);
 
             AddSFListeners();
+
+            _side = _server.MySelf.GetVariable("turn").GetIntValue();
+            _sceneUI.StartPanel.SetInitiative(_side == VAR_TURN_BLACKSIDE);
+            
+            _sceneUI.MenuWindow.DisconnectButton.AddListenerOnClick(ExitGame);
+            _sceneUI.ResultPanel.BackTitleButton.AddListenerOnClick(ExitGame);
+            _sceneUI.ResultPanel.BackTitleButton.Hide();
         }
         else
         {
@@ -46,12 +65,22 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         }
 
     }
+
+    protected override void OnUpdate()
+    {
+        if(clientReady && opponentReady && !started)
+        {
+            StartGame();
+            started = true;
+        }
+    }
     #endregion
 
 
     #region // Public methods
     public void SendSFMessage(string msg)
     {
+        if(!_server.IsConnected) return;
         // Send public message to Room
 		_server.Send(new PublicMessageRequest(msg));
     }
@@ -59,14 +88,40 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
     {
         SendSFMessage(MSG_RECV_CALLBACK);
     }
+
+    public void SetThinkingState(bool flag)
+    {
+        UserVariable variable = new SFSUserVariable("thinking",flag);
+		_server.MySelf.SetVariable(variable);
+
+		List<UserVariable> vars = new List<UserVariable>();
+		vars.Add(variable);
+
+		// Set User Variables
+		_server.Send(new SetUserVariablesRequest(vars));
+    }
     #endregion
 
     #region // Private methods
+    private void StartGame()
+    {
+        _sceneUI.ReversiPanel.Show();
+        _reversi.gameObject.SetActive(true);
+        _reversi.StartMode(_side);
+    }
     private void ReadyToStart()
     {
-        var turn = _server.MySelf.GetVariable("turn");
-        _reversi.gameObject.SetActive(true);
-        _reversi.StartMode(turn.GetIntValue());
+        if(!started && _server != null && _server.IsConnected)
+        {
+            UserVariable variable = new SFSUserVariable("ready",true);
+            _server.MySelf.SetVariable(variable);
+
+            List<UserVariable> vars = new List<UserVariable>();
+            vars.Add(variable);
+
+            // Set User Variables
+            _server.Send(new SetUserVariablesRequest(vars));
+        }
     }
     private void ExitGame()
     {
@@ -83,6 +138,11 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
     private void OnSendMessage(string msg)
     {
         Debug.Log($"Sent: {msg}");
+
+        if(msg == MSG_TIMEOVER)
+        {
+            ExitGame();
+        }
         // ReversiGamePVP.Instance.SelectPoint(new Reversi.Point(msg));
     }
     private void OnReceiveMessage(string msg)
@@ -92,9 +152,13 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         {
             OnCallBackReceived();
         }
+        else if(msg == MSG_TIMEOVER)
+        {
+            ExitGame();
+        }
         else
         {
-            ReversiGamePVP.Instance.ReceivePoint(new Reversi.Point(msg));
+            ReversiGameNetwork.Instance.ReceivePoint(new Reversi.Point(msg));
         }
     }
     private void OnCallBackReceived()
@@ -111,6 +175,7 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         _server.AddEventListener(SFSEvent.USER_EXIT_ROOM,OnSFUserExitRoom);
 
         _server.AddEventListener(SFSEvent.PUBLIC_MESSAGE,OnSFMessageReceived);
+        _server.AddEventListener(SFSEvent.USER_VARIABLES_UPDATE,OnSFUserVariableChanged);
     }
     public override void RemoveSFListeners()
     {
@@ -121,6 +186,7 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         _server.RemoveEventListener(SFSEvent.USER_EXIT_ROOM,OnSFUserExitRoom);
 
         _server.RemoveEventListener(SFSEvent.PUBLIC_MESSAGE,OnSFMessageReceived);
+        _server.RemoveEventListener(SFSEvent.USER_VARIABLES_UPDATE,OnSFUserVariableChanged);
     }
 
     public void OnSFConnection(BaseEvent evt)
@@ -134,8 +200,14 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
 		// イベントリスナーを削除
 		if(_server.IsConnected) RemoveSFListeners();
 
+        clientReady = false;
+        opponentReady = false;
+        started = false;
+
 		// 一旦ウィンドウをすべて閉じる
 		_sceneUI.HideModals();
+
+        TransitScene("TitleScene");
     }
 
     public void OnSFUserEnterRoom(BaseEvent evt)
@@ -145,20 +217,18 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
 
     public void OnSFUserExitRoom(BaseEvent evt)
     {
-        // User user = (User)evt.Params["user"];
+        User user = (User)evt.Params["user"];
 
-        // if()
-
-        // if(user != _server.MySelf)
-        // {
-        //     _sceneUI.ShowError("You have been disconnected.");
-        // }
-        // else
-        // {
-        //     _sceneUI.ShowError("Opponent has been disconnected.");
-        // }
-
-        // _server.Disconnect();
+        if(user.IsItMe)
+        {
+            _sceneUI.ShowError("You have been disconnected.");
+            _server.Disconnect();
+        }
+        else
+        {
+            _server.Send(new LeaveRoomRequest());
+            _sceneUI.ShowError("Opponent has been disconnected.");
+        }
     }
 
     public void OnSFMessageReceived(BaseEvent evt)
@@ -176,5 +246,40 @@ public class GameSceneController : SceneController,ISFConnectable,ISFRoomAccessW
         {
             OnSendMessage(message);
         }
+    }
+
+    public void OnSFUserVariableChanged(BaseEvent evt)
+    {
+        User user = (User)evt.Params["user"];
+        List<string> changedVars = (List<string>)evt.Params["changedVars"];
+		if(user.IsItMe)
+		{
+        	Debug.Log("My Var Changed!");
+			foreach(string variable in changedVars)
+			{
+                Debug.Log($"My {variable} : {user.GetVariable(variable)}");
+
+                if(variable == "ready" && user.GetVariable(variable).GetBoolValue())
+                {
+                    clientReady = true;
+                }
+			}
+		}
+		else
+		{
+			Debug.Log("Their Var Changed!");
+            foreach(string variable in changedVars)
+			{
+                Debug.Log($"Their {variable} : {user.GetVariable(variable)}");
+
+                if(variable == "ready" && user.GetVariable(variable).GetBoolValue())
+                {
+                    opponentReady = true;
+                    _reversi.SetUserNames(_server.MySelf.Name,user.Name);
+                }
+			}
+            
+            
+		}
     }
 }

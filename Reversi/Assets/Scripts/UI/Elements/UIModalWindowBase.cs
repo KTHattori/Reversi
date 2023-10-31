@@ -8,8 +8,6 @@ namespace T0R1.UI
     {
         protected override void OnAwake()
         {
-            Debug.Log(this);
-            Debug.Log(_closeButton);
             _isModal = true;
             _closeButton.SetParent(this);
         }

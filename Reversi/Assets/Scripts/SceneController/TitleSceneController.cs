@@ -11,9 +11,10 @@ using Sfs2X.Entities.Variables;
 
 
 
-public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreatable,ISFRoomJoinable,ISFRoomAccessWatchable
+public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreatable,ISFRoomJoinable,ISFRoomAccessWatcher,ISFUserVariableWatcher
 {
     #region // Private variables
+	private static readonly int VAR_TURN_INIT = -1;
     private SmartFox _server;
 	private string _manualDCReason = "";
 	private bool _lobbyConnected = false;
@@ -291,6 +292,8 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 
 		_server.AddEventListener(SFSEvent.USER_ENTER_ROOM, OnSFUserEnterRoom);
 		_server.AddEventListener(SFSEvent.USER_EXIT_ROOM, OnSFUserExitRoom);
+
+		_server.AddEventListener(SFSEvent.USER_VARIABLES_UPDATE,OnSFUserVariableChanged);
 	}
 
     public override void RemoveSFListeners()
@@ -310,6 +313,8 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 
 			_server.RemoveEventListener(SFSEvent.USER_ENTER_ROOM, OnSFUserEnterRoom);
 			_server.RemoveEventListener(SFSEvent.USER_EXIT_ROOM, OnSFUserExitRoom);
+
+			_server.RemoveEventListener(SFSEvent.USER_VARIABLES_UPDATE,OnSFUserVariableChanged);
 		} 
     }
 
@@ -439,15 +444,13 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
 			SetMatchButtonCancellable(true);
 			_sceneUI.OnlinePlayWindow.Message.SetText("Waiting for other player...");
 
-			if(_server.MySelf.IsPlayerInRoom(room)) {SetTurnVariable(0); Debug.Log($"is Black");}
-			else {SetTurnVariable(1); Debug.Log($"is White");}
-
+			SetTurnVariable(_server.MySelf.GetPlayerId(room) - 1);
 			if(CheckGameStart(room)) Invoke("StartMatch",1.0f);
 		}
 		else
 		{
 			ReadyToMatchMaking();
-			SetTurnVariable(0);
+			SetTurnVariable(VAR_TURN_INIT);
 			_lobbyConnected = true;
 		}
     }
@@ -481,6 +484,29 @@ public class TitleSceneController : SceneController,ISFConnectable,ISFRoomCreata
     public void OnSFUserExitRoom(BaseEvent evt)
     {
 		Debug.Log("User Exit Room");
+    }
+
+    public void OnSFUserVariableChanged(BaseEvent evt)
+    {
+        User user = (User)evt.Params["user"];
+        List<string> changedVars = (List<string>)evt.Params["changedVars"];
+		if(user.IsItMe)
+		{
+        	Debug.Log("My Var Changed!");
+			foreach(string variable in changedVars)
+			{
+                Debug.Log($"My {variable} : {user.GetVariable(variable)}");
+			}
+		}
+		else
+		{
+			Debug.Log("Their Var Changed!");
+            foreach(string variable in changedVars)
+			{
+                Debug.Log($"Their {variable} : {user.GetVariable(variable)}");
+			}
+		}
+
     }
     #endregion
 

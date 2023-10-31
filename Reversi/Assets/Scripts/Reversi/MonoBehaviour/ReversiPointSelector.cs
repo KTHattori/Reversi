@@ -51,13 +51,13 @@ public class ReversiPointSelector : MonoBehaviour
     /// </summary>
     public void OnPressNetwork()
     {
-        ReversiGamePVP.Instance.SelectPoint(_point);
+        ReversiGameNetwork.Instance.SelectPoint(_point);
     }
 
     /// <summary>
     /// このオブジェクトが押されたときにコールされる関数
     /// </summary>
-    public void OnPressPvP()
+    public void OnPressLocal()
     {
         ReversiGameManager.Instance.SelectPoint(_point);
     }

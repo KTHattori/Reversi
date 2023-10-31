@@ -3,12 +3,11 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using Reversi;
 using T0R1;
 
 
-public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
+public class ReversiGameNetwork : MonoSingleton<ReversiGameNetwork>
 {
     // 定数 Constants
 
@@ -39,6 +38,9 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     [SerializeField]
     private ReversiBoard3D _3dboard;
 
+    [SerializeField]
+    private GameSceneUI _ui;
+
     // Private: Non-Serialized
 
     /// <summary>
@@ -50,11 +52,6 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// プレイヤーの枠
     /// </summary>
     private IReversiPlayer[] _player = new IReversiPlayer[2];
-
-    /// <summary>
-    /// UIマネージャ
-    /// </summary>
-    private GameReversiUI _ui;
 
     /// <summary>
     /// 現在の手番
@@ -102,6 +99,17 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     private bool _gameDestroyed = false;
 
     /// <summary>
+    /// クライアント側のユーザーネーム
+    /// </summary>
+    private string _clientUserName = "Me";
+    public string ClientUserName { get => _clientUserName; }
+    /// <summary>
+    /// 対戦相手のユーザーネーム
+    /// </summary>
+    private string _opponentUserName = "Opponent";
+    public string OpponentUserName { get => _opponentUserName; }
+
+    /// <summary>
     /// 現在の手番を取得するプロパティ
     /// </summary>
     public int CurrentPlayer => _currentPlayer;
@@ -110,6 +118,8 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// 現在と反対の手番を取得するプロパティ
     /// </summary>
     public int OppositePlayer => _currentPlayer == BlackSide ? WhiteSide : BlackSide;
+
+    private int _oldSecondInt = 0;
 
 
     // Start is called before the first frame update
@@ -123,7 +133,8 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         _selectedPoint = null;
         _mainThread = SynchronizationContext.Current;
         _gameDestroyed = false;
-        InitializeUI();
+        SetUpUI();
+        _ui.ReversiPanel.HideUndoButton();
     }
 
     /// <summary>
@@ -135,9 +146,10 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         Destroy(_3dboard);
     }
 
-    public void OnPlayerTurn()
+    public void SetUserNames(string client,string opponent)
     {
-
+        _clientUserName = client;
+        _opponentUserName = opponent;
     }
 
     /// <summary>
@@ -149,19 +161,28 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         {
             OnTurn();
             _turnUpdated = false;
-            _turnTime = 0.0f;
+            _turnTime = Constant.TurnTimeOver;
         }
         else
         {
-            if(_turnTime > Constant.TurnTimeOver)
+            _turnTime -= Time.deltaTime;
+            int secondInt = Mathf.RoundToInt(_turnTime);
+            if(secondInt != _oldSecondInt)
             {
-                return;
-            }
-            else if(_board.IsPassable())
-            {
-                _ui.SetMessageText($"{CurrentPlayer} Thinking");
+                if(secondInt < 0)
+                {
+                    OnTimerUp();
+                    return;
+                }
+                _ui.ReversiPanel.SetTimeCount(secondInt);
+                _oldSecondInt = secondInt;
             }
         }
+    }
+
+    private void OnTimerUp()
+    {
+        _controller.SendSFMessage(GameSceneController.MSG_TIMEOVER);
     }
 
     public void StopThink()
@@ -203,9 +224,10 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// <summary>
     /// UIの初期化
     /// </summary>
-    private void InitializeUI()
+    private void SetUpUI()
     {
-        _ui = _controller.SceneUI.ReversiPanel;
+        _ui = _controller.SceneUI;
+        _ui.ReversiPanel.PassButton.AddListenerOnClick(Pass);
     }
 
     /// <summary>
@@ -220,7 +242,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         }
 
         // UI初期化
-        _ui.Initialize();
+        _ui.ReversiPanel.Initialize();
 
         // 盤面データの初期化
         _board.Init();
@@ -230,6 +252,8 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         _3dboard.InitializeBoard(_board);
 
         _clientSide = startTurn;
+        if(_clientSide == BlackSide) _ui.ReversiPanel.SetClientSide(DiscColor.Black);
+        else _ui.ReversiPanel.SetClientSide(DiscColor.White);
 
         ShowMessage($"ClientSide:{_clientSide}");
 
@@ -245,7 +269,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     public void InitializeGame(int startTurn)
     {
         // UI初期化
-        _ui.Initialize();
+        _ui.ReversiPanel.Initialize();
 
         // 盤面データの初期化
         _board.Init();
@@ -327,7 +351,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// <param name="content"></param>
     private void ShowMessage(string content)
     {
-        _ui.SetMessageText(content);
+         _ui.ReversiPanel.SetMessageText(content);
     }
 
     /// <summary>
@@ -336,8 +360,9 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// <param name="playMode"></param>
     private void UpdateUI()
     {
-        _ui.SetTurnNumber(_board.GetCurrentTurn());
-        _ui.HidePassButton();
+        _ui.ReversiPanel.SetTurnNumber(_board.GetCurrentTurn());
+        _ui.ReversiPanel.HidePassButton();
+        _ui.Activate();
     }
 
     /// <summary>
@@ -348,19 +373,19 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         _movablePoints.Clear();
         _movablePoints = _board.GetMovablePoints();
 
+        _ui.ReversiPanel.TurnBackgroundColor(_board.GetCurrentColor());
+
         if(_currentPlayer == _clientSide)
         {
             if(_board.IsPassable())
             {
-                _ui.ShowPassButton();
-                _ui.ShowUndoButton();
+                _ui.ReversiPanel.SetMessageText($"Nowhere to place...");
+                _ui.ReversiPanel.ShowPassButton();
                 StartWait();
             }
             else
             {
-                _ui.SetMessageText($"Decide your move.");
-                _ui.SetMessageText($"{CurrentPlayer}");
-                _ui.ShowUndoButton();
+                _ui.ReversiPanel.SetMessageText($"Make your move!");
                 _3dboard.HighlightMovable(_movablePoints,_board.GetCurrentColor());
                 StartWait();
             }
@@ -368,7 +393,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         else
         {
             _3dboard.RemoveHighlight(_movablePoints);
-            _ui.SetMessageText($"Your Opponent is thinking.");
+            _ui.ReversiPanel.SetMessageText($"{_opponentUserName} is thinking.");
             StartWait();
         }
 
@@ -459,7 +484,7 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
         _turnUpdated = true;
         UpdateUI();
         _3dboard.RemoveHighlight(_movablePoints);
-        IsGameOver();
+        CheckGameOver();
     }
 
     /// <summary>
@@ -474,11 +499,12 @@ public class ReversiGamePVP : MonoSingleton<ReversiGamePVP>
     /// <summary>
     /// 手番入れ替え時の処理
     /// </summary>
-    private void IsGameOver()
+    private void CheckGameOver()
     {
         if(!_board.IsGameOver()) return;
-
         _turnUpdated = false;
+        _ui.ResultPanel.SetResult(_board.CountDisc(DiscColor.Black),_board.CountDisc(DiscColor.White),_clientSide);
+        _ui.ResultPanel.Show();
     }
 
     /// <summary>

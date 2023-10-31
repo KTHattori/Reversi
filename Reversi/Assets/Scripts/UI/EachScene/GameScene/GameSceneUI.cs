@@ -15,9 +15,13 @@ public class GameSceneUI : SceneUIBase
     [SerializeField]
     GameMenuWindow _menuWindow;
 
-    public GameStartPanel StartPanel{ get { return _startPanel; }}
-    public GameReversiUI ReversiPanel{get{ return _reversiUI; }}
-    public GameMenuWindow MenuWindow{get{ return _menuWindow; }}
+    [SerializeField]
+    GameResultPanel _resultPanel;
+
+    public GameStartPanel StartPanel { get { return _startPanel; }}
+    public GameReversiUI ReversiPanel { get{ return _reversiUI; }}
+    public GameMenuWindow MenuWindow { get{ return _menuWindow; }}
+    public GameResultPanel ResultPanel { get { return _resultPanel; }}
 
     public override void Deactivate()
     {
@@ -40,7 +44,19 @@ public class GameSceneUI : SceneUIBase
         _reversiUI.Hide();
 
         _startPanel.SetBaseUI(this);
+        _startPanel.Show();
         MarkAsModal(_startPanel);
+
+        _resultPanel.SetBaseUI(this);
+        _resultPanel.Hide();
+        MarkAsModal(_resultPanel);
+
+        ReversiPanel.MenuButton.AddListenerOnClick(ShowMenu);
     }
     #endregion
+
+    private void ShowMenu()
+    {
+        MenuWindow.Show();
+    }
 }

@@ -98,7 +98,7 @@ public interface ISFRoomJoinable : ISFRoomFetchable
 /// <summary>
 /// SmartFoxルーム参加監視用インタフェース
 /// </summary>
-public interface ISFRoomAccessWatchable : ISFEventTriggerable
+public interface ISFRoomAccessWatcher : ISFEventTriggerable
 {
     /// <summary>
     /// ルーム参加時
@@ -119,4 +119,13 @@ public interface ISFMessageReceiver : ISFEventTriggerable
     /// </summary>
     /// <param name="evt"></param>
     public abstract void OnSFMessageReceived(BaseEvent evt);
+}
+
+public interface ISFUserVariableWatcher : ISFEventTriggerable
+{
+    /// <summary>
+    /// UserVariable変更時（自分のものも含む）
+    /// </summary>
+    /// <param name="evt"></param>
+    public abstract void OnSFUserVariableChanged(BaseEvent evt);
 }
